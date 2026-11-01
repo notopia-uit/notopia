@@ -14,20 +14,21 @@ import (
 )
 
 type AccountRepo struct {
-	q    *pgsqlc.Queries
-	inTx bool
+	q         *pgsqlc.Queries
+	publisher EventPublisher
+	inTx      bool
 }
 
 var _ domain.BillingAccountRepo = (*AccountRepo)(nil)
 
 func NewAccountRepo(q *pgsqlc.Queries) *AccountRepo {
-	return &AccountRepo{q: q, inTx: false}
+	return &AccountRepo{q: q, publisher: nil, inTx: false}
 }
 
 var ProvideAccountRepo = NewAccountRepo
 
-func newAccountRepoInTx(q *pgsqlc.Queries) *AccountRepo {
-	return &AccountRepo{q: q, inTx: true}
+func newAccountRepoInTx(q *pgsqlc.Queries, publisher EventPublisher) *AccountRepo {
+	return &AccountRepo{q: q, publisher: publisher, inTx: true}
 }
 
 func (r *AccountRepo) GetByWorkspace(ctx context.Context, workspaceID uuid.UUID, forUpdate bool) (*domain.BillingAccount, error) {
@@ -70,9 +71,8 @@ func (r *AccountRepo) Save(ctx context.Context, a *domain.BillingAccount) error 
 		PayerID: p.ID(), PayerEmail: p.Email(), PayerName: p.Name(), PayerMissingSince: a.PayerMissingSince(),
 		CreatedAt: a.CreatedAt(), UpdatedAt: a.UpdatedAt(),
 	})
-	drain(ctx, a.PopEvents())
 	if err != nil {
 		return errs.NewInternal("failed to save billing account", err)
 	}
-	return nil
+	return r.publisher.Publish(ctx, a.PopEvents()...)
 }

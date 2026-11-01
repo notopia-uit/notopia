@@ -10,6 +10,8 @@ import (
 	"context"
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/billing/app"
+	"github.com/notopia-uit/notopia/internal/billing/config"
+	"github.com/notopia-uit/notopia/internal/billing/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgreadmodel"
@@ -24,11 +26,11 @@ import (
 func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) {
 	validate := billingseed.NewValidate()
 	viper := billingseed.NewViper()
-	config, err := billingseed.NewConfig(validate, viper)
+	billingseedConfig, err := billingseed.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &config.Database
+	sql := &billingseedConfig.Database
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
@@ -60,8 +62,8 @@ func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) 
 		return nil, nil, err
 	}
 	db := persistence.NewPgxPoolStdlib(pool)
-	log := &config.Log
-	general := &config.General
+	log := &billingseedConfig.Log
+	general := &billingseedConfig.General
 	stdoutHandler := logging.NewStdoutHandler(log, general)
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
@@ -82,18 +84,35 @@ func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) 
 		return nil, nil, err
 	}
 	queries := persistence.NewSQLCQueries(pool)
-	unitOfWork := pgrepo.NewUnitOfWork(pool, queries)
+	domainEvent, err := config.NewDefaultDomainEvent()
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	postgreSQLQueueSchema := outbox.NewSchemaAdapter()
+	publisherFactory := outbox.NewPublisherFactory(domainEvent, postgreSQLQueueSchema, serviceName)
+	unitOfWork := pgrepo.NewUnitOfWork(pool, queries, publisherFactory)
 	ensureDefaultsHandler := app.NewEnsureDefaultsHandler(unitOfWork)
 	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
 	listPricesHandler := app.NewListPricesHandler(billingReadModel)
 	priceRepo := pgrepo.NewPriceRepo(queries)
 	policyRepo := pgrepo.NewPolicyRepo(queries)
-	billingseedStripe := &config.Stripe
+	billingseedStripe := &billingseedConfig.Stripe
 	configStripe := billingseed.NewBillingStripeConfig(billingseedStripe)
-	catalog := &config.Catalog
+	catalog := &billingseedConfig.Catalog
 	billing := billingseed.NewBillingConfig(catalog)
-	stripeProvider := stripe.New(configStripe, billing)
-	identity := &config.Identity
+	stripeProvider, err := stripe.New(configStripe, billing)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	identity := &billingseedConfig.Identity
 	settings := billingseed.NewAppSettings(catalog, identity)
 	createPriceHandler := app.NewCreatePriceHandler(unitOfWork, priceRepo, policyRepo, stripeProvider, settings)
 	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, priceRepo, policyRepo, stripeProvider, settings)

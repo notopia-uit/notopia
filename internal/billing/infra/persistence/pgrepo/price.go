@@ -15,20 +15,21 @@ import (
 )
 
 type PriceRepo struct {
-	q    *pgsqlc.Queries
-	inTx bool
+	q         *pgsqlc.Queries
+	publisher EventPublisher
+	inTx      bool
 }
 
 var _ domain.PriceRepo = (*PriceRepo)(nil)
 
 func NewPriceRepo(q *pgsqlc.Queries) *PriceRepo {
-	return &PriceRepo{q: q, inTx: false}
+	return &PriceRepo{q: q, publisher: nil, inTx: false}
 }
 
 var ProvidePriceRepo = NewPriceRepo
 
-func newPriceRepoInTx(q *pgsqlc.Queries) *PriceRepo {
-	return &PriceRepo{q: q, inTx: true}
+func newPriceRepoInTx(q *pgsqlc.Queries, publisher EventPublisher) *PriceRepo {
+	return &PriceRepo{q: q, publisher: publisher, inTx: true}
 }
 
 func (r *PriceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Price, error) {
@@ -97,9 +98,8 @@ func (r *PriceRepo) Save(ctx context.Context, p *domain.Price) error {
 		Amount: p.Amount().Amount(), Currency: pgmapper.FromCurrency(p.Amount().Currency()), ProviderPriceID: p.ProviderPriceID(),
 		LookupKey: p.ProviderLookupKey(), Active: p.Active(), CreatedAt: p.CreatedAt(), ArchivedAt: p.ArchivedAt(),
 	})
-	drain(ctx, p.PopEvents())
 	if err != nil {
 		return errs.NewInternal("failed to save price", err)
 	}
-	return nil
+	return r.publisher.Publish(ctx, p.PopEvents()...)
 }

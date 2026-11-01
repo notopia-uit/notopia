@@ -20,7 +20,6 @@ type CompleteCheckoutHandler struct {
 	subs     domain.SubscriptionRepo
 	accounts domain.BillingAccountRepo
 	provider PaymentProvider
-	notifier Notifier
 	settings *Settings
 	refunds  *RefundRunner
 }
@@ -30,11 +29,10 @@ func NewCompleteCheckoutHandler(
 	subs domain.SubscriptionRepo,
 	accounts domain.BillingAccountRepo,
 	provider PaymentProvider,
-	notifier Notifier,
 	settings *Settings,
 	refunds *RefundRunner,
 ) *CompleteCheckoutHandler {
-	return &CompleteCheckoutHandler{uow: uow, subs: subs, accounts: accounts, provider: provider, notifier: notifier, settings: settings, refunds: refunds}
+	return &CompleteCheckoutHandler{uow: uow, subs: subs, accounts: accounts, provider: provider, settings: settings, refunds: refunds}
 }
 
 var ProvideCompleteCheckoutHandler = NewCompleteCheckoutHandler
@@ -153,7 +151,6 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 		}
 		return h.refunds.Run(ctx, saved.ID())
 	}
-	notifySubscription(ctx, h.notifier, saved)
 	return nil
 }
 
@@ -244,9 +241,6 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 			return err
 		}
 	}
-	if !duplicate {
-		notifySubscription(ctx, h.notifier, saved)
-	}
 	return nil
 }
 
@@ -297,8 +291,5 @@ func (h *CompleteCheckoutHandler) payerChange(ctx context.Context, cmd *Complete
 		sub.ResumeCancel(now, s.Payer.ID())
 		return r.Subscription().Save(ctx, sub)
 	})
-	if err == nil && cur != nil {
-		notifySubscription(ctx, h.notifier, cur)
-	}
 	return err
 }

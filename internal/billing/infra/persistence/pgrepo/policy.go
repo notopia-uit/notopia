@@ -13,20 +13,21 @@ import (
 )
 
 type PolicyRepo struct {
-	q    *pgsqlc.Queries
-	inTx bool
+	q         *pgsqlc.Queries
+	publisher EventPublisher
+	inTx      bool
 }
 
 var _ domain.BillingPolicyRepo = (*PolicyRepo)(nil)
 
 func NewPolicyRepo(q *pgsqlc.Queries) *PolicyRepo {
-	return &PolicyRepo{q: q, inTx: false}
+	return &PolicyRepo{q: q, publisher: nil, inTx: false}
 }
 
 var ProvidePolicyRepo = NewPolicyRepo
 
-func newPolicyRepoInTx(q *pgsqlc.Queries) *PolicyRepo {
-	return &PolicyRepo{q: q, inTx: true}
+func newPolicyRepoInTx(q *pgsqlc.Queries, publisher EventPublisher) *PolicyRepo {
+	return &PolicyRepo{q: q, publisher: publisher, inTx: true}
 }
 
 func (r *PolicyRepo) Get(ctx context.Context, forUpdate bool) (*domain.BillingPolicy, error) {
@@ -53,9 +54,8 @@ func (r *PolicyRepo) Save(ctx context.Context, p *domain.BillingPolicy) error {
 		PortalConfigurationID:    p.PortalConfigurationID(),
 		UpdatedAt:                p.UpdatedAt(),
 	})
-	drain(ctx, p.PopEvents())
 	if err != nil {
 		return errs.NewInternal("failed to save policy", err)
 	}
-	return nil
+	return r.publisher.Publish(ctx, p.PopEvents()...)
 }

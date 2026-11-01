@@ -28,9 +28,7 @@ func (f *cancellerFixture) providerSnapshot(t *testing.T, status domain.Subscrip
 
 func newSyncHandler(t *testing.T, f *cancellerFixture) *SyncSubscriptionHandler {
 	t.Helper()
-	notifier := NewMockNotifier(t)
-	notifier.EXPECT().SubscriptionChanged(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Maybe()
-	return NewSyncSubscriptionHandler(f.store, f.provider, notifier, &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"})
+	return NewSyncSubscriptionHandler(f.store, f.provider, &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"})
 }
 
 func TestSyncCancelsAtProviderWhenLocallyCanceledButProviderStillActive(t *testing.T) {

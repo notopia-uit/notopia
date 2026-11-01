@@ -15,20 +15,21 @@ import (
 )
 
 type PlanRepo struct {
-	q    *pgsqlc.Queries
-	inTx bool
+	q         *pgsqlc.Queries
+	publisher EventPublisher
+	inTx      bool
 }
 
 var _ domain.PlanRepo = (*PlanRepo)(nil)
 
 func NewPlanRepo(q *pgsqlc.Queries) *PlanRepo {
-	return &PlanRepo{q: q, inTx: false}
+	return &PlanRepo{q: q, publisher: nil, inTx: false}
 }
 
 var ProvidePlanRepo = NewPlanRepo
 
-func newPlanRepoInTx(q *pgsqlc.Queries) *PlanRepo {
-	return &PlanRepo{q: q, inTx: true}
+func newPlanRepoInTx(q *pgsqlc.Queries, publisher EventPublisher) *PlanRepo {
+	return &PlanRepo{q: q, publisher: publisher, inTx: true}
 }
 
 func (r *PlanRepo) Get(ctx context.Context, tier domain.PlanTier, forUpdate bool) (*domain.Plan, error) {
@@ -61,9 +62,8 @@ func (r *PlanRepo) Save(ctx context.Context, p *domain.Plan) error {
 		Tier: pgmapper.FromPlanTier(p.Tier()), Features: pgjsonb.Features(p.Features()),
 		Limits: pgjsonb.Limits(p.Limits()), UpdatedAt: p.UpdatedAt(),
 	})
-	drain(ctx, p.PopEvents())
 	if err != nil {
 		return errs.NewInternal("failed to save plan", err)
 	}
-	return nil
+	return r.publisher.Publish(ctx, p.PopEvents()...)
 }

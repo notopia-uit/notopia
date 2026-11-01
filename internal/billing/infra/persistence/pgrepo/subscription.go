@@ -16,20 +16,21 @@ import (
 )
 
 type SubscriptionRepo struct {
-	q    *pgsqlc.Queries
-	inTx bool
+	q         *pgsqlc.Queries
+	publisher EventPublisher
+	inTx      bool
 }
 
 var _ domain.SubscriptionRepo = (*SubscriptionRepo)(nil)
 
 func NewSubscriptionRepo(q *pgsqlc.Queries) *SubscriptionRepo {
-	return &SubscriptionRepo{q: q, inTx: false}
+	return &SubscriptionRepo{q: q, publisher: nil, inTx: false}
 }
 
 var ProvideSubscriptionRepo = NewSubscriptionRepo
 
-func newSubscriptionRepoInTx(q *pgsqlc.Queries) *SubscriptionRepo {
-	return &SubscriptionRepo{q: q, inTx: true}
+func newSubscriptionRepoInTx(q *pgsqlc.Queries, publisher EventPublisher) *SubscriptionRepo {
+	return &SubscriptionRepo{q: q, publisher: publisher, inTx: true}
 }
 
 func (r *SubscriptionRepo) hydrate(ctx context.Context, rows []*pgsqlc.Subscription) ([]*domain.Subscription, error) {
@@ -165,6 +166,5 @@ func (r *SubscriptionRepo) Save(ctx context.Context, s *domain.Subscription) err
 			return errs.NewInternal("failed to save refund", err)
 		}
 	}
-	drain(ctx, s.PopEvents())
-	return nil
+	return r.publisher.Publish(ctx, s.PopEvents()...)
 }

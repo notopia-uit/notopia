@@ -34,13 +34,11 @@ func newCancellerFixture(t *testing.T, status domain.SubscriptionStatus) *cancel
 	require.NoError(t, store.Subscription().Save(context.Background(), sub))
 
 	provider := NewMockPaymentProvider(t)
-	notifier := NewMockNotifier(t)
-	notifier.EXPECT().SubscriptionChanged(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Maybe()
 	settings := &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"}
 	return &cancellerFixture{
 		store:                 store,
 		provider:              provider,
-		subscriptionCanceller: NewSubscriptionCanceller(store, store.Subscription(), store.BillingPolicy(), provider, notifier, NewRefundRunner(store, store.Subscription(), provider, settings)),
+		subscriptionCanceller: NewSubscriptionCanceller(store, store.Subscription(), store.BillingPolicy(), provider, NewRefundRunner(store, store.Subscription(), provider, settings)),
 		ws:                    ws,
 		sub:                   sub,
 	}

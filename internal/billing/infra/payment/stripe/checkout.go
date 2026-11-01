@@ -74,7 +74,7 @@ func (p *Provider) CreateCheckoutSession(ctx context.Context, in app.CheckoutInp
 		params.PaymentIntentData = &stripego.CheckoutSessionCreatePaymentIntentDataParams{Metadata: meta}
 	case app.CheckoutPurposePayerChange:
 		params.Mode = stripego.String(string(stripego.CheckoutSessionModeSetup))
-		params.Currency = stripego.String(p.currency)
+		params.Currency = stripego.String(string(p.currency))
 		params.SetupIntentData = &stripego.CheckoutSessionCreateSetupIntentDataParams{Metadata: meta}
 	case app.CheckoutPurposeUnspecified:
 	}

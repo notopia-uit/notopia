@@ -2,10 +2,12 @@ package stripe
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/config"
+	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
 	stripego "github.com/stripe/stripe-go/v87"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -15,13 +17,21 @@ import (
 
 type Provider struct {
 	sc       *stripego.Client
-	currency string
+	currency stripego.Currency
 }
 
 var _ app.PaymentProvider = (*Provider)(nil)
 
 // stripe-go forwards ctx to every request, so the otelhttp spans nest under the use case span.
-func New(stripeCfg *config.Stripe, billingCfg *config.Billing) *Provider {
+func New(stripeCfg *config.Stripe, billingCfg *config.Billing) (*Provider, error) {
+	currency, err := domain.ParseCurrency(billingCfg.Currency)
+	if err != nil {
+		return nil, fmt.Errorf("invalid billing currency: %w", err)
+	}
+	stripeCurrency, err := toStripeCurrency(currency)
+	if err != nil {
+		return nil, fmt.Errorf("invalid billing currency: %w", err)
+	}
 	httpClient := &http.Client{
 		Transport: otelhttp.NewTransport(
 			http.DefaultTransport,
@@ -35,8 +45,8 @@ func New(stripeCfg *config.Stripe, billingCfg *config.Billing) *Provider {
 			stripeCfg.SecretKey.Reveal(),
 			stripego.WithBackends(stripego.NewBackends(httpClient)),
 		),
-		currency: billingCfg.Currency,
-	}
+		currency: stripeCurrency,
+	}, nil
 }
 
 var Provide = New

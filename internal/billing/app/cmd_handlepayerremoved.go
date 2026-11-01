@@ -19,7 +19,6 @@ type HandlePayerRemovedHandler struct {
 	accounts domain.BillingAccountRepo
 	subs     domain.SubscriptionRepo
 	provider PaymentProvider
-	notifier Notifier
 	settings *Settings
 }
 
@@ -28,10 +27,9 @@ func NewHandlePayerRemovedHandler(
 	accounts domain.BillingAccountRepo,
 	subs domain.SubscriptionRepo,
 	provider PaymentProvider,
-	notifier Notifier,
 	settings *Settings,
 ) *HandlePayerRemovedHandler {
-	return &HandlePayerRemovedHandler{uow: uow, accounts: accounts, subs: subs, provider: provider, notifier: notifier, settings: settings}
+	return &HandlePayerRemovedHandler{uow: uow, accounts: accounts, subs: subs, provider: provider, settings: settings}
 }
 
 var ProvideHandlePayerRemovedHandler = NewHandlePayerRemovedHandler
@@ -83,8 +81,5 @@ func (h *HandlePayerRemovedHandler) Handle(ctx context.Context, cmd *HandlePayer
 		}
 		return r.Subscription().Save(ctx, s)
 	})
-	if err == nil && sub != nil {
-		notifySubscription(ctx, h.notifier, sub)
-	}
 	return err
 }

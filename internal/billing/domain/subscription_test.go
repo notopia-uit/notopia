@@ -69,6 +69,12 @@ func fmtType(e domain.Event) string {
 		return "cancel_scheduled"
 	case *domain.SubscriptionEndedEvent:
 		return "ended"
+	case *domain.SubscriptionStateChangedEvent:
+		return "state_changed"
+	case *domain.SubscriptionCanceledNowEvent:
+		return "canceled_now"
+	case *domain.RefundRequestedEvent:
+		return "refund_requested"
 	default:
 		return "other"
 	}
@@ -103,17 +109,43 @@ func TestApplySnapshotEvents(t *testing.T) {
 	pro := price(t, domain.PlanTierPro, domain.IntervalMonth, 99000)
 	end := t0.AddDate(0, 1, 0)
 	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), plus, snap(domain.SubscriptionStatusActive, t0, end), t0, "u")
-	assert.Equal(t, []string{"created", "activated"}, eventNames(s.PopEvents()))
+	assert.Equal(t, []string{"created", "activated", "state_changed"}, eventNames(s.PopEvents()))
 
 	s.ApplySnapshot(snap(domain.SubscriptionStatusActive, end, end.AddDate(0, 1, 0)), plus, end, "u")
 	assert.Equal(t, []string{"renewed"}, eventNames(s.PopEvents()))
 
 	s.ApplySnapshot(snap(domain.SubscriptionStatusPastDue, end, end.AddDate(0, 1, 0)), pro, end, "u")
-	assert.Equal(t, []string{"past_due", "plan_changed"}, eventNames(s.PopEvents()))
+	events := s.PopEvents()
+	assert.Equal(t, []string{"past_due", "plan_changed", "state_changed"}, eventNames(events))
+	changed, ok := events[2].(*domain.SubscriptionStateChangedEvent)
+	require.True(t, ok)
+	assert.Equal(t, s.WorkspaceID(), changed.WorkspaceID)
+	assert.Equal(t, domain.PlanTierPro, changed.Plan)
+	assert.Equal(t, domain.SubscriptionStatusPastDue, changed.Status)
 
 	ended := snap(domain.SubscriptionStatusCanceled, end, end.AddDate(0, 1, 0))
 	s.ApplySnapshot(ended, pro, end, "u")
-	assert.Equal(t, []string{"ended"}, eventNames(s.PopEvents()))
+	assert.Equal(t, []string{"ended", "state_changed"}, eventNames(s.PopEvents()))
+}
+
+func TestCancelNowRecordsStateChangeAndRefunds(t *testing.T) {
+	end := t0.Add(30 * 24 * time.Hour)
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), snap(domain.SubscriptionStatusActive, t0, end), t0, "u")
+	s.PopEvents()
+	line, err := domain.NewRefundLine(domain.RefundLineParams{PaymentRef: "pi_1", PaidAmount: vnd(t, 30000), Amount: vnd(t, 10000)})
+	require.NoError(t, err)
+	quote, err := domain.NewRefundQuote([]domain.RefundLine{line}, 0, 0)
+	require.NoError(t, err)
+
+	refunds, err := s.CancelNow(t0, domain.RefundReasonCancelNow, quote, "u")
+	require.NoError(t, err)
+
+	events := s.PopEvents()
+	assert.Equal(t, []string{"canceled_now", "state_changed", "refund_requested"}, eventNames(events))
+	requested, ok := events[2].(*domain.RefundRequestedEvent)
+	require.True(t, ok)
+	assert.Equal(t, refunds[0].ID(), requested.RefundID)
+	assert.Equal(t, s.ID().String(), requested.GetAggregateID())
 }
 
 func TestQuoteCancelNow(t *testing.T) {

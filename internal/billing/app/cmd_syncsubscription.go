@@ -18,12 +18,11 @@ type SyncSubscription struct {
 type SyncSubscriptionHandler struct {
 	uow      domain.UnitOfWork
 	provider PaymentProvider
-	notifier Notifier
 	settings *Settings
 }
 
-func NewSyncSubscriptionHandler(uow domain.UnitOfWork, provider PaymentProvider, notifier Notifier, settings *Settings) *SyncSubscriptionHandler {
-	return &SyncSubscriptionHandler{uow: uow, provider: provider, notifier: notifier, settings: settings}
+func NewSyncSubscriptionHandler(uow domain.UnitOfWork, provider PaymentProvider, settings *Settings) *SyncSubscriptionHandler {
+	return &SyncSubscriptionHandler{uow: uow, provider: provider, settings: settings}
 }
 
 var ProvideSyncSubscriptionHandler = NewSyncSubscriptionHandler
@@ -37,7 +36,6 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 	if err != nil {
 		return err
 	}
-	var changed *domain.Subscription
 	cancelRemotely := false
 	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if cmd.EventID != "" {
@@ -62,13 +60,7 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 		if err != nil {
 			return err
 		}
-		beforeStatus, beforePlan, beforeCancel, beforeEnd := sub.Status(), sub.Plan(), sub.CancelAtPeriodEnd(), sub.CurrentPeriodEnd()
 		sub.ApplySnapshot(snap, price, time.Now(), h.settings.ServiceAccountUserID)
-		end := sub.CurrentPeriodEnd()
-		if beforeStatus != sub.Status() || beforePlan != sub.Plan() || beforeCancel != sub.CancelAtPeriodEnd() ||
-			beforeEnd == nil || end == nil || !beforeEnd.Equal(*end) {
-			changed = sub
-		}
 		return r.Subscription().Save(ctx, sub)
 	})
 	if err == nil && cancelRemotely {
@@ -79,9 +71,6 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 				slog.Any("error", err),
 			)
 		}
-	}
-	if err == nil {
-		notifySubscription(ctx, h.notifier, changed)
 	}
 	return err
 }

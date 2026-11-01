@@ -1,4 +1,4 @@
-package notifier
+package outbox
 
 import (
 	"fmt"
@@ -6,6 +6,22 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 )
+
+func toShareSubscriptionChanged(e *domain.SubscriptionStateChangedEvent) (*share.SubscriptionChangedEvent, error) {
+	plan, err := toSharePlan(e.Plan)
+	if err != nil {
+		return nil, err
+	}
+	status, err := toShareStatus(e.Status)
+	if err != nil {
+		return nil, err
+	}
+	return &share.SubscriptionChangedEvent{
+		WorkspaceId: e.WorkspaceID,
+		Plan:        plan,
+		Status:      status,
+	}, nil
+}
 
 func toSharePlan(t domain.PlanTier) (share.SubscriptionChangedEventPlan, error) {
 	switch t {

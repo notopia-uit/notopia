@@ -35,7 +35,7 @@ func providerWithHandler(t *testing.T, handle func(r *http.Request) (int, string
 	})}
 	return &Provider{
 		sc:       stripego.NewClient("sk_test_x", stripego.WithBackends(stripego.NewBackends(client))),
-		currency: "vnd",
+		currency: stripego.CurrencyVND,
 	}
 }
 

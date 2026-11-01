@@ -18,7 +18,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
 	"github.com/notopia-uit/notopia/internal/billing/controller/http"
-	"github.com/notopia-uit/notopia/internal/billing/infra/notifier"
+	"github.com/notopia-uit/notopia/internal/billing/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgreadmodel"
@@ -79,12 +79,22 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		return nil, nil, err
 	}
 	queries := persistence.NewSQLCQueries(pool)
-	unitOfWork := pgrepo.NewUnitOfWork(pool, queries)
+	domainEvent := &configConfig.DomainEvent
+	postgreSQLQueueSchema := outbox.NewSchemaAdapter()
+	publisherFactory := outbox.NewPublisherFactory(domainEvent, postgreSQLQueueSchema, serviceName)
+	unitOfWork := pgrepo.NewUnitOfWork(pool, queries, publisherFactory)
 	priceRepo := pgrepo.NewPriceRepo(queries)
 	policyRepo := pgrepo.NewPolicyRepo(queries)
 	configStripe := &configConfig.Stripe
 	configBilling := &configConfig.Billing
-	provider := stripe.New(configStripe, configBilling)
+	provider, err := stripe.New(configStripe, configBilling)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	identity := &configConfig.Identity
 	settings := billing.NewAppSettings(configBilling, identity)
 	archivePriceHandler := app.NewArchivePriceHandler(unitOfWork, priceRepo, policyRepo, provider, settings)
@@ -99,30 +109,18 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		return nil, nil, err
 	}
 	subscriptionRepo := pgrepo.NewSubscriptionRepo(queries)
-	kafka := &configConfig.Kafka
-	loggerAdapter := logging.NewWatermill(logger)
-	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	notifierKafka, cleanup6, err := notifier.NewKafka(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
-	if err != nil {
-		cleanup5()
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
 	refundRunner := app.NewRefundRunner(unitOfWork, subscriptionRepo, provider, settings)
-	subscriptionCanceller := app.NewSubscriptionCanceller(unitOfWork, subscriptionRepo, policyRepo, provider, notifierKafka, refundRunner)
+	subscriptionCanceller := app.NewSubscriptionCanceller(unitOfWork, subscriptionRepo, policyRepo, provider, refundRunner)
 	cancelNowHandler := app.NewCancelNowHandler(authorization, subscriptionCanceller)
 	accountRepo := pgrepo.NewAccountRepo(queries)
-	completeCheckoutHandler := app.NewCompleteCheckoutHandler(unitOfWork, subscriptionRepo, accountRepo, provider, notifierKafka, settings, refundRunner)
+	completeCheckoutHandler := app.NewCompleteCheckoutHandler(unitOfWork, subscriptionRepo, accountRepo, provider, settings, refundRunner)
 	createPriceHandler := app.NewCreatePriceHandler(unitOfWork, priceRepo, policyRepo, provider, settings)
 	ensureDefaultsHandler := app.NewEnsureDefaultsHandler(unitOfWork)
 	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, priceRepo, policyRepo, provider, settings)
-	handlePayerRemovedHandler := app.NewHandlePayerRemovedHandler(unitOfWork, accountRepo, subscriptionRepo, provider, notifierKafka, settings)
+	handlePayerRemovedHandler := app.NewHandlePayerRemovedHandler(unitOfWork, accountRepo, subscriptionRepo, provider, settings)
 	handleWorkspaceDeletedHandler := app.NewHandleWorkspaceDeletedHandler(subscriptionCanceller, settings)
 	pruneProviderEventsHandler := app.NewPruneProviderEventsHandler(unitOfWork)
-	syncSubscriptionHandler := app.NewSyncSubscriptionHandler(unitOfWork, provider, notifierKafka, settings)
+	syncSubscriptionHandler := app.NewSyncSubscriptionHandler(unitOfWork, provider, settings)
 	reconcileSubscriptionsHandler := app.NewReconcileSubscriptionsHandler(subscriptionRepo, syncSubscriptionHandler, refundRunner)
 	syncRefundHandler := app.NewSyncRefundHandler(unitOfWork, provider, settings)
 	updatePlanHandler := app.NewUpdatePlanHandler(unitOfWork)
@@ -150,7 +148,6 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	db := persistence.NewPgxPoolStdlib(pool)
 	gooseProvider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
-		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -160,7 +157,6 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	}
 	pg, err := persistence.NewPg(pool, gooseProvider)
 	if err != nil {
-		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -174,7 +170,17 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	strictHandler := http.NewStrictHandler(server, identity, configStripe)
 	v := http.NewHandler(strictHandler)
 	configServer := &configConfig.Server
-	httpHTTP, cleanup7, err := http.New(ctx, engine, v, configServer, logger)
+	httpHTTP, cleanup6, err := http.New(ctx, engine, v, configServer, logger)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	serviceServer := grpc.NewServiceServer(server)
+	grpcGRPC, cleanup7, err := grpc.New(ctx, serviceServer, configServer, loggingLogger, global)
 	if err != nil {
 		cleanup6()
 		cleanup5()
@@ -184,8 +190,10 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	serviceServer := grpc.NewServiceServer(server)
-	grpcGRPC, cleanup8, err := grpc.New(ctx, serviceServer, configServer, loggingLogger, global)
+	kafka := &configConfig.Kafka
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
+	loggerAdapter := logging.NewWatermill(logger)
+	eventEvent, err := event.New(kafka, server, watermillKafkaTracer, loggerAdapter, global)
 	if err != nil {
 		cleanup7()
 		cleanup6()
@@ -196,9 +204,9 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	eventEvent, err := event.New(kafka, server, watermillKafkaTracer, loggerAdapter, global)
+	postgreSQLQueueOffsetsAdapter := outbox.NewOffsetsAdapter()
+	forwarder, cleanup8, err := outbox.NewForwarder(pool, kafka, domainEvent, postgreSQLQueueSchema, postgreSQLQueueOffsetsAdapter, watermillKafkaTracer, loggerAdapter, serviceName, global)
 	if err != nil {
-		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -249,7 +257,7 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		return nil, nil, err
 	}
 	healthHealth := health.New(pg, configServer, kafka, client, services)
-	billingServer := billing.NewServer(server, pg, httpHTTP, grpcGRPC, eventEvent, cronCron, healthHealth, logger, global)
+	billingServer := billing.NewServer(server, pg, httpHTTP, grpcGRPC, eventEvent, forwarder, cronCron, healthHealth, logger, global)
 	return billingServer, func() {
 		cleanup9()
 		cleanup8()

@@ -43,11 +43,11 @@ Deferred (not this PR): handler decorator refactor, see `tmp/billing/deferred-ha
 
 ## T5 Billing outbox, phase 1 (opus)
 
-- [ ] `internal/billing/infra/outbox/`: per-tx `sql.NewPublisher(sql.TxFromPgx(tx))` → `forwarder.NewPublisher` → otel decorator; forwarder daemon (`sql.BeginnerFromPgx(pool)` subscriber → kafka publisher) run from `server.go`. Queue schema as T4. Config `DomainEvent` like note
-- [ ] UoW creates the publisher per tx and passes it to repos; `Save` publishes `PopEvents()` (replaces `drain`)
-- [ ] Topics: domain `events.internal.billing.{aggregate}.{event}`; integration `events.integration.billing.subscription.changed` with `share.SubscriptionChangedEvent`
-- [ ] Aggregate records `SubscriptionStateChangedEvent{WorkspaceID, Plan, Status}` whenever plan or status changes; outbox infra maps it to the share payload on the integration topic
-- [ ] Delete `app.Notifier`, `notifySubscription`, `infra/notifier`
+- [x] `internal/billing/infra/outbox/`: per-tx `sql.NewPublisher(sql.TxFromPgx(tx))` → `forwarder.NewPublisher` → otel decorator; forwarder daemon (`sql.BeginnerFromPgx(pool)` subscriber → kafka publisher) run from `server.go`. Queue schema as T4. Config `DomainEvent` like note
+- [x] UoW creates the publisher per tx and passes it to repos; `Save` publishes `PopEvents()` (replaces `drain`)
+- [x] Topics: domain `events.internal.billing.{aggregate}.{event}`; integration `events.integration.billing.subscription.changed` with `share.SubscriptionChangedEvent`
+- [x] Aggregate records `SubscriptionStateChangedEvent{WorkspaceID, Plan, Status}` whenever plan or status changes; outbox infra maps it to the share payload on the integration topic
+- [x] Delete `app.Notifier`, `notifySubscription`, `infra/notifier`
 
 ## T6 Billing outbox, phase 2 (opus)
 

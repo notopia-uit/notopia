@@ -32,6 +32,10 @@ type Subscription struct {
 
 func (s *Subscription) base(userID string) BaseEvent { return NewBaseEvent(s.id.String(), userID) }
 
+func (s *Subscription) recordStateChanged(userID string) {
+	s.record(&SubscriptionStateChangedEvent{BaseEvent: s.base(userID), WorkspaceID: s.workspaceID, Plan: s.plan, Status: s.status})
+}
+
 func NewSubscription(id, workspaceID uuid.UUID, price *Price, snap ProviderSnapshot, now time.Time, userID string) (*Subscription, error) {
 	if price.Interval() == IntervalLifetime {
 		return nil, errs.NewInvalid("recurring subscription needs a recurring price")
@@ -90,6 +94,7 @@ func NewLifetimeSubscription(id, workspaceID uuid.UUID, price *Price, providerPa
 	}
 	s.record(&SubscriptionCreatedEvent{BaseEvent: s.base(userID), Plan: s.plan, Interval: s.interval})
 	s.record(&SubscriptionActivatedEvent{BaseEvent: s.base(userID)})
+	s.recordStateChanged(userID)
 	return s, nil
 }
 
@@ -174,6 +179,9 @@ func (s *Subscription) ApplySnapshot(snap ProviderSnapshot, price *Price, now ti
 	}
 	if !s.IsCurrent() && (prevStatus != s.status) && !isNew {
 		s.record(&SubscriptionEndedEvent{BaseEvent: s.base(userID)})
+	}
+	if isNew || prevStatus != s.status || prevPlan != s.plan {
+		s.recordStateChanged(userID)
 	}
 }
 
@@ -308,6 +316,7 @@ func (s *Subscription) CancelNow(now time.Time, reason RefundReason, quote Refun
 	}
 	s.status, s.canceledAt, s.cancelAtPeriodEnd, s.updatedAt = SubscriptionStatusCanceled, &now, false, now
 	s.record(&SubscriptionCanceledNowEvent{BaseEvent: s.base(userID), Reason: reason})
+	s.recordStateChanged(userID)
 	var refunds []*Refund
 	for _, l := range quote.lines {
 		if l.amount.amount <= 0 {

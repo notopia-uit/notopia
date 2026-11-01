@@ -33,6 +33,12 @@ type Billing struct {
 	WebBaseURL string `default:"-"   json:"webBaseUrl" mapstructure:"web_base_url" validate:"required,url" yaml:"web_base_url"`
 }
 
+type DomainEvent struct {
+	MessageMetadataAggregateIDKey  string `default:"aggregate_id"  json:"messageMetadataAggregateIdKey"  mapstructure:"message_metadata_aggregate_id_key"  validate:"required" yaml:"message_metadata_aggregate_id_key"`
+	MessageMetadataUserIDKey       string `default:"user_id"       json:"messageMetadataUserIdKey"       mapstructure:"message_metadata_user_id_key"       validate:"required" yaml:"message_metadata_user_id_key"`
+	MessageMetadataPartitionKeyKey string `default:"partition_key" json:"messageMetadataPartitionKeyKey" mapstructure:"message_metadata_partition_key_key" validate:"required" yaml:"message_metadata_partition_key_key"`
+}
+
 type Cron struct {
 	ReconcileSubscriptions commonconfig.CronJob `json:"reconcileSubscriptions" mapstructure:"reconcile_subscriptions" validate:"required" yaml:"reconcile_subscriptions"`
 	PruneProviderEvents    commonconfig.CronJob `json:"pruneProviderEvents"    mapstructure:"prune_provider_events"   validate:"required" yaml:"prune_provider_events"`
@@ -50,6 +56,8 @@ type Config struct {
 	Stripe   Stripe                `json:"-"        mapstructure:"stripe"   validate:"required"  yaml:"stripe"`
 	Billing  Billing               `json:"billing"  mapstructure:"billing"  validate:"required"  yaml:"billing"`
 	Cron     Cron                  `json:"cron"     mapstructure:"cron"     validate:"required"  yaml:"cron"`
+
+	DomainEvent DomainEvent `json:"domainEvent" mapstructure:"domain_event" validate:"required" yaml:"domain_event"`
 }
 
 var (
@@ -113,3 +121,14 @@ func New(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
 }
 
 var Provide = New
+
+// NewDefaultDomainEvent serves binaries that write billing's outbox without loading billing's config (seed, fixtures).
+func NewDefaultDomainEvent() (*DomainEvent, error) {
+	cfg := &DomainEvent{}
+	if err := defaults.Set(cfg); err != nil {
+		return nil, fmt.Errorf("cannot set default domain event config: %w", err)
+	}
+	return cfg, nil
+}
+
+var ProvideDefaultDomainEvent = NewDefaultDomainEvent

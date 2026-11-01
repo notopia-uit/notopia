@@ -11,13 +11,14 @@ import (
 )
 
 type memStore struct {
-	mu       sync.Mutex
-	subs     map[uuid.UUID]*domain.Subscription
-	accounts map[uuid.UUID]*domain.BillingAccount
-	prices   map[uuid.UUID]*domain.Price
-	plans    map[domain.PlanTier]*domain.Plan
-	policy   *domain.BillingPolicy
-	events   map[string]bool
+	mu        sync.Mutex
+	subs      map[uuid.UUID]*domain.Subscription
+	accounts  map[uuid.UUID]*domain.BillingAccount
+	prices    map[uuid.UUID]*domain.Price
+	plans     map[domain.PlanTier]*domain.Plan
+	policy    *domain.BillingPolicy
+	events    map[string]bool
+	published []domain.Event
 }
 
 func newMemStore() *memStore {
@@ -129,7 +130,7 @@ func (r memSubs) Save(_ context.Context, s *domain.Subscription) error {
 			return errs.NewInternal("unique current subscription violated", nil)
 		}
 	}
-	s.PopEvents()
+	r.m.published = append(r.m.published, s.PopEvents()...)
 	r.m.subs[s.ID()] = s
 	return nil
 }
@@ -151,7 +152,7 @@ func (r memAccounts) ListByPayer(_ context.Context, payerID string) ([]*domain.B
 }
 
 func (r memAccounts) Save(_ context.Context, a *domain.BillingAccount) error {
-	a.PopEvents()
+	r.m.published = append(r.m.published, a.PopEvents()...)
 	r.m.accounts[a.WorkspaceID()] = a
 	return nil
 }
@@ -194,7 +195,7 @@ func (r memPrices) ListActive(context.Context) ([]*domain.Price, error) {
 }
 func (r memPrices) List(ctx context.Context) ([]*domain.Price, error) { return r.ListActive(ctx) }
 func (r memPrices) Save(_ context.Context, p *domain.Price) error {
-	p.PopEvents()
+	r.m.published = append(r.m.published, p.PopEvents()...)
 	r.m.prices[p.ID()] = p
 	return nil
 }

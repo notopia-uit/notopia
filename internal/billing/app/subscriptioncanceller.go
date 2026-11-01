@@ -16,7 +16,6 @@ type SubscriptionCanceller struct {
 	subs     domain.SubscriptionRepo
 	policies domain.BillingPolicyRepo
 	provider PaymentProvider
-	notifier Notifier
 	refunds  *RefundRunner
 }
 
@@ -25,10 +24,9 @@ func NewSubscriptionCanceller(
 	subs domain.SubscriptionRepo,
 	policies domain.BillingPolicyRepo,
 	provider PaymentProvider,
-	notifier Notifier,
 	refunds *RefundRunner,
 ) *SubscriptionCanceller {
-	return &SubscriptionCanceller{uow: uow, subs: subs, policies: policies, provider: provider, notifier: notifier, refunds: refunds}
+	return &SubscriptionCanceller{uow: uow, subs: subs, policies: policies, provider: provider, refunds: refunds}
 }
 
 var ProvideSubscriptionCanceller = NewSubscriptionCanceller
@@ -119,6 +117,5 @@ func (c *SubscriptionCanceller) CancelNow(ctx context.Context, ws uuid.UUID, rea
 			)
 		}
 	}
-	notifySubscription(ctx, c.notifier, saved)
 	return c.refunds.Run(ctx, saved.ID())
 }
