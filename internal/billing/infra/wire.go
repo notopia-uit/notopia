@@ -8,12 +8,15 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/billing/infra/redis"
 	"github.com/notopia-uit/notopia/internal/billing/infra/service"
+	pkgcron "github.com/notopia-uit/notopia/pkg/cron"
+	goredis "github.com/redis/go-redis/v9"
 )
 
 var ProviderSet = wire.NewSet(
 	persistence.ProviderSet,
 	redis.ProvideClient,
-	redis.ProvideCronLocker,
+	pkgcron.ProvideRedisLocker,
+	wire.Bind(new(goredis.UniversalClient), new(*goredis.Client)),
 	notifier.ProvideKafka,
 	service.ProvideAuthorization,
 	stripeadapter.Provide,

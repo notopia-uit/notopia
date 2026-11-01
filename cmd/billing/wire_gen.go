@@ -13,7 +13,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/component"
 	"github.com/notopia-uit/notopia/internal/billing/config"
-	"github.com/notopia-uit/notopia/internal/billing/controller/cron"
+	cron2 "github.com/notopia-uit/notopia/internal/billing/controller/cron"
 	"github.com/notopia-uit/notopia/internal/billing/controller/event"
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
@@ -26,6 +26,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/infra/redis"
 	"github.com/notopia-uit/notopia/internal/billing/infra/service"
 	"github.com/notopia-uit/notopia/pkg/common/http"
+	"github.com/notopia-uit/notopia/pkg/cron"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -216,7 +217,7 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	v2, err := redis.NewCronLocker(client)
+	locker, err := cron.NewRedisLocker(client)
 	if err != nil {
 		cleanup9()
 		cleanup8()
@@ -230,7 +231,7 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		return nil, nil, err
 	}
 	configCron := &configConfig.Cron
-	cronCron, err := cron.New(server, v2, configCron, logger)
+	cronCron, err := cron2.New(server, locker, configCron, logger)
 	if err != nil {
 		cleanup9()
 		cleanup8()

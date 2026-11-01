@@ -20,7 +20,7 @@ Deferred (not this PR): handler decorator refactor, see `tmp/billing/deferred-ha
 - [x] `app.Canceller` → `SubscriptionCanceller` (file `subscriptioncanceller.go`, field `subscriptionCanceller`, `ProvideSubscriptionCanceller`)
 - [x] Delete `app/common.go`: inline `hasCode` (`var e errs.Error; errors.As(err, &e) && e.Code() == code`) and `cancelAtProvider` (with its log) at every call site
 - [x] `pgrepo/common.go`: inline `wrap` → `errs.NewInternal("failed to <msg>", err)`, `notFound` → `errors.Is(err, pgx.ErrNoRows)`. `drain`/`typeName` stay until T5
-- [ ] `pkg/cron`: delete `slogAdapter`, pass `gocron.WithLogger(logger)`; drop `type Locker = gocron.Locker`, use `gocron.Locker`; delete billing `infra/redis.NewCronLocker`, wire `pkgcron.NewRedisLocker` directly (bind `*redis.Client` → `redis.UniversalClient`); same for note
+- [x] `pkg/cron`: delete `slogAdapter`, pass `gocron.WithLogger(logger)`; drop `type Locker = gocron.Locker`, use `gocron.Locker`; delete billing `infra/redis.NewCronLocker`, wire `pkgcron.NewRedisLocker` directly (bind `*redis.Client` → `redis.UniversalClient`); same for note
 
 ## T2 Immutable value objects (sonnet)
 
