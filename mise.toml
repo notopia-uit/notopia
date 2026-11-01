@@ -32,6 +32,7 @@ protoc-gen-go-grpc = "1.6.2"
 "npm:ts-proto" = "2.12.4"
 go = "1.27.3"
 stripe = "latest"
+node = "26.13.0"
 
 [shell_alias]
 shadcn = "pnpm exec shadcn"
