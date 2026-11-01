@@ -21,7 +21,6 @@ type CompleteCheckoutHandler struct {
 	accounts domain.BillingAccountRepo
 	provider PaymentProvider
 	settings *Settings
-	refunds  *RefundRunner
 }
 
 func NewCompleteCheckoutHandler(
@@ -30,9 +29,8 @@ func NewCompleteCheckoutHandler(
 	accounts domain.BillingAccountRepo,
 	provider PaymentProvider,
 	settings *Settings,
-	refunds *RefundRunner,
 ) *CompleteCheckoutHandler {
-	return &CompleteCheckoutHandler{uow: uow, subs: subs, accounts: accounts, provider: provider, settings: settings, refunds: refunds}
+	return &CompleteCheckoutHandler{uow: uow, subs: subs, accounts: accounts, provider: provider, settings: settings}
 }
 
 var ProvideCompleteCheckoutHandler = NewCompleteCheckoutHandler
@@ -108,8 +106,7 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 	}
 
 	now, actor := time.Now(), h.settings.ServiceAccountUserID
-	var saved *domain.Subscription
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, eventCheckoutCompleted); err != nil || !first {
 			return err
 		}
@@ -135,23 +132,8 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 		} else if err := h.setPayer(ctx, r, s.WorkspaceID, s.Payer, now); err != nil {
 			return err
 		}
-		saved = sub
 		return r.Subscription().Save(ctx, sub)
 	})
-	if err != nil || saved == nil {
-		return err
-	}
-	if duplicate {
-		if err := h.provider.CancelSubscriptionNow(ctx, s.ProviderSubscriptionID); err != nil {
-			slog.ErrorContext(
-				ctx, "cancelling subscription at the provider failed; reconcile will retry",
-				slog.String("provider_subscription_id", s.ProviderSubscriptionID),
-				slog.Any("error", err),
-			)
-		}
-		return h.refunds.Run(ctx, saved.ID())
-	}
-	return nil
 }
 
 func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteCheckout, s CheckoutSessionResult) error {
@@ -170,9 +152,7 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 	}
 
 	now, actor := time.Now(), h.settings.ServiceAccountUserID
-	var toRefund []uuid.UUID
-	var saved *domain.Subscription
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, eventCheckoutCompleted); err != nil || !first {
 			return err
 		}
@@ -202,7 +182,6 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 			if err := r.Subscription().Save(ctx, old); err != nil {
 				return err
 			}
-			toRefund = append(toRefund, old.ID())
 		}
 		sub, err := domain.NewLifetimeSubscription(uuid.Must(uuid.NewV7()), s.WorkspaceID, price, s.Payment.PaymentRef(), s.Payment.PaidAt(), now, actor)
 		if err != nil {
@@ -216,32 +195,11 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, quote, actor); err != nil {
 				return err
 			}
-			toRefund = append(toRefund, sub.ID())
 		} else if err := h.setPayer(ctx, r, s.WorkspaceID, s.Payer, now); err != nil {
 			return err
 		}
-		saved = sub
 		return r.Subscription().Save(ctx, sub)
 	})
-	if err != nil || saved == nil {
-		return err
-	}
-	if replacing {
-		providerSubscriptionID := *cur.ProviderSubscriptionID()
-		if err := h.provider.CancelSubscriptionNow(ctx, providerSubscriptionID); err != nil {
-			slog.ErrorContext(
-				ctx, "cancelling subscription at the provider failed; reconcile will retry",
-				slog.String("provider_subscription_id", providerSubscriptionID),
-				slog.Any("error", err),
-			)
-		}
-	}
-	for _, id := range toRefund {
-		if err := h.refunds.Run(ctx, id); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (h *CompleteCheckoutHandler) payerChange(ctx context.Context, cmd *CompleteCheckout, s CheckoutSessionResult) error {

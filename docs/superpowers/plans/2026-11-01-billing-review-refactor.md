@@ -51,12 +51,12 @@ Deferred (not this PR): handler decorator refactor, see `tmp/billing/deferred-ha
 
 ## T6 Billing outbox, phase 2 (opus)
 
-- [ ] Billing event controller consumes its own domain topics:
+- [x] Billing event controller consumes its own domain topics:
   - `SubscriptionCanceledNowEvent` → `CancelProviderSubscriptionCmd` (provider cancel, then `MarkProviderSynced` in a write tx; no-op if already synced / no provider id)
   - `RefundRequestedEvent` (refund without provider id) → `SubmitRefundCmd{SubscriptionID, RefundID}` (provider `CreateRefund` keyed by refund id; `CodeInvalid` → `FailRefund`; other errors returned → router retry)
-- [ ] Delete `RefundRunner` and post-commit tails in `SubscriptionCanceller`, `CompleteCheckout`, etc.; handlers end at commit
-- [ ] Reconcile cron stays as a safety net
-- [ ] Events carry what consumers need (subscription id, refund id)
+- [x] Delete `RefundRunner` and post-commit tails in `SubscriptionCanceller`, `CompleteCheckout`, etc.; handlers end at commit
+- [x] Reconcile cron stays as a safety net
+- [x] Events carry what consumers need (subscription id, refund id)
 
 ## T7 Webhook typing (sonnet) — dedicated commit
 

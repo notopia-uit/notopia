@@ -19,26 +19,29 @@ func NewHandlerProvider(traceProvider trace.TracerProvider, logger *slog.Logger)
 var ProvideHandlerProvider = NewHandlerProvider
 
 type Cmds struct {
-	ArchivePrice              ArchivePriceCmd
-	CancelNow                 CancelNowCmd
-	CompleteCheckout          CompleteCheckoutCmd
-	CreatePrice               CreatePriceCmd
-	EnsureDefaults            EnsureDefaultsCmd
-	EnsurePortalConfiguration EnsurePortalConfigurationCmd
-	HandlePayerRemoved        HandlePayerRemovedCmd
-	HandleWorkspaceDeleted    HandleWorkspaceDeletedCmd
-	PruneProviderEvents       PruneProviderEventsCmd
-	ReconcileSubscriptions    ReconcileSubscriptionsCmd
-	SyncRefund                SyncRefundCmd
-	SyncSubscription          SyncSubscriptionCmd
-	UpdatePlan                UpdatePlanCmd
-	UpdatePolicy              UpdatePolicyCmd
+	ArchivePrice               ArchivePriceCmd
+	CancelNow                  CancelNowCmd
+	CancelProviderSubscription CancelProviderSubscriptionCmd
+	CompleteCheckout           CompleteCheckoutCmd
+	CreatePrice                CreatePriceCmd
+	EnsureDefaults             EnsureDefaultsCmd
+	EnsurePortalConfiguration  EnsurePortalConfigurationCmd
+	HandlePayerRemoved         HandlePayerRemovedCmd
+	HandleWorkspaceDeleted     HandleWorkspaceDeletedCmd
+	PruneProviderEvents        PruneProviderEventsCmd
+	ReconcileSubscriptions     ReconcileSubscriptionsCmd
+	SubmitRefund               SubmitRefundCmd
+	SyncRefund                 SyncRefundCmd
+	SyncSubscription           SyncSubscriptionCmd
+	UpdatePlan                 UpdatePlanCmd
+	UpdatePolicy               UpdatePolicyCmd
 }
 
 func NewCmds(
 	handlerProvider *HandlerProvider,
 	archivePriceHandler *ArchivePriceHandler,
 	cancelNowHandler *CancelNowHandler,
+	cancelProviderSubscriptionHandler *CancelProviderSubscriptionHandler,
 	completeCheckoutHandler *CompleteCheckoutHandler,
 	createPriceHandler *CreatePriceHandler,
 	ensureDefaultsHandler *EnsureDefaultsHandler,
@@ -47,6 +50,7 @@ func NewCmds(
 	handleWorkspaceDeletedHandler *HandleWorkspaceDeletedHandler,
 	pruneProviderEventsHandler *PruneProviderEventsHandler,
 	reconcileSubscriptionsHandler *ReconcileSubscriptionsHandler,
+	submitRefundHandler *SubmitRefundHandler,
 	syncRefundHandler *SyncRefundHandler,
 	syncSubscriptionHandler *SyncSubscriptionHandler,
 	updatePlanHandler *UpdatePlanHandler,
@@ -54,20 +58,22 @@ func NewCmds(
 ) *Cmds {
 	hp := (*commonhandler.HandlerProvider)(handlerProvider)
 	return &Cmds{
-		ArchivePrice:              commonhandler.DecorateCmd(hp, archivePriceHandler),
-		CancelNow:                 commonhandler.DecorateCmd(hp, cancelNowHandler),
-		CompleteCheckout:          commonhandler.DecorateCmd(hp, completeCheckoutHandler),
-		CreatePrice:               commonhandler.DecorateCmd(hp, createPriceHandler),
-		EnsureDefaults:            commonhandler.DecorateCmd(hp, ensureDefaultsHandler),
-		EnsurePortalConfiguration: commonhandler.DecorateCmd(hp, ensurePortalConfigurationHandler),
-		HandlePayerRemoved:        commonhandler.DecorateCmd(hp, handlePayerRemovedHandler),
-		HandleWorkspaceDeleted:    commonhandler.DecorateCmd(hp, handleWorkspaceDeletedHandler),
-		PruneProviderEvents:       commonhandler.DecorateCmd(hp, pruneProviderEventsHandler),
-		ReconcileSubscriptions:    commonhandler.DecorateCmd(hp, reconcileSubscriptionsHandler),
-		SyncRefund:                commonhandler.DecorateCmd(hp, syncRefundHandler),
-		SyncSubscription:          commonhandler.DecorateCmd(hp, syncSubscriptionHandler),
-		UpdatePlan:                commonhandler.DecorateCmd(hp, updatePlanHandler),
-		UpdatePolicy:              commonhandler.DecorateCmd(hp, updatePolicyHandler),
+		ArchivePrice:               commonhandler.DecorateCmd(hp, archivePriceHandler),
+		CancelNow:                  commonhandler.DecorateCmd(hp, cancelNowHandler),
+		CancelProviderSubscription: commonhandler.DecorateCmd(hp, cancelProviderSubscriptionHandler),
+		CompleteCheckout:           commonhandler.DecorateCmd(hp, completeCheckoutHandler),
+		CreatePrice:                commonhandler.DecorateCmd(hp, createPriceHandler),
+		EnsureDefaults:             commonhandler.DecorateCmd(hp, ensureDefaultsHandler),
+		EnsurePortalConfiguration:  commonhandler.DecorateCmd(hp, ensurePortalConfigurationHandler),
+		HandlePayerRemoved:         commonhandler.DecorateCmd(hp, handlePayerRemovedHandler),
+		HandleWorkspaceDeleted:     commonhandler.DecorateCmd(hp, handleWorkspaceDeletedHandler),
+		PruneProviderEvents:        commonhandler.DecorateCmd(hp, pruneProviderEventsHandler),
+		ReconcileSubscriptions:     commonhandler.DecorateCmd(hp, reconcileSubscriptionsHandler),
+		SubmitRefund:               commonhandler.DecorateCmd(hp, submitRefundHandler),
+		SyncRefund:                 commonhandler.DecorateCmd(hp, syncRefundHandler),
+		SyncSubscription:           commonhandler.DecorateCmd(hp, syncSubscriptionHandler),
+		UpdatePlan:                 commonhandler.DecorateCmd(hp, updatePlanHandler),
+		UpdatePolicy:               commonhandler.DecorateCmd(hp, updatePolicyHandler),
 	}
 }
 

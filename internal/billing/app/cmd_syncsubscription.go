@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	"github.com/notopia-uit/notopia/internal/billing/domain"
@@ -36,8 +35,7 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 	if err != nil {
 		return err
 	}
-	cancelRemotely := false
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if cmd.EventID != "" {
 			if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType); err != nil || !first {
 				return err
@@ -48,12 +46,12 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 			return err // unknown yet: checkout.session.completed creates it
 		}
 		if !sub.IsCurrent() {
-			// canceled locally (cancel-now / duplicate / replaced): never resurrect
+			// canceled locally (cancel-now / duplicate / replaced): never resurrect; while the provider still
+			// runs it, CancelProviderSubscription (outbox event, reconcile) cancels it there
 			if snap.Status() == domain.SubscriptionStatusCanceled || snap.Status() == domain.SubscriptionStatusIncompleteExpired {
 				sub.MarkProviderSynced(time.Now())
 				return r.Subscription().Save(ctx, sub)
 			}
-			cancelRemotely = true
 			return nil
 		}
 		price, err := r.Price().GetByProviderPriceID(ctx, snap.ProviderPriceID())
@@ -63,14 +61,4 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 		sub.ApplySnapshot(snap, price, time.Now(), h.settings.ServiceAccountUserID)
 		return r.Subscription().Save(ctx, sub)
 	})
-	if err == nil && cancelRemotely {
-		if err := h.provider.CancelSubscriptionNow(ctx, cmd.ProviderSubscriptionID); err != nil {
-			slog.ErrorContext(
-				ctx, "cancelling subscription at the provider failed; reconcile will retry",
-				slog.String("provider_subscription_id", cmd.ProviderSubscriptionID),
-				slog.Any("error", err),
-			)
-		}
-	}
-	return err
 }

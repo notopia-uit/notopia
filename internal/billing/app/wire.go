@@ -7,11 +7,11 @@ var ProviderSet = wire.NewSet(
 	ProvideCmds,
 	ProvideQueries,
 
-	ProvideRefundRunner,
 	ProvideSubscriptionCanceller,
 
 	ProvideArchivePriceHandler,
 	ProvideCancelNowHandler,
+	ProvideCancelProviderSubscriptionHandler,
 	ProvideCompleteCheckoutHandler,
 	ProvideCreatePriceHandler,
 	ProvideEnsureDefaultsHandler,
@@ -20,6 +20,7 @@ var ProviderSet = wire.NewSet(
 	ProvideHandleWorkspaceDeletedHandler,
 	ProvidePruneProviderEventsHandler,
 	ProvideReconcileSubscriptionsHandler,
+	ProvideSubmitRefundHandler,
 	ProvideSyncRefundHandler,
 	ProvideSyncSubscriptionHandler,
 	ProvideUpdatePlanHandler,

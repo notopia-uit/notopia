@@ -31,11 +31,10 @@ func newSyncHandler(t *testing.T, f *cancellerFixture) *SyncSubscriptionHandler 
 	return NewSyncSubscriptionHandler(f.store, f.provider, &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"})
 }
 
-func TestSyncCancelsAtProviderWhenLocallyCanceledButProviderStillActive(t *testing.T) {
+func TestSyncNeverResurrectsLocallyCanceledSubscription(t *testing.T) {
 	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
 	f.cancelLocally(t)
 	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, "sub_1").Return(f.providerSnapshot(t, domain.SubscriptionStatusActive), nil).Once()
-	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").Return(nil).Once()
 
 	err := newSyncHandler(t, f).Handle(context.Background(), &SyncSubscription{EventID: "", EventType: "", ProviderSubscriptionID: "sub_1"})
 
@@ -59,10 +58,10 @@ func TestSyncMarksLocallyCanceledSubscriptionSyncedOnceProviderCanceled(t *testi
 func TestReconcileCancelsLocallyCanceledSubscriptionAtProvider(t *testing.T) {
 	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
 	f.cancelLocally(t)
-	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, "sub_1").Return(f.providerSnapshot(t, domain.SubscriptionStatusActive), nil).Once()
 	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").Return(nil).Once()
-	settings := &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"}
-	handler := NewReconcileSubscriptionsHandler(f.store.Subscription(), newSyncHandler(t, f), NewRefundRunner(f.store, f.store.Subscription(), f.provider, settings))
+	handler := NewReconcileSubscriptionsHandler(f.store.Subscription(), newSyncHandler(t, f), newCancelProviderHandler(f), newSubmitRefundHandler(f))
 
 	require.NoError(t, handler.Handle(context.Background(), &ReconcileSubscriptions{}))
+
+	assert.False(t, f.store.subs[f.sub.ID()].AwaitingProviderCancel())
 }

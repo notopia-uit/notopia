@@ -40,6 +40,15 @@ func (m *memStore) Execute(ctx context.Context, fn func(domain.RepoRegistry) err
 	return fn(m)
 }
 
+func (m *memStore) hasPublished(pred func(domain.Event) bool) bool {
+	for _, e := range m.published {
+		if pred(e) {
+			return true
+		}
+	}
+	return false
+}
+
 func (m *memStore) Subscription() domain.SubscriptionRepo     { return memSubs{m} }
 func (m *memStore) BillingAccount() domain.BillingAccountRepo { return memAccounts{m} }
 func (m *memStore) Price() domain.PriceRepo                   { return memPrices{m} }
@@ -110,16 +119,27 @@ func (r memSubs) ListCanceledAwaitingProviderCancel(_ context.Context, limit int
 		if len(out) == limit {
 			break
 		}
-		if s.Status() == domain.SubscriptionStatusCanceled && s.ProviderSubscriptionID() != nil && s.CanceledAt() != nil &&
-			!s.ProviderSyncedAt().After(*s.CanceledAt()) {
+		if s.AwaitingProviderCancel() {
 			out = append(out, s)
 		}
 	}
 	return out, nil
 }
 
-func (r memSubs) ListIDsWithUnsubmittedRefunds(context.Context, int) ([]uuid.UUID, error) {
-	return nil, nil
+func (r memSubs) ListIDsWithUnsubmittedRefunds(_ context.Context, limit int) ([]uuid.UUID, error) {
+	var out []uuid.UUID
+	for _, s := range r.m.subs {
+		if len(out) == limit {
+			break
+		}
+		for _, rf := range s.Refunds() {
+			if rf.AwaitingSubmission() {
+				out = append(out, s.ID())
+				break
+			}
+		}
+	}
+	return out, nil
 }
 
 func (r memSubs) Save(_ context.Context, s *domain.Subscription) error {

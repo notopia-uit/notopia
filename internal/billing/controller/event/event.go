@@ -55,6 +55,8 @@ func New(
 		{name: "workspace-deleted", topic: component.TopicWorkspaceDeleted, handler: decode(e.workspaceDeleted)},
 		{name: "role-updated", topic: component.TopicRoleUpdated, handler: decode(e.roleUpdated)},
 		{name: "member-removed", topic: component.TopicMemberRemoved, handler: decode(e.memberRemoved)},
+		{name: "subscription-canceled-now", topic: component.TopicSubscriptionCanceledNow, handler: decode(e.subscriptionCanceledNow)},
+		{name: "refund-requested", topic: component.TopicSubscriptionRefundRequested, handler: decode(e.refundRequested)},
 	}
 	// One consumer group per topic: subscribers sharing a group steal each other's partitions.
 	for _, h := range handlers {

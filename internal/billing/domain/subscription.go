@@ -209,6 +209,12 @@ func (s *Subscription) pastDueStart() *time.Time {
 	return s.currentPeriodStart
 }
 
+// AwaitingProviderCancel reports a locally canceled subscription the provider has not confirmed canceled yet.
+func (s *Subscription) AwaitingProviderCancel() bool {
+	return s.status == SubscriptionStatusCanceled && s.providerSubscriptionID != nil && s.canceledAt != nil &&
+		!s.providerSyncedAt.After(*s.canceledAt)
+}
+
 // MarkProviderSynced records that the provider confirmed this (locally canceled) subscription ended.
 func (s *Subscription) MarkProviderSynced(now time.Time) {
 	s.providerSyncedAt, s.updatedAt = now, now
@@ -375,6 +381,15 @@ func (s *Subscription) FailRefund(refundID uuid.UUID, failureMessage string, now
 		return nil
 	}
 	return errs.NewNotFound(fmt.Sprintf("refund %s not found", refundID))
+}
+
+func (s *Subscription) Refund(refundID uuid.UUID) *Refund {
+	for _, r := range s.refunds {
+		if r.id == refundID {
+			return r
+		}
+	}
+	return nil
 }
 
 func (s *Subscription) RefundByProviderID(providerRefundID string) *Refund {
