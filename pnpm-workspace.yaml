@@ -90,7 +90,7 @@ catalog:
   google-protobuf: "~4.0.2"
   ioredis: "5.11.1"
   jose: "^6.2.3"
-  jsdom: "^29.1.1"
+  jsdom: "^30.0.0"
   kafkajs: "^2.2.4"
   lru-cache: "^11.5.3"
   lucide-react: "^1.6.0"
