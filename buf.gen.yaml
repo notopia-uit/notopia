@@ -21,6 +21,11 @@ plugins:
       - nestJs=true
       - addGrpcMetadata=true
       - useDate=true
+  - local: protoc-gen-doc
+    out: ./docs/src/api/grpc
+    strategy: all
+    opt:
+      - markdown,index.md
 managed:
   enabled: true
   override:
