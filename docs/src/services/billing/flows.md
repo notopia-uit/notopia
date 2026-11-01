@@ -86,7 +86,7 @@ sequenceDiagram
 
 Ordering rule for every webhook use case:
 
-1. Provider reads and idempotent mutations that must not be lost (change the default card) run **before** the write transaction.
+1. Provider reads and idempotent mutations that must not be lost (change the default card) run **before** the write transaction. Checkout completion locks the workspace's billing account inside the transaction and decides duplicate / replace there, so concurrent checkouts of one workspace serialize.
 2. The write transaction records the event (`processed_provider_events`) together with the state change and the outbox events. Handlers end at commit.
 3. **Phase 2** is driven by billing's own outbox events, consumed in `controller/event`: `subscription.canceled_now` runs `CancelProviderSubscription` (cancel at the provider, then `MarkProviderSynced`), and `subscription.refund_requested` runs `SubmitRefund` (`CreateRefund` keyed by the refund id; a provider `invalid` error marks the refund `failed`). A locally canceled row is never resurrected.
 4. The hourly reconcile cron is the safety net: it retries provider cancels and refund submissions for rows still awaiting them.

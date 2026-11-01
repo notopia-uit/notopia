@@ -100,7 +100,7 @@ for the integration event). Topics are declared once in `internal/billing/compon
 
 | Topic                                             | Payload                       | When                                                                                                                                                          |
 | ------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `events.integration.billing.subscription.changed` | `{workspaceId, plan, status}` | `SubscriptionStateChangedEvent`: recorded whenever a subscription's plan or status changes                                                                    |
+| `events.integration.billing.subscription.changed` | `{workspaceId, plan, status}` | `SubscriptionStateChangedEvent`: recorded whenever a subscription's plan or status changes (not for duplicate checkouts)                                      |
 | `events.internal.billing.{aggregate}.{event}`     | the domain event              | every other domain event, e.g. `subscription.canceled_now`, `subscription.refund_requested`, `billing_account.payer_missing`, `price.created`, `plan.updated` |
 
 The `events.internal.*` topics are billing's own: only billing consumes them (see below).

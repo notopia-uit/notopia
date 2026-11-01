@@ -108,6 +108,10 @@ func TestDuplicateCheckoutIsCanceledWithPendingRefund(t *testing.T) {
 		_, ok := e.(*domain.SubscriptionCanceledNowEvent)
 		return ok && e.GetAggregateID() == dup.ID().String()
 	}))
+	assert.False(t, f.store.hasPublished(func(e domain.Event) bool {
+		_, ok := e.(*domain.SubscriptionStateChangedEvent)
+		return ok
+	}), "a duplicate must not report the workspace's subscription state")
 	// no CancelSubscriptionNow / CreateRefund expectation: both are driven by the outbox events
 }
 

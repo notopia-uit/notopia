@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/notopia-uit/notopia/internal/billing/errs"
 	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
@@ -71,42 +72,46 @@ func (h *CompleteCheckoutHandler) markProcessed(ctx context.Context, cmd *Comple
 	})
 }
 
-func (h *CompleteCheckoutHandler) currentSub(ctx context.Context, ws uuid.UUID) (*domain.Subscription, error) {
-	return h.subs.GetCurrentByWorkspace(ctx, ws, false)
-}
-
-func (h *CompleteCheckoutHandler) setPayer(ctx context.Context, r domain.RepoRegistry, ws uuid.UUID, payer domain.Payer, now time.Time) error {
+// lockAccount locks the workspace's billing account, opened by StartCheckout before any checkout. The lock
+// serializes the checkouts of one workspace, so each one sees the subscription a concurrent one committed.
+func (h *CompleteCheckoutHandler) lockAccount(ctx context.Context, r domain.RepoRegistry, ws uuid.UUID) (*domain.BillingAccount, error) {
 	account, err := r.BillingAccount().GetByWorkspace(ctx, ws, true)
-	if err != nil || account == nil {
-		return err
+	if err != nil {
+		return nil, err
 	}
-	if account.Payer().ID() != payer.ID() || account.PayerMissingSince() != nil {
-		account.ChangePayer(payer, now, payer.ID())
-		return r.BillingAccount().Save(ctx, account)
+	if account == nil {
+		return nil, errs.New(errs.CodeNoBillingAccount, "checkout completed for a workspace without a billing account", nil)
 	}
-	return nil
+	return account, nil
 }
 
+func (h *CompleteCheckoutHandler) setPayer(ctx context.Context, r domain.RepoRegistry, account *domain.BillingAccount, payer domain.Payer, now time.Time) error {
+	if account.Payer().ID() == payer.ID() && account.PayerMissingSince() == nil {
+		return nil
+	}
+	account.ChangePayer(payer, now, payer.ID())
+	return r.BillingAccount().Save(ctx, account)
+}
+
+// subscribe fetches the new subscription's payments up front, so the duplicate decision can be made
+// inside the transaction, under the account lock.
 func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCheckout, s CheckoutSessionResult) error {
 	snap, err := h.provider.GetSubscriptionSnapshot(ctx, s.ProviderSubscriptionID)
 	if err != nil {
 		return err
 	}
-	cur, err := h.currentSub(ctx, s.WorkspaceID)
+	payments, err := h.provider.PeriodPayments(ctx, s.ProviderSubscriptionID, snap.CurrentPeriodStart(), snap.CurrentPeriodEnd())
 	if err != nil {
 		return err
-	}
-	duplicate := cur != nil && (cur.ProviderSubscriptionID() == nil || *cur.ProviderSubscriptionID() != s.ProviderSubscriptionID)
-	var payments []domain.PaymentInfo
-	if duplicate {
-		if payments, err = h.provider.PeriodPayments(ctx, s.ProviderSubscriptionID, snap.CurrentPeriodStart(), snap.CurrentPeriodEnd()); err != nil {
-			return err
-		}
 	}
 
 	now, actor := time.Now(), h.settings.ServiceAccountUserID
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType); err != nil || !first {
+			return err
+		}
+		account, err := h.lockAccount(ctx, r, s.WorkspaceID)
+		if err != nil {
 			return err
 		}
 		if existing, err := r.Subscription().GetByProviderSubscriptionID(ctx, s.ProviderSubscriptionID, true); err != nil || existing != nil {
@@ -116,36 +121,40 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 		if err != nil {
 			return err
 		}
-		sub, err := domain.NewSubscription(uuid.Must(uuid.NewV7()), s.WorkspaceID, price, snap, now, actor)
+		cur, err := r.Subscription().GetCurrentByWorkspace(ctx, s.WorkspaceID, false)
 		if err != nil {
 			return err
 		}
-		if duplicate {
-			quote, err := domain.FullRefundQuote(payments...)
+		id := uuid.Must(uuid.NewV7())
+		if cur != nil {
+			sub, err := domain.NewDuplicateSubscription(id, s.WorkspaceID, price, snap, payments, now, actor)
 			if err != nil {
 				return err
 			}
-			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, quote, actor); err != nil {
-				return err
-			}
-		} else if err := h.setPayer(ctx, r, s.WorkspaceID, s.Payer, now); err != nil {
+			return r.Subscription().Save(ctx, sub)
+		}
+		sub, err := domain.NewSubscription(id, s.WorkspaceID, price, snap, now, actor)
+		if err != nil {
+			return err
+		}
+		if err := h.setPayer(ctx, r, account, s.Payer, now); err != nil {
 			return err
 		}
 		return r.Subscription().Save(ctx, sub)
 	})
 }
 
+// lifetime replaces a recurring subscription (refunding its unused time) or, over a lifetime one, is a duplicate.
+// The replaced subscription's payments are fetched before the transaction; if the current subscription
+// changed by then, the error makes the provider redeliver the event.
 func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteCheckout, s CheckoutSessionResult) error {
-	cur, err := h.currentSub(ctx, s.WorkspaceID)
+	before, err := h.subs.GetCurrentByWorkspace(ctx, s.WorkspaceID, false)
 	if err != nil {
 		return err
 	}
 	var replaced []domain.PaymentInfo
-	replacing := cur != nil && cur.Interval() != domain.IntervalLifetime
-	duplicate := cur != nil && cur.Interval() == domain.IntervalLifetime &&
-		(cur.ProviderPaymentID() == nil || *cur.ProviderPaymentID() != s.Payment.PaymentRef())
-	if replacing {
-		if replaced, err = h.provider.PeriodPayments(ctx, *cur.ProviderSubscriptionID(), *cur.CurrentPeriodStart(), *cur.CurrentPeriodEnd()); err != nil {
+	if before != nil && before.Interval() != domain.IntervalLifetime {
+		if replaced, err = h.provider.PeriodPayments(ctx, *before.ProviderSubscriptionID(), *before.CurrentPeriodStart(), *before.CurrentPeriodEnd()); err != nil {
 			return err
 		}
 	}
@@ -155,6 +164,10 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType); err != nil || !first {
 			return err
 		}
+		account, err := h.lockAccount(ctx, r, s.WorkspaceID)
+		if err != nil {
+			return err
+		}
 		if existing, err := r.Subscription().GetByProviderPaymentID(ctx, s.Payment.PaymentRef(), true); err != nil || existing != nil {
 			return err
 		}
@@ -162,39 +175,42 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 		if err != nil {
 			return err
 		}
-		policy, err := r.BillingPolicy().Get(ctx, false)
+		cur, err := r.Subscription().GetCurrentByWorkspace(ctx, s.WorkspaceID, true)
 		if err != nil {
 			return err
 		}
-		if replacing {
-			old, err := r.Subscription().GetByID(ctx, cur.ID(), true)
+		id := uuid.Must(uuid.NewV7())
+		if cur != nil && cur.Interval() == domain.IntervalLifetime {
+			sub, err := domain.NewDuplicateLifetimeSubscription(id, s.WorkspaceID, price, s.Payment, now, actor)
 			if err != nil {
 				return err
 			}
-			quote, err := old.QuoteCancelNow(now, policy, replaced)
+			return r.Subscription().Save(ctx, sub)
+		}
+		if cur != nil {
+			if before == nil || before.ID() != cur.ID() {
+				return errs.NewInternal("current subscription changed while completing the lifetime checkout", nil)
+			}
+			policy, err := r.BillingPolicy().Get(ctx, false)
 			if err != nil {
 				return err
 			}
-			if _, err := old.CancelNow(now, domain.RefundReasonReplacedByLifetime, quote, actor); err != nil {
+			quote, err := cur.QuoteCancelNow(now, policy, replaced)
+			if err != nil {
 				return err
 			}
-			if err := r.Subscription().Save(ctx, old); err != nil {
+			if _, err := cur.CancelNow(now, domain.RefundReasonReplacedByLifetime, quote, actor); err != nil {
+				return err
+			}
+			if err := r.Subscription().Save(ctx, cur); err != nil {
 				return err
 			}
 		}
-		sub, err := domain.NewLifetimeSubscription(uuid.Must(uuid.NewV7()), s.WorkspaceID, price, s.Payment.PaymentRef(), s.Payment.PaidAt(), now, actor)
+		sub, err := domain.NewLifetimeSubscription(id, s.WorkspaceID, price, s.Payment.PaymentRef(), s.Payment.PaidAt(), now, actor)
 		if err != nil {
 			return err
 		}
-		if duplicate {
-			quote, err := domain.FullRefundQuote(s.Payment)
-			if err != nil {
-				return err
-			}
-			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, quote, actor); err != nil {
-				return err
-			}
-		} else if err := h.setPayer(ctx, r, s.WorkspaceID, s.Payer, now); err != nil {
+		if err := h.setPayer(ctx, r, account, s.Payer, now); err != nil {
 			return err
 		}
 		return r.Subscription().Save(ctx, sub)
@@ -202,7 +218,7 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 }
 
 func (h *CompleteCheckoutHandler) payerChange(ctx context.Context, cmd *CompleteCheckout, s CheckoutSessionResult) error {
-	cur, err := h.currentSub(ctx, s.WorkspaceID)
+	cur, err := h.subs.GetCurrentByWorkspace(ctx, s.WorkspaceID, false)
 	if err != nil {
 		return err
 	}
@@ -235,7 +251,11 @@ func (h *CompleteCheckoutHandler) payerChange(ctx context.Context, cmd *Complete
 		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType); err != nil || !first {
 			return err
 		}
-		if err := h.setPayer(ctx, r, s.WorkspaceID, s.Payer, now); err != nil {
+		locked, err := h.lockAccount(ctx, r, s.WorkspaceID)
+		if err != nil {
+			return err
+		}
+		if err := h.setPayer(ctx, r, locked, s.Payer, now); err != nil {
 			return err
 		}
 		if !resume {

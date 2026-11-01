@@ -48,7 +48,7 @@ Repo `Save` writes the aggregate's popped events into `outbox_messages` (Watermi
 (`pgrepo.PublisherFactory` → `outbox.PublisherFactory`); `outbox.Forwarder` relays them to Kafka, keyed by
 the `partition_key` metadata (aggregate id, workspace id for integration events). Topics are in
 `component/eventtopic.go`: domain events go to `events.internal.billing.{aggregate}.{event}`;
-`SubscriptionStateChangedEvent` (recorded whenever plan or status changes) is mapped to
+`SubscriptionStateChangedEvent` (recorded whenever plan or status changes, never for a duplicate checkout) is mapped to
 `share.SubscriptionChangedEvent` on `events.integration.billing.subscription.changed`.
 Billing also consumes its own `subscription.canceled_now` and `subscription.refund_requested` topics (phase 2 above). There is no Kafka `Notifier` or `RefundRunner`; do not publish to Kafka outside the outbox.
 Consumers of the integration event never cache billing state; they call gRPC on every check.
