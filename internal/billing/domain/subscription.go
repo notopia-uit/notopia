@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/google/uuid"
@@ -96,6 +97,55 @@ func NewLifetimeSubscription(id, workspaceID uuid.UUID, price *Price, providerPa
 	s.record(&SubscriptionActivatedEvent{BaseEvent: s.base(userID)})
 	s.recordStateChanged(userID)
 	return s, nil
+}
+
+// NewDuplicateSubscription records a checkout that duplicated the workspace's current subscription:
+// canceled at once with every payment refunded in full.
+func NewDuplicateSubscription(
+	id, workspaceID uuid.UUID,
+	price *Price,
+	snap ProviderSnapshot,
+	payments []PaymentInfo,
+	now time.Time,
+	userID string,
+) (*Subscription, error) {
+	s, err := NewSubscription(id, workspaceID, price, snap, now, userID)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.cancelDuplicate(payments, now, userID); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+// NewDuplicateLifetimeSubscription is NewDuplicateSubscription for a lifetime checkout.
+func NewDuplicateLifetimeSubscription(id, workspaceID uuid.UUID, price *Price, payment PaymentInfo, now time.Time, userID string) (*Subscription, error) {
+	s, err := NewLifetimeSubscription(id, workspaceID, price, payment.paymentRef, payment.paidAt, now, userID)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.cancelDuplicate([]PaymentInfo{payment}, now, userID); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+// cancelDuplicate drops SubscriptionStateChangedEvent: a duplicate never was the workspace's subscription,
+// so reporting it would override the workspace's current one downstream.
+func (s *Subscription) cancelDuplicate(payments []PaymentInfo, now time.Time, userID string) error {
+	quote, err := FullRefundQuote(payments...)
+	if err != nil {
+		return err
+	}
+	if _, err := s.CancelNow(now, RefundReasonDuplicateCheckout, quote, userID); err != nil {
+		return err
+	}
+	s.events = slices.DeleteFunc(s.events, func(e Event) bool {
+		_, ok := e.(*SubscriptionStateChangedEvent)
+		return ok
+	})
+	return nil
 }
 
 type UnmarshalSubscriptionParams struct {
