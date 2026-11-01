@@ -261,6 +261,15 @@ lsp.config("oxlint", {
       },
     },
     {
+      workspaceUri = string.format("%s/packages/lib-server", uri_root),
+      options = {
+        configPath = string.format("%s/packages/lib-server/oxlint.config.ts", root),
+        fixKind = "all",
+        run = "onSave",
+        typeAware = false,
+      },
+    },
+    {
       workspaceUri = string.format("%s/apps/web", uri_root),
       options = {
         configPath = string.format("%s/apps/web/oxlint.config.ts", root),
@@ -314,6 +323,10 @@ lsp.config("oxlint", {
     {
       name = "lib",
       uri = string.format("%s/packages/lib", uri_root),
+    },
+    {
+      name = "lib-server",
+      uri = string.format("%s/packages/lib-server", uri_root),
     },
     {
       name = "web",

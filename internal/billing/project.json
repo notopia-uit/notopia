@@ -9,7 +9,7 @@
   "targets": {
     "gen:mockery": {
       "executor": "nx:run-commands",
-      "inputs": ["default", "{projectRoot}/.mockery.yaml"],
+      "inputs": ["default", "{projectRoot}/.mockery.yaml", "mockeryVersion"],
       "outputs": ["{projectRoot}/app/mock.go"],
       "options": {
         "command": "mockery",

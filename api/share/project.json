@@ -11,7 +11,12 @@
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/../bundled/share.json"],
-      "inputs": ["openapiFilesWithCommon"]
+      "inputs": [
+        "openapiFilesWithCommon",
+        {
+          "externalDependencies": ["@redocly/cli"]
+        }
+      ]
     },
     "build": {
       "dependsOn": ["bundle:json"]
@@ -69,7 +74,10 @@
           "dependentTasksOutputFiles": "api/bundled/share.json",
           "transitive": true
         },
-        "{projectRoot}/openapi-ts.config.ts"
+        "{projectRoot}/openapi-ts.config.ts",
+        {
+          "externalDependencies": ["@hey-api/openapi-ts"]
+        }
       ],
       "executor": "nx:run-commands",
       "options": {

@@ -5,6 +5,7 @@ export default defineConfig({
   rules: {
     'typescript/require-await': 'error',
     'typescript/return-await': 'error',
+    'typescript/no-deprecated': 'warn',
   },
   settings: {
     'better-tailwindcss': {

@@ -99,7 +99,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
-      "inputs": ["default", "test"],
+      "inputs": ["default", "test", "goVersion"],
       "outputs": ["{workspaceRoot}/coverage/authorization"],
       "options": {
         "command": "./test.sh",

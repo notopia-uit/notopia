@@ -2,6 +2,7 @@
   "name": "@notopia-uit/api-web",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@notopia-uit/api": "workspace:",
     "@scalar/api-reference-react": "0.9.87"

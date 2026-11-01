@@ -128,7 +128,7 @@
       "dependsOn": ["migration:validate"]
     },
     "gen:sqlc": {
-      "inputs": ["sqlc"],
+      "inputs": ["sqlc", "sqlcVersion"],
       "outputs": ["{workspaceRoot}/internal/billing/infra/persistence/pgsqlc/*.go"],
       "executor": "nx:run-commands",
       "options": {
