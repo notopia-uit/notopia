@@ -77,8 +77,14 @@ type (
 		BaseEvent
 		Reason RefundReason
 	}
-	SubscriptionEndedEvent struct{ BaseEvent }
-	RefundRequestedEvent   struct {
+	SubscriptionEndedEvent        struct{ BaseEvent }
+	SubscriptionStateChangedEvent struct {
+		BaseEvent
+		WorkspaceID uuid.UUID
+		Plan        PlanTier
+		Status      SubscriptionStatus
+	}
+	RefundRequestedEvent struct {
 		BaseEvent
 		RefundID uuid.UUID
 		Amount   Money

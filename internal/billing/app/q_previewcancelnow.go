@@ -13,12 +13,12 @@ type PreviewCancelNow struct {
 }
 
 type PreviewCancelNowHandler struct {
-	authz     AuthorizationSvc
-	canceller *Canceller
+	authz                 AuthorizationSvc
+	subscriptionCanceller *SubscriptionCanceller
 }
 
-func NewPreviewCancelNowHandler(authz AuthorizationSvc, canceller *Canceller) *PreviewCancelNowHandler {
-	return &PreviewCancelNowHandler{authz: authz, canceller: canceller}
+func NewPreviewCancelNowHandler(authz AuthorizationSvc, subscriptionCanceller *SubscriptionCanceller) *PreviewCancelNowHandler {
+	return &PreviewCancelNowHandler{authz: authz, subscriptionCanceller: subscriptionCanceller}
 }
 
 var ProvidePreviewCancelNowHandler = NewPreviewCancelNowHandler
@@ -31,7 +31,7 @@ func (h *PreviewCancelNowHandler) Handle(ctx context.Context, q *PreviewCancelNo
 	if err := requirePermission(ctx, h.authz, q.UserID, q.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
 		return RefundQuote{}, err
 	}
-	quote, err := h.canceller.Quote(ctx, q.WorkspaceID)
+	quote, err := h.subscriptionCanceller.Quote(ctx, q.WorkspaceID)
 	if err != nil {
 		return RefundQuote{}, err
 	}

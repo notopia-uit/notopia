@@ -5,4 +5,4 @@ pkgname: "{{ .SrcPackageName }}"
 packages:
   github.com/notopia-uit/notopia/internal/billing/app:
     config:
-      include-interface-regex: "^(PaymentProvider|Notifier|CompleteCheckoutCmd|SyncSubscriptionCmd|SyncRefundCmd)$"
+      include-interface-regex: "^(PaymentProvider|CompleteCheckoutCmd|SyncSubscriptionCmd|SyncRefundCmd)$"

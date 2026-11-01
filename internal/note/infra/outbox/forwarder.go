@@ -150,7 +150,7 @@ func (f *FromPersistenceToQSLForwarder) Create(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create SQL publisher: %w", err)
 	}
-	publisher := forwarder.NewPublisher(sqlPublisher, forwarder.PublisherConfig{})
+	publisher := forwarder.NewPublisher(sqlPublisher, forwarder.PublisherConfig{ForwarderTopic: ForwarderTopic})
 	otelPublisher := wotel.NewNamedPublisherDecorator(
 		f.serviceName,
 		publisher,

@@ -30,7 +30,7 @@ func (h *GetWorkspacePayerHandler) Handle(ctx context.Context, q *GetWorkspacePa
 	if err != nil || account == nil {
 		return v, err
 	}
-	id := account.Payer().ID
+	id := account.Payer().ID()
 	v.PayerID = &id
 	sub, err := h.read.CurrentSubscription(ctx, q.WorkspaceID)
 	if err != nil {

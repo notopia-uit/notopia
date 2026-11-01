@@ -28,13 +28,6 @@ type Scheduler struct {
 	jobs      map[string]gocron.Job
 }
 
-type slogAdapter struct{ logger *slog.Logger }
-
-func (a slogAdapter) Debug(msg string, args ...any) { a.logger.Debug(msg, args...) } //nolint:sloglint
-func (a slogAdapter) Info(msg string, args ...any)  { a.logger.Info(msg, args...) }  //nolint:sloglint
-func (a slogAdapter) Warn(msg string, args ...any)  { a.logger.Warn(msg, args...) }  //nolint:sloglint
-func (a slogAdapter) Error(msg string, args ...any) { a.logger.Error(msg, args...) } //nolint:sloglint
-
 func JobFromConfig(cfg commonconfig.CronJob, run func(ctx context.Context) error) Job {
 	return Job{
 		Name:     cfg.Name,
@@ -45,7 +38,7 @@ func JobFromConfig(cfg commonconfig.CronJob, run func(ctx context.Context) error
 	}
 }
 
-func NewScheduler(locker Locker, logger *slog.Logger, location *time.Location) (*Scheduler, error) {
+func NewScheduler(locker gocron.Locker, logger *slog.Logger, location *time.Location) (*Scheduler, error) {
 	if logger == nil {
 		return nil, errors.New("cron logger is required")
 	}
@@ -55,7 +48,7 @@ func NewScheduler(locker Locker, logger *slog.Logger, location *time.Location) (
 	s, err := gocron.NewScheduler(
 		gocron.WithLocation(location),
 		gocron.WithDistributedLocker(locker),
-		gocron.WithLogger(slogAdapter{logger}),
+		gocron.WithLogger(logger),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cron scheduler: %w", err)

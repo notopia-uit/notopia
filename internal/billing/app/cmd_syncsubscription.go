@@ -17,12 +17,11 @@ type SyncSubscription struct {
 type SyncSubscriptionHandler struct {
 	uow      domain.UnitOfWork
 	provider PaymentProvider
-	notifier Notifier
 	settings *Settings
 }
 
-func NewSyncSubscriptionHandler(uow domain.UnitOfWork, provider PaymentProvider, notifier Notifier, settings *Settings) *SyncSubscriptionHandler {
-	return &SyncSubscriptionHandler{uow: uow, provider: provider, notifier: notifier, settings: settings}
+func NewSyncSubscriptionHandler(uow domain.UnitOfWork, provider PaymentProvider, settings *Settings) *SyncSubscriptionHandler {
+	return &SyncSubscriptionHandler{uow: uow, provider: provider, settings: settings}
 }
 
 var ProvideSyncSubscriptionHandler = NewSyncSubscriptionHandler
@@ -36,9 +35,7 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 	if err != nil {
 		return err
 	}
-	var changed *domain.Subscription
-	cancelRemotely := false
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if cmd.EventID != "" {
 			if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType); err != nil || !first {
 				return err
@@ -49,32 +46,19 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 			return err // unknown yet: checkout.session.completed creates it
 		}
 		if !sub.IsCurrent() {
-			// canceled locally (cancel-now / duplicate / replaced): never resurrect
-			if snap.Status == domain.StatusCanceled || snap.Status == domain.StatusIncompleteExpired {
+			// canceled locally (cancel-now / duplicate / replaced): never resurrect; while the provider still
+			// runs it, CancelProviderSubscription (outbox event, reconcile) cancels it there
+			if snap.Status() == domain.SubscriptionStatusCanceled || snap.Status() == domain.SubscriptionStatusIncompleteExpired {
 				sub.MarkProviderSynced(time.Now())
 				return r.Subscription().Save(ctx, sub)
 			}
-			cancelRemotely = true
 			return nil
 		}
-		price, err := r.Price().GetByProviderPriceID(ctx, snap.ProviderPriceID)
+		price, err := r.Price().GetByProviderPriceID(ctx, snap.ProviderPriceID())
 		if err != nil {
 			return err
 		}
-		beforeStatus, beforePlan, beforeCancel, beforeEnd := sub.Status(), sub.Plan(), sub.CancelAtPeriodEnd(), sub.CurrentPeriodEnd()
 		sub.ApplySnapshot(snap, price, time.Now(), h.settings.ServiceAccountUserID)
-		end := sub.CurrentPeriodEnd()
-		if beforeStatus != sub.Status() || beforePlan != sub.Plan() || beforeCancel != sub.CancelAtPeriodEnd() ||
-			beforeEnd == nil || end == nil || !beforeEnd.Equal(*end) {
-			changed = sub
-		}
 		return r.Subscription().Save(ctx, sub)
 	})
-	if err == nil && cancelRemotely {
-		cancelAtProvider(ctx, h.provider, cmd.ProviderSubscriptionID)
-	}
-	if err == nil {
-		notifySubscription(ctx, h.notifier, changed)
-	}
-	return err
 }

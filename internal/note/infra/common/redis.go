@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
-	pkgcron "github.com/notopia-uit/notopia/pkg/cron"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -30,9 +29,3 @@ func NewRedisClient(
 }
 
 var ProvideRedisClient = NewRedisClient
-
-func NewCronLocker(client *RedisClient) (pkgcron.Locker, error) {
-	return pkgcron.NewRedisLocker(client.Client)
-}
-
-var ProvideCronLocker = NewCronLocker

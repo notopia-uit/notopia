@@ -5,6 +5,8 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
 	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
+	pkgcron "github.com/notopia-uit/notopia/pkg/cron"
+	"github.com/redis/go-redis/v9"
 )
 
 var KafkaPublisherProviderSet = wire.NewSet(
@@ -17,5 +19,6 @@ var KafkaPublisherProviderSet = wire.NewSet(
 var ProviderSet = wire.NewSet(
 	KafkaPublisherProviderSet,
 	ProvideRedisClient,
-	ProvideCronLocker,
+	pkgcron.ProvideRedisLocker,
+	wire.Bind(new(redis.UniversalClient), new(*RedisClient)),
 )

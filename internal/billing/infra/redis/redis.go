@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
-	pkgcron "github.com/notopia-uit/notopia/pkg/cron"
 	goredis "github.com/redis/go-redis/v9"
 )
 
@@ -18,9 +17,3 @@ func NewClient(ctx context.Context, cfg *commonconfig.Redis) (*goredis.Client, f
 }
 
 var ProvideClient = NewClient
-
-func NewCronLocker(client *goredis.Client) (pkgcron.Locker, error) {
-	return pkgcron.NewRedisLocker(client)
-}
-
-var ProvideCronLocker = NewCronLocker

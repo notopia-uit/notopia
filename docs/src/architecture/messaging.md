@@ -16,7 +16,7 @@ event it produces commit together. The flow in the Note service:
    `forwarder` publisher, which writes the message into an outbox table in the same Postgres
    transaction as the aggregate change.
 2. The outbox table (default name `eventsToForward`, config `outbox_table_name`) follows the
-   Watermill SQL schema adapter and is created at startup (`InitializeSchema`).
+   Watermill SQL queue schema (deleted on ack) and is created by a goose migration.
 3. A Watermill SQL subscriber polls the table (every second) and the forwarder re-publishes each
    message to its real topic on Redpanda.
 

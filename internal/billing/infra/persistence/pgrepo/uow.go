@@ -13,14 +13,15 @@ import (
 )
 
 type UnitOfWork struct {
-	pool    *pgxpool.Pool
-	queries *pgsqlc.Queries
+	pool             *pgxpool.Pool
+	queries          *pgsqlc.Queries
+	publisherFactory PublisherFactory
 }
 
 var _ domain.UnitOfWork = (*UnitOfWork)(nil)
 
-func NewUnitOfWork(pool *pgxpool.Pool, queries *pgsqlc.Queries) *UnitOfWork {
-	return &UnitOfWork{pool: pool, queries: queries}
+func NewUnitOfWork(pool *pgxpool.Pool, queries *pgsqlc.Queries, publisherFactory PublisherFactory) *UnitOfWork {
+	return &UnitOfWork{pool: pool, queries: queries, publisherFactory: publisherFactory}
 }
 
 var ProvideUnitOfWork = NewUnitOfWork
@@ -35,7 +36,11 @@ func (u *UnitOfWork) Execute(ctx context.Context, fn func(r domain.RepoRegistry)
 			slog.ErrorContext(ctx, "failed to rollback transaction", slog.Any("error", err))
 		}
 	}()
-	if err := fn(&registry{q: u.queries.WithTx(tx)}); err != nil {
+	publisher, err := u.publisherFactory.Create(tx)
+	if err != nil {
+		return errs.NewInternal("failed to create event publisher", err)
+	}
+	if err := fn(&registry{q: u.queries.WithTx(tx), publisher: publisher}); err != nil {
 		return err
 	}
 	if err := tx.Commit(ctx); err != nil {
@@ -44,11 +49,31 @@ func (u *UnitOfWork) Execute(ctx context.Context, fn func(r domain.RepoRegistry)
 	return nil
 }
 
-type registry struct{ q *pgsqlc.Queries }
+type registry struct {
+	q         *pgsqlc.Queries
+	publisher EventPublisher
+}
 
-func (r *registry) Subscription() domain.SubscriptionRepo     { return &subscriptionRepo{q: r.q} }
-func (r *registry) BillingAccount() domain.BillingAccountRepo { return &accountRepo{q: r.q} }
-func (r *registry) Price() domain.PriceRepo                   { return &priceRepo{q: r.q} }
-func (r *registry) Plan() domain.PlanRepo                     { return &planRepo{q: r.q} }
-func (r *registry) BillingPolicy() domain.BillingPolicyRepo   { return &policyRepo{q: r.q} }
-func (r *registry) ProviderEventLog() domain.ProviderEventLog { return &providerEventLog{q: r.q} }
+func (r *registry) Subscription() domain.SubscriptionRepo {
+	return newSubscriptionRepoInTx(r.q, r.publisher)
+}
+
+func (r *registry) BillingAccount() domain.BillingAccountRepo {
+	return newAccountRepoInTx(r.q, r.publisher)
+}
+
+func (r *registry) Price() domain.PriceRepo {
+	return newPriceRepoInTx(r.q, r.publisher)
+}
+
+func (r *registry) Plan() domain.PlanRepo {
+	return newPlanRepoInTx(r.q, r.publisher)
+}
+
+func (r *registry) BillingPolicy() domain.BillingPolicyRepo {
+	return newPolicyRepoInTx(r.q, r.publisher)
+}
+
+func (r *registry) ProviderEventLog() domain.ProviderEventLog {
+	return newProviderEventLogInTx(r.q)
+}

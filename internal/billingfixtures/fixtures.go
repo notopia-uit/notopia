@@ -14,16 +14,10 @@ import (
 // Provider ids are fake: Stripe actions on this workspace fail, entitlements work.
 var (
 	workspaceID = uuid.MustParse("00000000-0000-4000-8000-000000000110")
-	payer       = domain.Payer{
-		ID:    "110",
-		Email: "user@notopia.com",
-		Name:  "User",
-	}
 )
 
 const (
 	actor                  = "110"
-	currency               = "vnd"
 	fakeProviderCustomerID = "cus_fixture_110"
 	fakeProviderPaymentID  = "pi_fixture_110"
 )
@@ -54,12 +48,16 @@ func (f *Fixtures) Run(ctx context.Context) error {
 			f.logger.InfoContext(ctx, "workspace already has a subscription, skipped", slog.String("workspaceId", workspaceID.String()))
 			return nil
 		}
-		price, err := r.Price().GetActive(ctx, domain.PlanTierPro, domain.IntervalLifetime, currency, false)
+		price, err := r.Price().GetActive(ctx, domain.PlanTierPro, domain.IntervalLifetime, domain.CurrencyVND, false)
 		if err != nil {
 			return err
 		}
 		if price == nil {
 			return errors.New("pro lifetime price missing: run just seed-billing first")
+		}
+		payer, err := domain.NewPayer("110", "user@notopia.com", "User")
+		if err != nil {
+			return err
 		}
 		account := domain.OpenBillingAccount(workspaceID, fakeProviderCustomerID, payer, now, actor)
 		if err := r.BillingAccount().Save(ctx, account); err != nil {

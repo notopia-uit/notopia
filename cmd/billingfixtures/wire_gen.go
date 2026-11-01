@@ -9,6 +9,8 @@ package main
 import (
 	"context"
 	"github.com/goforj/wire"
+	"github.com/notopia-uit/notopia/internal/billing/config"
+	"github.com/notopia-uit/notopia/internal/billing/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgrepo"
 	"github.com/notopia-uit/notopia/internal/billingfixtures"
@@ -21,11 +23,11 @@ import (
 func InitializeFixtures(ctx context.Context) (*billingfixtures.Fixtures, func(), error) {
 	validate := billingfixtures.NewValidate()
 	viper := billingfixtures.NewViper()
-	config, err := billingfixtures.NewConfig(validate, viper)
+	billingfixturesConfig, err := billingfixtures.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &config.Database
+	sql := &billingfixturesConfig.Database
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
@@ -57,9 +59,19 @@ func InitializeFixtures(ctx context.Context) (*billingfixtures.Fixtures, func(),
 		return nil, nil, err
 	}
 	queries := persistence.NewSQLCQueries(pool)
-	unitOfWork := pgrepo.NewUnitOfWork(pool, queries)
-	log := &config.Log
-	general := &config.General
+	domainEvent, err := config.NewDefaultDomainEvent()
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	postgreSQLQueueSchema := outbox.NewSchemaAdapter()
+	publisherFactory := outbox.NewPublisherFactory(domainEvent, postgreSQLQueueSchema, serviceName)
+	unitOfWork := pgrepo.NewUnitOfWork(pool, queries, publisherFactory)
+	log := &billingfixturesConfig.Log
+	general := &billingfixturesConfig.General
 	stdoutHandler := logging.NewStdoutHandler(log, general)
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.NewSlog(stdoutHandler, slogHandler, log)

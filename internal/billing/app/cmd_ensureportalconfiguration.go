@@ -15,10 +15,12 @@ type EnsurePortalConfigurationHandler struct{ catalog *catalog }
 
 func NewEnsurePortalConfigurationHandler(
 	uow domain.UnitOfWork,
+	prices domain.PriceRepo,
+	policies domain.BillingPolicyRepo,
 	provider PaymentProvider,
 	settings *Settings,
 ) *EnsurePortalConfigurationHandler {
-	return &EnsurePortalConfigurationHandler{catalog: newCatalog(uow, provider, settings)}
+	return &EnsurePortalConfigurationHandler{catalog: newCatalog(uow, prices, policies, provider, settings)}
 }
 
 var ProvideEnsurePortalConfigurationHandler = NewEnsurePortalConfigurationHandler
@@ -30,12 +32,8 @@ var _ EnsurePortalConfigurationCmd = (*EnsurePortalConfigurationHandler)(nil)
 // Handle creates the portal configuration only when billing_policy has none;
 // CreatePrice/ArchivePrice already refresh it when the price set changes.
 func (h *EnsurePortalConfigurationHandler) Handle(ctx context.Context, cmd *EnsurePortalConfiguration) error {
-	var policy *domain.BillingPolicy
-	if err := h.catalog.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		policy, err = r.BillingPolicy().Get(ctx, false)
-		return err
-	}); err != nil {
+	policy, err := h.catalog.policies.Get(ctx, false)
+	if err != nil {
 		return err
 	}
 	if policy.PortalConfigurationID() != nil {

@@ -2,6 +2,7 @@ package pgmapper
 
 import (
 	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/notopia-uit/notopia/internal/billing/errs"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
@@ -59,42 +60,42 @@ func ToInterval(i pgsqlc.BillingInterval) domain.Interval {
 	}
 }
 
-func FromStatus(s domain.Status) pgsqlc.SubscriptionStatus {
+func FromStatus(s domain.SubscriptionStatus) pgsqlc.SubscriptionStatus {
 	switch s {
-	case domain.StatusIncomplete:
+	case domain.SubscriptionStatusIncomplete:
 		return pgsqlc.SubscriptionStatusIncomplete
-	case domain.StatusActive:
+	case domain.SubscriptionStatusActive:
 		return pgsqlc.SubscriptionStatusActive
-	case domain.StatusPastDue:
+	case domain.SubscriptionStatusPastDue:
 		return pgsqlc.SubscriptionStatusPastDue
-	case domain.StatusUnpaid:
+	case domain.SubscriptionStatusUnpaid:
 		return pgsqlc.SubscriptionStatusUnpaid
-	case domain.StatusCanceled:
+	case domain.SubscriptionStatusCanceled:
 		return pgsqlc.SubscriptionStatusCanceled
-	case domain.StatusIncompleteExpired:
+	case domain.SubscriptionStatusIncompleteExpired:
 		return pgsqlc.SubscriptionStatusIncompleteExpired
-	case domain.StatusNone:
+	case domain.SubscriptionStatusNone:
 		return ""
 	}
 	return ""
 }
 
-func ToStatus(s pgsqlc.SubscriptionStatus) domain.Status {
+func ToStatus(s pgsqlc.SubscriptionStatus) domain.SubscriptionStatus {
 	switch s {
 	case pgsqlc.SubscriptionStatusIncomplete:
-		return domain.StatusIncomplete
+		return domain.SubscriptionStatusIncomplete
 	case pgsqlc.SubscriptionStatusActive:
-		return domain.StatusActive
+		return domain.SubscriptionStatusActive
 	case pgsqlc.SubscriptionStatusPastDue:
-		return domain.StatusPastDue
+		return domain.SubscriptionStatusPastDue
 	case pgsqlc.SubscriptionStatusUnpaid:
-		return domain.StatusUnpaid
+		return domain.SubscriptionStatusUnpaid
 	case pgsqlc.SubscriptionStatusCanceled:
-		return domain.StatusCanceled
+		return domain.SubscriptionStatusCanceled
 	case pgsqlc.SubscriptionStatusIncompleteExpired:
-		return domain.StatusIncompleteExpired
+		return domain.SubscriptionStatusIncompleteExpired
 	default:
-		return domain.StatusNone
+		return domain.SubscriptionStatusNone
 	}
 }
 
@@ -166,4 +167,35 @@ func ToRefundStatus(s pgsqlc.RefundStatus) domain.RefundStatus {
 	default:
 		return domain.RefundStatusUnspecified
 	}
+}
+
+const (
+	currencyVND = "vnd"
+)
+
+func FromCurrency(c domain.Currency) string {
+	switch c {
+	case domain.CurrencyVND:
+		return currencyVND
+	case domain.CurrencyUnspecified:
+		return ""
+	}
+	return ""
+}
+
+func ToCurrency(s string) (domain.Currency, error) {
+	switch s {
+	case currencyVND:
+		return domain.CurrencyVND, nil
+	default:
+		return domain.CurrencyUnspecified, errs.NewInternal("unknown stored currency "+s, nil)
+	}
+}
+
+func ToMoney(amount int64, currency string) (domain.Money, error) {
+	c, err := ToCurrency(currency)
+	if err != nil {
+		return domain.Money{}, err
+	}
+	return domain.NewMoney(amount, c)
 }
