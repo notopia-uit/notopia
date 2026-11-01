@@ -4,6 +4,7 @@
 package billing
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/oapi-codegen/nullable"
@@ -472,7 +473,7 @@ type NotFoundError = Error
 type UnauthorizedError = map[string]interface{}
 
 // StripeWebhookJSONBody defines parameters for StripeWebhook.
-type StripeWebhookJSONBody map[string]interface{}
+type StripeWebhookJSONBody = json.RawMessage
 
 // StripeWebhookParams defines parameters for StripeWebhook.
 type StripeWebhookParams struct {
@@ -489,7 +490,7 @@ type AdminUpdatePolicyJSONRequestBody = UpdatePolicyRequest
 type AdminCreatePriceJSONRequestBody = CreatePriceRequest
 
 // StripeWebhookJSONRequestBody defines body for StripeWebhook for application/json ContentType.
-type StripeWebhookJSONRequestBody StripeWebhookJSONBody
+type StripeWebhookJSONRequestBody = StripeWebhookJSONBody
 
 // CreateCheckoutSessionJSONRequestBody defines body for CreateCheckoutSession for application/json ContentType.
 type CreateCheckoutSessionJSONRequestBody = CheckoutSessionRequest

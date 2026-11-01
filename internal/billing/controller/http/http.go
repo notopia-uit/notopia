@@ -1,11 +1,9 @@
 package http
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"time"
@@ -72,34 +70,6 @@ func ValidateHandler() (gin.HandlerFunc, error) {
 	return ginmiddleware.OapiRequestValidatorWithOptions(spec, opts), nil
 }
 
-const rawBodyKey = "billing.rawBody"
-
-func captureRawBody() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if c.Request.Method == http.MethodPost && c.Request.URL.Path == "/billing/webhooks/stripe" {
-			body, err := io.ReadAll(c.Request.Body)
-			if err != nil {
-				c.AbortWithStatus(http.StatusBadRequest)
-				return
-			}
-			c.Set(rawBodyKey, body)
-			c.Request.Body = io.NopCloser(bytes.NewReader(body))
-		}
-		c.Next()
-	}
-}
-
-func rawBody(ctx context.Context) []byte {
-	if c, ok := ctx.(*gin.Context); ok {
-		if v, ok := c.Get(rawBodyKey); ok {
-			if b, ok := v.([]byte); ok {
-				return b
-			}
-		}
-	}
-	return nil
-}
-
 func RegisterRoutes(e *gin.Engine, handler IHandler) error {
 	validateHandler, err := ValidateHandler()
 	if err != nil {
@@ -108,9 +78,8 @@ func RegisterRoutes(e *gin.Engine, handler IHandler) error {
 	api := e.Group("/")
 	{
 		api.Use(commonhttp.GatewayUserAuth())
-		api.Use(captureRawBody())
 		api.Use(validateHandler)
-		billing.RegisterHandlers(api, handler)
+		billing.RegisterHandlersWithOptions(api, handler, handlerOptions())
 	}
 	e.GET("/billing/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")

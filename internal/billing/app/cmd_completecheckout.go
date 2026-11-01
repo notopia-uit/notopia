@@ -12,6 +12,7 @@ import (
 
 type CompleteCheckout struct {
 	EventID   string
+	EventType string
 	SessionID string
 }
 
@@ -39,8 +40,6 @@ type CompleteCheckoutCmd commonhandler.Cmd[CompleteCheckout]
 
 var _ CompleteCheckoutCmd = (*CompleteCheckoutHandler)(nil)
 
-const eventCheckoutCompleted = "checkout.session.completed"
-
 func (h *CompleteCheckoutHandler) Handle(ctx context.Context, cmd *CompleteCheckout) error {
 	session, err := h.provider.GetCheckoutSession(ctx, cmd.SessionID)
 	if err != nil {
@@ -67,7 +66,7 @@ func (h *CompleteCheckoutHandler) Handle(ctx context.Context, cmd *CompleteCheck
 
 func (h *CompleteCheckoutHandler) markProcessed(ctx context.Context, cmd *CompleteCheckout) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		_, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, eventCheckoutCompleted)
+		_, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType)
 		return err
 	})
 }
@@ -107,7 +106,7 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 
 	now, actor := time.Now(), h.settings.ServiceAccountUserID
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, eventCheckoutCompleted); err != nil || !first {
+		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType); err != nil || !first {
 			return err
 		}
 		if existing, err := r.Subscription().GetByProviderSubscriptionID(ctx, s.ProviderSubscriptionID, true); err != nil || existing != nil {
@@ -153,7 +152,7 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 
 	now, actor := time.Now(), h.settings.ServiceAccountUserID
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, eventCheckoutCompleted); err != nil || !first {
+		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType); err != nil || !first {
 			return err
 		}
 		if existing, err := r.Subscription().GetByProviderPaymentID(ctx, s.Payment.PaymentRef(), true); err != nil || existing != nil {
@@ -233,7 +232,7 @@ func (h *CompleteCheckoutHandler) payerChange(ctx context.Context, cmd *Complete
 
 	now := time.Now()
 	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, eventCheckoutCompleted); err != nil || !first {
+		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType); err != nil || !first {
 			return err
 		}
 		if err := h.setPayer(ctx, r, s.WorkspaceID, s.Payer, now); err != nil {

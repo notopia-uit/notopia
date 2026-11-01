@@ -60,10 +60,10 @@ Deferred (not this PR): handler decorator refactor, see `tmp/billing/deferred-ha
 
 ## T7 Webhook typing (sonnet) — dedicated commit
 
-- [ ] `api/billing/paths/webhooks_stripe.yaml` body schema `x-go-type: json.RawMessage`, `x-go-type-import: {path: encoding/json}`; `nx gen api`
-- [ ] Delete `captureRawBody`, `rawBodyKey`, `rawBody(ctx)`
-- [ ] Controller (may import stripe-go): verify with `webhook.ConstructEventWithOptions(*req.Body, …)`, switch on `ev.Type` with `stripe.EventTypeX`, parse `ev.Data.Raw` into `stripe.CheckoutSession` / `stripe.Subscription` / `stripe.Invoice` / `stripe.Refund`; delete `stripeObject`/`stripeID`
-- [ ] App stays agnostic: commands take plain ids + event id/type string; remove `eventCheckoutCompleted` from app (controller passes event type)
+- [x] `api/billing/paths/webhooks_stripe.yaml` body schema `x-go-type: json.RawMessage` (no explicit import: generator auto-imports and a duplicate breaks the build); `nx gen api`
+- [x] Replace global `captureRawBody` with a `billing.GinServerOptions` middleware scoped by `c.FullPath()` to the webhook route (typed ctx key); bound json drops trailing whitespace, so the signature is verified against the captured bytes
+- [x] Controller (may import stripe-go): verify with `webhook.ConstructEventWithOptions(<captured bytes>, …)`, switch on `ev.Type` with `stripe.EventTypeX`, parse `ev.Data.Raw` into `stripe.CheckoutSession` / `stripe.Subscription` / `stripe.Invoice` / `stripe.Refund`; delete `stripeObject`/`stripeID`
+- [x] App stays agnostic: commands take plain ids + event id/type string; remove `eventCheckoutCompleted` from app (controller passes event type)
 - [ ] Manual check: `stripe listen` + `stripe trigger checkout.session.completed` verifies signature with the bound bytes
 
 ## T8 Docs restructure (sonnet, worktree)
