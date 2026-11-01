@@ -1,3 +1,19 @@
+---
+title: Overview
+order: 1
+---
+
+# System Architecture
+
+Notopia is a set of small services behind a single gateway (Traefik). Go services (note,
+authorization, billing) and NestJS services (document, search worker) talk to each other
+over gRPC for synchronous calls and over Redpanda for events. Faded boxes are planned or
+unused.
+
+See [Messaging](./messaging) for the event backbone and [Auth and Gateway](./auth-and-gateway)
+for how requests are authenticated.
+
+```d2
 direction: right
 
 vars: {
@@ -201,3 +217,6 @@ style.border-radius: 15
 *.style.border-radius: 15
 *.*.style.border-radius: 15
 *.*.*.style.border-radius: 15
+```
+
+<!-- diagram id="architecture-diagram" -->

@@ -1,3 +1,22 @@
+---
+title: Note
+order: 1
+---
+
+# Note Service
+
+Go service owning workspaces, folders, notes, links, tags, trash and publishing. DDD + CQRS,
+with a transactional outbox for integration events. Note only stores note metadata; the
+editable binary content lives in the [Document service](../document/).
+
+- [Domain](./domain): class diagrams
+- [Data](./data): database schema
+- [Flows](./flows): sequence diagrams
+- [Events](./events): topics published and consumed
+
+## Architecture
+
+```d2
 direction: right
 
 vars: {
@@ -60,3 +79,6 @@ application -> domain
 controllers -> application
 infrastructure -> application
 infrastructure -> domain
+```
+
+<!-- diagram id="architecture-note-diagram" -->

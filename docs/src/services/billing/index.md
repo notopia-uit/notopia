@@ -1,3 +1,20 @@
+---
+title: Billing
+order: 4
+---
+
+# Billing Service
+
+Plans, prices, subscriptions and entitlements. Stripe (sandbox) through hosted Checkout and
+Customer Portal. DDD + CQRS like the Note service, but without an outbox: subscription
+changes are published best-effort to Kafka after commit. Other services read entitlements
+over gRPC and never cache them.
+
+- [Flows](./flows): checkout, webhooks, cancellation, crons
+
+## Architecture
+
+```d2
 direction: right
 
 vars: {
@@ -66,3 +83,6 @@ infrastructure.notifier -> kafka: subscription.changed (best-effort)
 kafka -> controllers.event: workspace.deleted\nrole_updated\nmember_removed
 infrastructure.authorization -> authz
 note -> controllers.grpc: entitlement checks
+```
+
+<!-- diagram id="architecture-billing-diagram" -->

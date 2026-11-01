@@ -1,3 +1,15 @@
+---
+title: Search Worker
+order: 5
+---
+
+# Search Worker
+
+NestJS worker consuming integration events from Redpanda and syncing notes into Meilisearch.
+
+## Architecture
+
+```d2
 direction: right
 
 vars: {
@@ -29,3 +41,6 @@ meili: MeiliSearch
 
 controller -> service
 service -> meili
+```
+
+<!-- diagram id="architecture-search-worker-diagram" -->

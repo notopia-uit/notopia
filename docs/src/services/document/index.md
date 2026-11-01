@@ -1,3 +1,19 @@
+---
+title: Document
+order: 2
+---
+
+# Document Service
+
+NestJS service holding the collaborative (Yjs / Blocknote) content of notes and serving the
+realtime websocket. Note content is committed back to the Note service through events.
+
+- [Domain](./domain): class diagrams
+- [Data](./data): database schema
+
+## Architecture
+
+```d2
 direction: right
 
 vars: {
@@ -43,3 +59,6 @@ modules: Modules {
   hocuspocus -> authorization
   hocuspocus -> note
 }
+```
+
+<!-- diagram id="architecture-document-diagram" -->

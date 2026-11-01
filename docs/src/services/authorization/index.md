@@ -1,3 +1,19 @@
+---
+title: Authorization
+order: 3
+---
+
+# Authorization Service
+
+Go service that answers permission checks (Casbin policies, workspace memberships and roles)
+over gRPC for the other services.
+
+- [Domain](./domain): class diagrams
+- [Data](./data): database schema
+
+## Architecture
+
+```d2
 direction: right
 
 vars: {
@@ -36,3 +52,6 @@ infrastructure: Infrastructure {
 
 controllers -> application
 application -> infrastructure
+```
+
+<!-- diagram id="architecture-authorization-diagram" -->

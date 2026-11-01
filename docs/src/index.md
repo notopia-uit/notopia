@@ -7,9 +7,12 @@ hero:
   text: Utopia of Notes
   actions:
     - theme: brand
-      text: Basics
-      link: /basics
+      text: Getting Started
+      link: /getting-started/
     - theme: alt
-      text: References
-      link: /references
+      text: Architecture
+      link: /architecture/overview
+    - theme: alt
+      text: Services
+      link: /services/note/
 ---

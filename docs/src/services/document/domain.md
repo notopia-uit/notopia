@@ -1,5 +1,5 @@
 ---
-order: 1
+order: 2
 ---
 
 # Document Class Diagram
