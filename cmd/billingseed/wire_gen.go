@@ -86,6 +86,8 @@ func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) 
 	ensureDefaultsHandler := app.NewEnsureDefaultsHandler(unitOfWork)
 	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
 	listPricesHandler := app.NewListPricesHandler(billingReadModel)
+	priceRepo := pgrepo.NewPriceRepo(queries)
+	policyRepo := pgrepo.NewPolicyRepo(queries)
 	billingseedStripe := &config.Stripe
 	configStripe := billingseed.NewBillingStripeConfig(billingseedStripe)
 	catalog := &config.Catalog
@@ -93,8 +95,8 @@ func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) 
 	stripeProvider := stripe.New(configStripe, billing)
 	identity := &config.Identity
 	settings := billingseed.NewAppSettings(catalog, identity)
-	createPriceHandler := app.NewCreatePriceHandler(unitOfWork, stripeProvider, settings)
-	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, stripeProvider, settings)
+	createPriceHandler := app.NewCreatePriceHandler(unitOfWork, priceRepo, policyRepo, stripeProvider, settings)
+	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, priceRepo, policyRepo, stripeProvider, settings)
 	seeder := billingseed.NewSeeder(pg, ensureDefaultsHandler, listPricesHandler, createPriceHandler, ensurePortalConfigurationHandler, catalog, identity, logger)
 	return seeder, func() {
 		cleanup4()

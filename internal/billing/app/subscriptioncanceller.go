@@ -13,32 +13,39 @@ import (
 
 type SubscriptionCanceller struct {
 	uow      domain.UnitOfWork
+	subs     domain.SubscriptionRepo
+	policies domain.BillingPolicyRepo
 	provider PaymentProvider
 	notifier Notifier
 	refunds  *RefundRunner
 }
 
-func NewSubscriptionCanceller(uow domain.UnitOfWork, provider PaymentProvider, notifier Notifier, refunds *RefundRunner) *SubscriptionCanceller {
-	return &SubscriptionCanceller{uow: uow, provider: provider, notifier: notifier, refunds: refunds}
+func NewSubscriptionCanceller(
+	uow domain.UnitOfWork,
+	subs domain.SubscriptionRepo,
+	policies domain.BillingPolicyRepo,
+	provider PaymentProvider,
+	notifier Notifier,
+	refunds *RefundRunner,
+) *SubscriptionCanceller {
+	return &SubscriptionCanceller{uow: uow, subs: subs, policies: policies, provider: provider, notifier: notifier, refunds: refunds}
 }
 
 var ProvideSubscriptionCanceller = NewSubscriptionCanceller
 
 func (c *SubscriptionCanceller) load(ctx context.Context, ws uuid.UUID) (*domain.Subscription, *domain.BillingPolicy, error) {
-	var sub *domain.Subscription
-	var policy *domain.BillingPolicy
-	err := c.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		if sub, err = r.Subscription().GetCurrentByWorkspace(ctx, ws, false); err != nil {
-			return err
-		}
-		policy, err = r.BillingPolicy().Get(ctx, false)
-		return err
-	})
-	if err == nil && sub == nil {
-		err = errs.New(errs.CodeNoActiveSubscription, "no active subscription", nil)
+	sub, err := c.subs.GetCurrentByWorkspace(ctx, ws, false)
+	if err != nil {
+		return nil, nil, err
 	}
-	return sub, policy, err
+	if sub == nil {
+		return nil, nil, errs.New(errs.CodeNoActiveSubscription, "no active subscription", nil)
+	}
+	policy, err := c.policies.Get(ctx, false)
+	if err != nil {
+		return nil, nil, err
+	}
+	return sub, policy, nil
 }
 
 func (c *SubscriptionCanceller) payments(ctx context.Context, sub *domain.Subscription) ([]domain.PaymentInfo, error) {

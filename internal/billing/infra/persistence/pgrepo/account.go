@@ -13,9 +13,27 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
-type accountRepo struct{ q *pgsqlc.Queries }
+type AccountRepo struct {
+	q    *pgsqlc.Queries
+	inTx bool
+}
 
-func (r *accountRepo) GetByWorkspace(ctx context.Context, workspaceID uuid.UUID, forUpdate bool) (*domain.BillingAccount, error) {
+var _ domain.BillingAccountRepo = (*AccountRepo)(nil)
+
+func NewAccountRepo(q *pgsqlc.Queries) *AccountRepo {
+	return &AccountRepo{q: q, inTx: false}
+}
+
+var ProvideAccountRepo = NewAccountRepo
+
+func newAccountRepoInTx(q *pgsqlc.Queries) *AccountRepo {
+	return &AccountRepo{q: q, inTx: true}
+}
+
+func (r *AccountRepo) GetByWorkspace(ctx context.Context, workspaceID uuid.UUID, forUpdate bool) (*domain.BillingAccount, error) {
+	if err := requireLockTx(r.inTx, forUpdate); err != nil {
+		return nil, err
+	}
 	row, err := r.q.GetBillingAccount(ctx, pgsqlc.GetBillingAccountParams{WorkspaceID: workspaceID, ForUpdate: forUpdate})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
@@ -26,7 +44,7 @@ func (r *accountRepo) GetByWorkspace(ctx context.Context, workspaceID uuid.UUID,
 	return pgmapper.ToAccount(row)
 }
 
-func (r *accountRepo) ListByPayer(ctx context.Context, payerID string) ([]*domain.BillingAccount, error) {
+func (r *AccountRepo) ListByPayer(ctx context.Context, payerID string) ([]*domain.BillingAccount, error) {
 	rows, err := r.q.ListBillingAccountsByPayer(ctx, payerID)
 	if err != nil {
 		return nil, errs.NewInternal("failed to list billing accounts by payer", err)
@@ -42,7 +60,10 @@ func (r *accountRepo) ListByPayer(ctx context.Context, payerID string) ([]*domai
 	return out, nil
 }
 
-func (r *accountRepo) Save(ctx context.Context, a *domain.BillingAccount) error {
+func (r *AccountRepo) Save(ctx context.Context, a *domain.BillingAccount) error {
+	if err := requireTx(r.inTx, "save"); err != nil {
+		return err
+	}
 	p := a.Payer()
 	err := r.q.UpsertBillingAccount(ctx, &pgsqlc.UpsertBillingAccountParams{
 		WorkspaceID: a.WorkspaceID(), ProviderCustomerID: a.ProviderCustomerID(),

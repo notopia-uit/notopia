@@ -16,13 +16,22 @@ type HandlePayerRemoved struct {
 
 type HandlePayerRemovedHandler struct {
 	uow      domain.UnitOfWork
+	accounts domain.BillingAccountRepo
+	subs     domain.SubscriptionRepo
 	provider PaymentProvider
 	notifier Notifier
 	settings *Settings
 }
 
-func NewHandlePayerRemovedHandler(uow domain.UnitOfWork, provider PaymentProvider, notifier Notifier, settings *Settings) *HandlePayerRemovedHandler {
-	return &HandlePayerRemovedHandler{uow: uow, provider: provider, notifier: notifier, settings: settings}
+func NewHandlePayerRemovedHandler(
+	uow domain.UnitOfWork,
+	accounts domain.BillingAccountRepo,
+	subs domain.SubscriptionRepo,
+	provider PaymentProvider,
+	notifier Notifier,
+	settings *Settings,
+) *HandlePayerRemovedHandler {
+	return &HandlePayerRemovedHandler{uow: uow, accounts: accounts, subs: subs, provider: provider, notifier: notifier, settings: settings}
 }
 
 var ProvideHandlePayerRemovedHandler = NewHandlePayerRemovedHandler
@@ -32,16 +41,12 @@ type HandlePayerRemovedCmd commonhandler.Cmd[HandlePayerRemoved]
 var _ HandlePayerRemovedCmd = (*HandlePayerRemovedHandler)(nil)
 
 func (h *HandlePayerRemovedHandler) Handle(ctx context.Context, cmd *HandlePayerRemoved) error {
-	var account *domain.BillingAccount
-	var sub *domain.Subscription
-	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		if account, err = r.BillingAccount().GetByWorkspace(ctx, cmd.WorkspaceID, false); err != nil {
-			return err
-		}
-		sub, err = r.Subscription().GetCurrentByWorkspace(ctx, cmd.WorkspaceID, false)
+	account, err := h.accounts.GetByWorkspace(ctx, cmd.WorkspaceID, false)
+	if err != nil {
 		return err
-	}); err != nil {
+	}
+	sub, err := h.subs.GetCurrentByWorkspace(ctx, cmd.WorkspaceID, false)
+	if err != nil {
 		return err
 	}
 	if account == nil || account.Payer().ID() != cmd.UserID || account.PayerMissingSince() != nil {
@@ -57,7 +62,7 @@ func (h *HandlePayerRemovedHandler) Handle(ctx context.Context, cmd *HandlePayer
 		return err
 	}
 	now, actor := time.Now(), h.settings.ServiceAccountUserID
-	err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		a, err := r.BillingAccount().GetByWorkspace(ctx, cmd.WorkspaceID, true)
 		if err != nil {
 			return err

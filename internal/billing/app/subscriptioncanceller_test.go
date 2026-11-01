@@ -40,7 +40,7 @@ func newCancellerFixture(t *testing.T, status domain.SubscriptionStatus) *cancel
 	return &cancellerFixture{
 		store:                 store,
 		provider:              provider,
-		subscriptionCanceller: NewSubscriptionCanceller(store, provider, notifier, NewRefundRunner(store, provider, settings)),
+		subscriptionCanceller: NewSubscriptionCanceller(store, store.Subscription(), store.BillingPolicy(), provider, notifier, NewRefundRunner(store, store.Subscription(), provider, settings)),
 		ws:                    ws,
 		sub:                   sub,
 	}

@@ -64,7 +64,7 @@ func TestReconcileCancelsLocallyCanceledSubscriptionAtProvider(t *testing.T) {
 	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, "sub_1").Return(f.providerSnapshot(t, domain.SubscriptionStatusActive), nil).Once()
 	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").Return(nil).Once()
 	settings := &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"}
-	handler := NewReconcileSubscriptionsHandler(f.store, newSyncHandler(t, f), NewRefundRunner(f.store, f.provider, settings))
+	handler := NewReconcileSubscriptionsHandler(f.store.Subscription(), newSyncHandler(t, f), NewRefundRunner(f.store, f.store.Subscription(), f.provider, settings))
 
 	require.NoError(t, handler.Handle(context.Background(), &ReconcileSubscriptions{}))
 }

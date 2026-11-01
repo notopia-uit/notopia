@@ -45,14 +45,14 @@ func newFixture(t *testing.T) *fixture {
 	notifier.EXPECT().SubscriptionChanged(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Maybe()
 
 	settings := &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"}
-	refunds := NewRefundRunner(store, provider, settings)
+	refunds := NewRefundRunner(store, store.Subscription(), provider, settings)
 	return &fixture{
 		store:    store,
 		provider: provider,
 		ws:       ws,
 		plus:     plus,
 		lifetime: lifetime,
-		handler:  NewCompleteCheckoutHandler(store, provider, notifier, settings, refunds),
+		handler:  NewCompleteCheckoutHandler(store, store.Subscription(), store.BillingAccount(), provider, notifier, settings, refunds),
 	}
 }
 

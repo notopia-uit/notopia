@@ -15,14 +15,14 @@ type ClaimPayer struct {
 }
 
 type ClaimPayerHandler struct {
-	uow      domain.UnitOfWork
+	accounts domain.BillingAccountRepo
 	authz    AuthorizationSvc
 	provider PaymentProvider
 	settings *Settings
 }
 
-func NewClaimPayerHandler(uow domain.UnitOfWork, authz AuthorizationSvc, provider PaymentProvider, settings *Settings) *ClaimPayerHandler {
-	return &ClaimPayerHandler{uow: uow, authz: authz, provider: provider, settings: settings}
+func NewClaimPayerHandler(accounts domain.BillingAccountRepo, authz AuthorizationSvc, provider PaymentProvider, settings *Settings) *ClaimPayerHandler {
+	return &ClaimPayerHandler{accounts: accounts, authz: authz, provider: provider, settings: settings}
 }
 
 var ProvideClaimPayerHandler = NewClaimPayerHandler
@@ -35,12 +35,8 @@ func (h *ClaimPayerHandler) Handle(ctx context.Context, q *ClaimPayer) (string, 
 	if err := requirePermission(ctx, h.authz, q.Payer.ID, q.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
 		return "", err
 	}
-	var account *domain.BillingAccount
-	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		account, err = r.BillingAccount().GetByWorkspace(ctx, q.WorkspaceID, false)
-		return err
-	}); err != nil {
+	account, err := h.accounts.GetByWorkspace(ctx, q.WorkspaceID, false)
+	if err != nil {
 		return "", err
 	}
 	if account == nil {

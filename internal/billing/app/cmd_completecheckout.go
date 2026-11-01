@@ -17,14 +17,24 @@ type CompleteCheckout struct {
 
 type CompleteCheckoutHandler struct {
 	uow      domain.UnitOfWork
+	subs     domain.SubscriptionRepo
+	accounts domain.BillingAccountRepo
 	provider PaymentProvider
 	notifier Notifier
 	settings *Settings
 	refunds  *RefundRunner
 }
 
-func NewCompleteCheckoutHandler(uow domain.UnitOfWork, provider PaymentProvider, notifier Notifier, settings *Settings, refunds *RefundRunner) *CompleteCheckoutHandler {
-	return &CompleteCheckoutHandler{uow: uow, provider: provider, notifier: notifier, settings: settings, refunds: refunds}
+func NewCompleteCheckoutHandler(
+	uow domain.UnitOfWork,
+	subs domain.SubscriptionRepo,
+	accounts domain.BillingAccountRepo,
+	provider PaymentProvider,
+	notifier Notifier,
+	settings *Settings,
+	refunds *RefundRunner,
+) *CompleteCheckoutHandler {
+	return &CompleteCheckoutHandler{uow: uow, subs: subs, accounts: accounts, provider: provider, notifier: notifier, settings: settings, refunds: refunds}
 }
 
 var ProvideCompleteCheckoutHandler = NewCompleteCheckoutHandler
@@ -67,13 +77,7 @@ func (h *CompleteCheckoutHandler) markProcessed(ctx context.Context, cmd *Comple
 }
 
 func (h *CompleteCheckoutHandler) currentSub(ctx context.Context, ws uuid.UUID) (*domain.Subscription, error) {
-	var cur *domain.Subscription
-	err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		cur, err = r.Subscription().GetCurrentByWorkspace(ctx, ws, false)
-		return err
-	})
-	return cur, err
+	return h.subs.GetCurrentByWorkspace(ctx, ws, false)
 }
 
 func (h *CompleteCheckoutHandler) setPayer(ctx context.Context, r domain.RepoRegistry, ws uuid.UUID, payer domain.Payer, now time.Time) error {
@@ -247,16 +251,12 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 }
 
 func (h *CompleteCheckoutHandler) payerChange(ctx context.Context, cmd *CompleteCheckout, s CheckoutSessionResult) error {
-	var account *domain.BillingAccount
 	cur, err := h.currentSub(ctx, s.WorkspaceID)
 	if err != nil {
 		return err
 	}
-	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		account, err = r.BillingAccount().GetByWorkspace(ctx, s.WorkspaceID, false)
-		return err
-	}); err != nil || account == nil {
+	account, err := h.accounts.GetByWorkspace(ctx, s.WorkspaceID, false)
+	if err != nil || account == nil {
 		return err
 	}
 	resume := account.PayerMissingSince() != nil && cur != nil && cur.CancelAtPeriodEnd() && cur.ProviderSubscriptionID() != nil

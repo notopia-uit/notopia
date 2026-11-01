@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
@@ -15,17 +14,17 @@ const reconcileBatchSize = 100
 type ReconcileSubscriptions struct{}
 
 type ReconcileSubscriptionsHandler struct {
-	uow     domain.UnitOfWork
+	subs    domain.SubscriptionRepo
 	sync    *SyncSubscriptionHandler
 	refunds *RefundRunner
 }
 
 func NewReconcileSubscriptionsHandler(
-	uow domain.UnitOfWork,
+	subs domain.SubscriptionRepo,
 	sync *SyncSubscriptionHandler,
 	refunds *RefundRunner,
 ) *ReconcileSubscriptionsHandler {
-	return &ReconcileSubscriptionsHandler{uow: uow, sync: sync, refunds: refunds}
+	return &ReconcileSubscriptionsHandler{subs: subs, sync: sync, refunds: refunds}
 }
 
 var ProvideReconcileSubscriptionsHandler = NewReconcileSubscriptionsHandler
@@ -37,20 +36,16 @@ var _ ReconcileSubscriptionsCmd = (*ReconcileSubscriptionsHandler)(nil)
 // Handle re-syncs subscriptions whose provider state may be stale and retries refunds
 // that were never submitted. Locally canceled subscriptions are synced too, which retries a failed provider cancel. Per-item failures are logged; the next tick retries them.
 func (h *ReconcileSubscriptionsHandler) Handle(ctx context.Context, _ *ReconcileSubscriptions) error {
-	var stale []*domain.Subscription
-	var canceled []*domain.Subscription
-	var refundSubs []uuid.UUID
-	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		if stale, err = r.Subscription().ListNeedingReconcile(ctx, time.Now(), reconcileBatchSize); err != nil {
-			return err
-		}
-		if canceled, err = r.Subscription().ListCanceledAwaitingProviderCancel(ctx, reconcileBatchSize); err != nil {
-			return err
-		}
-		refundSubs, err = r.Subscription().ListIDsWithUnsubmittedRefunds(ctx, reconcileBatchSize)
+	stale, err := h.subs.ListNeedingReconcile(ctx, time.Now(), reconcileBatchSize)
+	if err != nil {
 		return err
-	}); err != nil {
+	}
+	canceled, err := h.subs.ListCanceledAwaitingProviderCancel(ctx, reconcileBatchSize)
+	if err != nil {
+		return err
+	}
+	refundSubs, err := h.subs.ListIDsWithUnsubmittedRefunds(ctx, reconcileBatchSize)
+	if err != nil {
 		return err
 	}
 	for _, s := range append(stale, canceled...) {

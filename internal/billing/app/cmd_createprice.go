@@ -19,8 +19,8 @@ type CreatePrice struct {
 
 type CreatePriceHandler struct{ catalog *catalog }
 
-func NewCreatePriceHandler(uow domain.UnitOfWork, provider PaymentProvider, settings *Settings) *CreatePriceHandler {
-	return &CreatePriceHandler{catalog: newCatalog(uow, provider, settings)}
+func NewCreatePriceHandler(uow domain.UnitOfWork, prices domain.PriceRepo, policies domain.BillingPolicyRepo, provider PaymentProvider, settings *Settings) *CreatePriceHandler {
+	return &CreatePriceHandler{catalog: newCatalog(uow, prices, policies, provider, settings)}
 }
 
 var ProvideCreatePriceHandler = NewCreatePriceHandler

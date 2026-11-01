@@ -31,15 +31,15 @@ Deferred (not this PR): handler decorator refactor, see `tmp/billing/deferred-ha
 
 ## T3 Singleton repos + Save guard (sonnet)
 
-- [ ] Wire provides `domain.SubscriptionRepo`, `BillingAccountRepo`, `PriceRepo`, `PlanRepo`, `BillingPolicyRepo`, `ProviderEventLog` backed by the pool (no tx, no publisher)
-- [ ] `Save` on a pool-backed repo returns `errs.NewInternal("save must run inside a unit of work", nil)`
-- [ ] App handlers use injected repos for plain reads; `uow.Execute` only for writes (lock + save)
+- [x] Wire provides `domain.SubscriptionRepo`, `BillingAccountRepo`, `PriceRepo`, `PlanRepo`, `BillingPolicyRepo`, `ProviderEventLog` backed by the pool (no tx, no publisher)
+- [x] `Save` on a pool-backed repo returns `errs.NewInternal("save must run inside a unit of work", nil)`
+- [x] App handlers use injected repos for plain reads; `uow.Execute` only for writes (lock + save)
 
 ## T4 Note outbox → queue schema (sonnet)
 
-- [ ] `sql.PostgreSQLQueueSchema{GenerateMessagesTableName}` + `sql.PostgreSQLQueueOffsetsAdapter{DeleteOnAck: true, GenerateMessagesTableName}`, no consumer group
-- [ ] Goose migration creates the queue table (drop old default-schema tables); `InitializeSchema: false`
-- [ ] Explicit matching `ForwarderTopic` in `forwarder.PublisherConfig` and `forwarder.Config`
+- [x] `sql.PostgreSQLQueueSchema{GenerateMessagesTableName}` + `sql.PostgreSQLQueueOffsetsAdapter{DeleteOnAck: true, GenerateMessagesTableName}`, no consumer group
+- [x] Goose migration creates the queue table (drop old default-schema tables); `InitializeSchema: false`
+- [x] Explicit matching `ForwarderTopic` in `forwarder.PublisherConfig` and `forwarder.Config`
 
 ## T5 Billing outbox, phase 1 (opus)
 

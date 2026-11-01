@@ -21,7 +21,7 @@ func runRefundWithError(t *testing.T, createErr error) *domain.Refund {
 	require.NoError(t, err)
 	require.NoError(t, f.store.Subscription().Save(context.Background(), f.sub))
 	f.provider.EXPECT().CreateRefund(mock.Anything, mock.Anything, "pi_1", mock.Anything).Return(RefundResult{}, createErr).Once()
-	runner := NewRefundRunner(f.store, f.provider, &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"})
+	runner := NewRefundRunner(f.store, f.store.Subscription(), f.provider, &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"})
 
 	require.NoError(t, runner.Run(context.Background(), f.sub.ID()))
 

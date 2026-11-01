@@ -19,13 +19,24 @@ type StartCheckout struct {
 
 type StartCheckoutHandler struct {
 	uow      domain.UnitOfWork
+	accounts domain.BillingAccountRepo
+	prices   domain.PriceRepo
+	subs     domain.SubscriptionRepo
 	authz    AuthorizationSvc
 	provider PaymentProvider
 	settings *Settings
 }
 
-func NewStartCheckoutHandler(uow domain.UnitOfWork, authz AuthorizationSvc, provider PaymentProvider, settings *Settings) *StartCheckoutHandler {
-	return &StartCheckoutHandler{uow: uow, authz: authz, provider: provider, settings: settings}
+func NewStartCheckoutHandler(
+	uow domain.UnitOfWork,
+	accounts domain.BillingAccountRepo,
+	prices domain.PriceRepo,
+	subs domain.SubscriptionRepo,
+	authz AuthorizationSvc,
+	provider PaymentProvider,
+	settings *Settings,
+) *StartCheckoutHandler {
+	return &StartCheckoutHandler{uow: uow, accounts: accounts, prices: prices, subs: subs, authz: authz, provider: provider, settings: settings}
 }
 
 var ProvideStartCheckoutHandler = NewStartCheckoutHandler
@@ -39,20 +50,16 @@ func billingPageURL(settings *Settings, ws uuid.UUID, result string) string {
 }
 
 // ensureAccount opens the billing account (and Stripe customer) on first use.
-func ensureAccount(ctx context.Context, uow domain.UnitOfWork, provider PaymentProvider, ws uuid.UUID, payer domain.Payer) (*domain.BillingAccount, error) {
-	var account *domain.BillingAccount
-	if err := uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		account, err = r.BillingAccount().GetByWorkspace(ctx, ws, false)
-		return err
-	}); err != nil || account != nil {
+func (h *StartCheckoutHandler) ensureAccount(ctx context.Context, ws uuid.UUID, payer domain.Payer) (*domain.BillingAccount, error) {
+	account, err := h.accounts.GetByWorkspace(ctx, ws, false)
+	if err != nil || account != nil {
 		return account, err
 	}
-	customerID, err := provider.CreateCustomer(ctx, ws, payer)
+	customerID, err := h.provider.CreateCustomer(ctx, ws, payer)
 	if err != nil {
 		return nil, err
 	}
-	err = uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		existing, err := r.BillingAccount().GetByWorkspace(ctx, ws, true)
 		if err != nil || existing != nil {
 			account = existing
@@ -68,16 +75,12 @@ func (h *StartCheckoutHandler) Handle(ctx context.Context, q *StartCheckout) (st
 	if err := requirePermission(ctx, h.authz, q.Payer.ID, q.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
 		return "", err
 	}
-	var price *domain.Price
-	var cur *domain.Subscription
-	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		if price, err = r.Price().GetByID(ctx, q.PriceID, false); err != nil {
-			return err
-		}
-		cur, err = r.Subscription().GetCurrentByWorkspace(ctx, q.WorkspaceID, false)
-		return err
-	}); err != nil {
+	price, err := h.prices.GetByID(ctx, q.PriceID, false)
+	if err != nil {
+		return "", err
+	}
+	cur, err := h.subs.GetCurrentByWorkspace(ctx, q.WorkspaceID, false)
+	if err != nil {
 		return "", err
 	}
 	if !price.Active() {
@@ -91,7 +94,7 @@ func (h *StartCheckoutHandler) Handle(ctx context.Context, q *StartCheckout) (st
 	if err != nil {
 		return "", err
 	}
-	account, err := ensureAccount(ctx, h.uow, h.provider, q.WorkspaceID, payer)
+	account, err := h.ensureAccount(ctx, q.WorkspaceID, payer)
 	if err != nil {
 		return "", err
 	}

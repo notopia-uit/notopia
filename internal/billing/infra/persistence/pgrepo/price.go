@@ -14,9 +14,27 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
-type priceRepo struct{ q *pgsqlc.Queries }
+type PriceRepo struct {
+	q    *pgsqlc.Queries
+	inTx bool
+}
 
-func (r *priceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Price, error) {
+var _ domain.PriceRepo = (*PriceRepo)(nil)
+
+func NewPriceRepo(q *pgsqlc.Queries) *PriceRepo {
+	return &PriceRepo{q: q, inTx: false}
+}
+
+var ProvidePriceRepo = NewPriceRepo
+
+func newPriceRepoInTx(q *pgsqlc.Queries) *PriceRepo {
+	return &PriceRepo{q: q, inTx: true}
+}
+
+func (r *PriceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Price, error) {
+	if err := requireLockTx(r.inTx, forUpdate); err != nil {
+		return nil, err
+	}
 	row, err := r.q.GetPrice(ctx, pgsqlc.GetPriceParams{ID: id, ForUpdate: forUpdate})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, errs.NewNotFound(fmt.Sprintf("price %s not found", id))
@@ -27,7 +45,7 @@ func (r *priceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 	return pgmapper.ToPrice(row)
 }
 
-func (r *priceRepo) GetByProviderPriceID(ctx context.Context, id string) (*domain.Price, error) {
+func (r *PriceRepo) GetByProviderPriceID(ctx context.Context, id string) (*domain.Price, error) {
 	row, err := r.q.GetPriceByProviderPriceID(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, errs.NewNotFound(fmt.Sprintf("provider price %s not found", id))
@@ -38,7 +56,10 @@ func (r *priceRepo) GetByProviderPriceID(ctx context.Context, id string) (*domai
 	return pgmapper.ToPrice(row)
 }
 
-func (r *priceRepo) GetActive(ctx context.Context, plan domain.PlanTier, interval domain.Interval, currency domain.Currency, forUpdate bool) (*domain.Price, error) {
+func (r *PriceRepo) GetActive(ctx context.Context, plan domain.PlanTier, interval domain.Interval, currency domain.Currency, forUpdate bool) (*domain.Price, error) {
+	if err := requireLockTx(r.inTx, forUpdate); err != nil {
+		return nil, err
+	}
 	row, err := r.q.GetActivePrice(ctx, &pgsqlc.GetActivePriceParams{
 		Plan: pgmapper.FromPlanTier(plan), BillingInterval: pgmapper.FromInterval(interval), Currency: pgmapper.FromCurrency(currency), ForUpdate: forUpdate,
 	})
@@ -51,7 +72,7 @@ func (r *priceRepo) GetActive(ctx context.Context, plan domain.PlanTier, interva
 	return pgmapper.ToPrice(row)
 }
 
-func (r *priceRepo) ListActive(ctx context.Context) ([]*domain.Price, error) {
+func (r *PriceRepo) ListActive(ctx context.Context) ([]*domain.Price, error) {
 	rows, err := r.q.ListActivePrices(ctx)
 	if err != nil {
 		return nil, errs.NewInternal("failed to list active prices", err)
@@ -59,7 +80,7 @@ func (r *priceRepo) ListActive(ctx context.Context) ([]*domain.Price, error) {
 	return pgmapper.ToPrices(rows)
 }
 
-func (r *priceRepo) List(ctx context.Context) ([]*domain.Price, error) {
+func (r *PriceRepo) List(ctx context.Context) ([]*domain.Price, error) {
 	rows, err := r.q.ListPrices(ctx)
 	if err != nil {
 		return nil, errs.NewInternal("failed to list prices", err)
@@ -67,7 +88,10 @@ func (r *priceRepo) List(ctx context.Context) ([]*domain.Price, error) {
 	return pgmapper.ToPrices(rows)
 }
 
-func (r *priceRepo) Save(ctx context.Context, p *domain.Price) error {
+func (r *PriceRepo) Save(ctx context.Context, p *domain.Price) error {
+	if err := requireTx(r.inTx, "save"); err != nil {
+		return err
+	}
 	err := r.q.UpsertPrice(ctx, &pgsqlc.UpsertPriceParams{
 		ID: p.ID(), Plan: pgmapper.FromPlanTier(p.Plan()), BillingInterval: pgmapper.FromInterval(p.Interval()),
 		Amount: p.Amount().Amount(), Currency: pgmapper.FromCurrency(p.Amount().Currency()), ProviderPriceID: p.ProviderPriceID(),

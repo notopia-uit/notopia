@@ -12,9 +12,27 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
-type policyRepo struct{ q *pgsqlc.Queries }
+type PolicyRepo struct {
+	q    *pgsqlc.Queries
+	inTx bool
+}
 
-func (r *policyRepo) Get(ctx context.Context, forUpdate bool) (*domain.BillingPolicy, error) {
+var _ domain.BillingPolicyRepo = (*PolicyRepo)(nil)
+
+func NewPolicyRepo(q *pgsqlc.Queries) *PolicyRepo {
+	return &PolicyRepo{q: q, inTx: false}
+}
+
+var ProvidePolicyRepo = NewPolicyRepo
+
+func newPolicyRepoInTx(q *pgsqlc.Queries) *PolicyRepo {
+	return &PolicyRepo{q: q, inTx: true}
+}
+
+func (r *PolicyRepo) Get(ctx context.Context, forUpdate bool) (*domain.BillingPolicy, error) {
+	if err := requireLockTx(r.inTx, forUpdate); err != nil {
+		return nil, err
+	}
 	row, err := r.q.GetPolicy(ctx, pgsqlc.GetPolicyParams{ForUpdate: forUpdate})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, errs.NewNotFound("billing policy not seeded")
@@ -25,7 +43,10 @@ func (r *policyRepo) Get(ctx context.Context, forUpdate bool) (*domain.BillingPo
 	return pgmapper.ToPolicy(row), nil
 }
 
-func (r *policyRepo) Save(ctx context.Context, p *domain.BillingPolicy) error {
+func (r *PolicyRepo) Save(ctx context.Context, p *domain.BillingPolicy) error {
+	if err := requireTx(r.inTx, "save"); err != nil {
+		return err
+	}
 	err := r.q.UpsertPolicy(ctx, &pgsqlc.UpsertPolicyParams{
 		PastDueGraceDays:         int32(p.PastDueGraceDays()),
 		LifetimeRefundWindowDays: int32(p.LifetimeRefundWindowDays()),

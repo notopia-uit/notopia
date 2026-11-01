@@ -10,13 +10,23 @@ import (
 
 type catalog struct {
 	uow      domain.UnitOfWork
+	prices   domain.PriceRepo
+	policies domain.BillingPolicyRepo
 	provider PaymentProvider
 	settings *Settings
 }
 
-func newCatalog(uow domain.UnitOfWork, provider PaymentProvider, settings *Settings) *catalog {
+func newCatalog(
+	uow domain.UnitOfWork,
+	prices domain.PriceRepo,
+	policies domain.BillingPolicyRepo,
+	provider PaymentProvider,
+	settings *Settings,
+) *catalog {
 	return &catalog{
 		uow:      uow,
+		prices:   prices,
+		policies: policies,
 		provider: provider,
 		settings: settings,
 	}
@@ -74,12 +84,8 @@ func (c *catalog) createPrice(
 
 // refreshPortal creates a new portal configuration for the current active prices.
 func (c *catalog) refreshPortal(ctx context.Context, userID string) error {
-	var prices []*domain.Price
-	if err := c.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		prices, err = r.Price().ListActive(ctx)
-		return err
-	}); err != nil {
+	prices, err := c.prices.ListActive(ctx)
+	if err != nil {
 		return err
 	}
 	id, err := c.provider.CreatePortalConfiguration(ctx, prices, c.settings.WebBaseURL)

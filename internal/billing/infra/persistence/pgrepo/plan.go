@@ -14,9 +14,27 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
-type planRepo struct{ q *pgsqlc.Queries }
+type PlanRepo struct {
+	q    *pgsqlc.Queries
+	inTx bool
+}
 
-func (r *planRepo) Get(ctx context.Context, tier domain.PlanTier, forUpdate bool) (*domain.Plan, error) {
+var _ domain.PlanRepo = (*PlanRepo)(nil)
+
+func NewPlanRepo(q *pgsqlc.Queries) *PlanRepo {
+	return &PlanRepo{q: q, inTx: false}
+}
+
+var ProvidePlanRepo = NewPlanRepo
+
+func newPlanRepoInTx(q *pgsqlc.Queries) *PlanRepo {
+	return &PlanRepo{q: q, inTx: true}
+}
+
+func (r *PlanRepo) Get(ctx context.Context, tier domain.PlanTier, forUpdate bool) (*domain.Plan, error) {
+	if err := requireLockTx(r.inTx, forUpdate); err != nil {
+		return nil, err
+	}
 	row, err := r.q.GetPlan(ctx, pgsqlc.GetPlanParams{Tier: pgmapper.FromPlanTier(tier), ForUpdate: forUpdate})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, errs.NewNotFound(fmt.Sprintf("plan %s not found", tier))
@@ -27,7 +45,7 @@ func (r *planRepo) Get(ctx context.Context, tier domain.PlanTier, forUpdate bool
 	return pgmapper.ToPlan(row), nil
 }
 
-func (r *planRepo) ListMap(ctx context.Context) (map[domain.PlanTier]*domain.Plan, error) {
+func (r *PlanRepo) ListMap(ctx context.Context) (map[domain.PlanTier]*domain.Plan, error) {
 	rows, err := r.q.ListPlans(ctx)
 	if err != nil {
 		return nil, errs.NewInternal("failed to list plans", err)
@@ -35,7 +53,10 @@ func (r *planRepo) ListMap(ctx context.Context) (map[domain.PlanTier]*domain.Pla
 	return pgmapper.ToPlanMap(rows), nil
 }
 
-func (r *planRepo) Save(ctx context.Context, p *domain.Plan) error {
+func (r *PlanRepo) Save(ctx context.Context, p *domain.Plan) error {
+	if err := requireTx(r.inTx, "save"); err != nil {
+		return err
+	}
 	err := r.q.UpsertPlan(ctx, &pgsqlc.UpsertPlanParams{
 		Tier: pgmapper.FromPlanTier(p.Tier()), Features: pgjsonb.Features(p.Features()),
 		Limits: pgjsonb.Limits(p.Limits()), UpdatedAt: p.UpdatedAt(),

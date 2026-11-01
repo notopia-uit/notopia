@@ -16,14 +16,15 @@ type StartPortal struct {
 }
 
 type StartPortalHandler struct {
-	uow      domain.UnitOfWork
+	accounts domain.BillingAccountRepo
+	policies domain.BillingPolicyRepo
 	authz    AuthorizationSvc
 	provider PaymentProvider
 	settings *Settings
 }
 
-func NewStartPortalHandler(uow domain.UnitOfWork, authz AuthorizationSvc, provider PaymentProvider, settings *Settings) *StartPortalHandler {
-	return &StartPortalHandler{uow: uow, authz: authz, provider: provider, settings: settings}
+func NewStartPortalHandler(accounts domain.BillingAccountRepo, policies domain.BillingPolicyRepo, authz AuthorizationSvc, provider PaymentProvider, settings *Settings) *StartPortalHandler {
+	return &StartPortalHandler{accounts: accounts, policies: policies, authz: authz, provider: provider, settings: settings}
 }
 
 var ProvideStartPortalHandler = NewStartPortalHandler
@@ -36,16 +37,12 @@ func (h *StartPortalHandler) Handle(ctx context.Context, q *StartPortal) (string
 	if err := requirePermission(ctx, h.authz, q.UserID, q.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
 		return "", err
 	}
-	var account *domain.BillingAccount
-	var policy *domain.BillingPolicy
-	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		if account, err = r.BillingAccount().GetByWorkspace(ctx, q.WorkspaceID, false); err != nil {
-			return err
-		}
-		policy, err = r.BillingPolicy().Get(ctx, false)
-		return err
-	}); err != nil {
+	account, err := h.accounts.GetByWorkspace(ctx, q.WorkspaceID, false)
+	if err != nil {
+		return "", err
+	}
+	policy, err := h.policies.Get(ctx, false)
+	if err != nil {
 		return "", err
 	}
 	if account == nil {

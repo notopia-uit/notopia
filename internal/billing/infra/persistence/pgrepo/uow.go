@@ -46,9 +46,9 @@ func (u *UnitOfWork) Execute(ctx context.Context, fn func(r domain.RepoRegistry)
 
 type registry struct{ q *pgsqlc.Queries }
 
-func (r *registry) Subscription() domain.SubscriptionRepo     { return &subscriptionRepo{q: r.q} }
-func (r *registry) BillingAccount() domain.BillingAccountRepo { return &accountRepo{q: r.q} }
-func (r *registry) Price() domain.PriceRepo                   { return &priceRepo{q: r.q} }
-func (r *registry) Plan() domain.PlanRepo                     { return &planRepo{q: r.q} }
-func (r *registry) BillingPolicy() domain.BillingPolicyRepo   { return &policyRepo{q: r.q} }
-func (r *registry) ProviderEventLog() domain.ProviderEventLog { return &providerEventLog{q: r.q} }
+func (r *registry) Subscription() domain.SubscriptionRepo     { return newSubscriptionRepoInTx(r.q) }
+func (r *registry) BillingAccount() domain.BillingAccountRepo { return newAccountRepoInTx(r.q) }
+func (r *registry) Price() domain.PriceRepo                   { return newPriceRepoInTx(r.q) }
+func (r *registry) Plan() domain.PlanRepo                     { return newPlanRepoInTx(r.q) }
+func (r *registry) BillingPolicy() domain.BillingPolicyRepo   { return newPolicyRepoInTx(r.q) }
+func (r *registry) ProviderEventLog() domain.ProviderEventLog { return newProviderEventLogInTx(r.q) }
