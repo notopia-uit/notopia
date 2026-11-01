@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/notopia-uit/notopia/internal/billing/domain"
@@ -39,7 +40,8 @@ func (h *EnsureDefaultsHandler) Handle(ctx context.Context, _ *EnsureDefaults) e
 			}
 		}
 		if _, err := r.BillingPolicy().Get(ctx, false); err != nil {
-			if !hasCode(err, errs.CodeNotFound) {
+			var errsErr errs.Error
+			if !errors.As(err, &errsErr) || errsErr.Code() != errs.CodeNotFound {
 				return err
 			}
 			return r.BillingPolicy().Save(ctx, domain.DefaultBillingPolicy(now))

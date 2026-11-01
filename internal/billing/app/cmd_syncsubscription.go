@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/notopia-uit/notopia/internal/billing/domain"
@@ -50,7 +51,7 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 		}
 		if !sub.IsCurrent() {
 			// canceled locally (cancel-now / duplicate / replaced): never resurrect
-			if snap.Status == domain.StatusCanceled || snap.Status == domain.StatusIncompleteExpired {
+			if snap.Status == domain.SubscriptionStatusCanceled || snap.Status == domain.SubscriptionStatusIncompleteExpired {
 				sub.MarkProviderSynced(time.Now())
 				return r.Subscription().Save(ctx, sub)
 			}
@@ -71,7 +72,13 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 		return r.Subscription().Save(ctx, sub)
 	})
 	if err == nil && cancelRemotely {
-		cancelAtProvider(ctx, h.provider, cmd.ProviderSubscriptionID)
+		if err := h.provider.CancelSubscriptionNow(ctx, cmd.ProviderSubscriptionID); err != nil {
+			slog.ErrorContext(
+				ctx, "cancelling subscription at the provider failed; reconcile will retry",
+				slog.String("provider_subscription_id", cmd.ProviderSubscriptionID),
+				slog.Any("error", err),
+			)
+		}
 	}
 	if err == nil {
 		notifySubscription(ctx, h.notifier, changed)

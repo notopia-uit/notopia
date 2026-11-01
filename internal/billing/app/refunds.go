@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -41,7 +42,8 @@ func (r *RefundRunner) Run(ctx context.Context, subscriptionID uuid.UUID) error 
 	}
 	for _, rf := range pending {
 		res, err := r.provider.CreateRefund(ctx, rf.ID(), rf.PaymentRef(), rf.Amount())
-		if hasCode(err, errs.CodeInvalid) {
+		var errsErr errs.Error
+		if errors.As(err, &errsErr) && errsErr.Code() == errs.CodeInvalid {
 			slog.ErrorContext(
 				ctx, "refund rejected by the provider; marking it failed",
 				slog.String("refund_id", rf.ID().String()),

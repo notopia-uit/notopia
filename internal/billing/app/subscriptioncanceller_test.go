@@ -14,14 +14,14 @@ import (
 )
 
 type cancellerFixture struct {
-	store     *memStore
-	provider  *MockPaymentProvider
-	canceller *Canceller
-	ws        uuid.UUID
-	sub       *domain.Subscription
+	store                 *memStore
+	provider              *MockPaymentProvider
+	subscriptionCanceller *SubscriptionCanceller
+	ws                    uuid.UUID
+	sub                   *domain.Subscription
 }
 
-func newCancellerFixture(t *testing.T, status domain.Status) *cancellerFixture {
+func newCancellerFixture(t *testing.T, status domain.SubscriptionStatus) *cancellerFixture {
 	t.Helper()
 	store := newMemStore()
 	now := time.Now()
@@ -41,28 +41,28 @@ func newCancellerFixture(t *testing.T, status domain.Status) *cancellerFixture {
 	notifier.EXPECT().SubscriptionChanged(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Maybe()
 	settings := &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"}
 	return &cancellerFixture{
-		store:     store,
-		provider:  provider,
-		canceller: NewCanceller(store, provider, notifier, NewRefundRunner(store, provider, settings)),
-		ws:        ws,
-		sub:       sub,
+		store:                 store,
+		provider:              provider,
+		subscriptionCanceller: NewSubscriptionCanceller(store, provider, notifier, NewRefundRunner(store, provider, settings)),
+		ws:                    ws,
+		sub:                   sub,
 	}
 }
 
 func TestCancelNowPastDueWithoutPeriodPayments(t *testing.T) {
-	f := newCancellerFixture(t, domain.StatusPastDue)
+	f := newCancellerFixture(t, domain.SubscriptionStatusPastDue)
 	f.provider.EXPECT().PeriodPayments(mock.Anything, "sub_1", mock.Anything, mock.Anything).Return(nil, nil).Once()
 	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").Return(nil).Once()
 
-	err := f.canceller.CancelNow(context.Background(), f.ws, domain.RefundReasonWorkspaceDeleted, "u", true)
+	err := f.subscriptionCanceller.CancelNow(context.Background(), f.ws, domain.RefundReasonWorkspaceDeleted, "u", true)
 
 	require.NoError(t, err)
-	assert.Equal(t, domain.StatusCanceled, f.store.subs[f.sub.ID()].Status())
+	assert.Equal(t, domain.SubscriptionStatusCanceled, f.store.subs[f.sub.ID()].Status())
 	assert.Empty(t, f.store.subs[f.sub.ID()].Refunds())
 }
 
 func TestCancelNowCancelsLocallyBeforeProviderAndSurvivesProviderFailure(t *testing.T) {
-	f := newCancellerFixture(t, domain.StatusActive)
+	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
 	now := time.Now()
 	f.provider.EXPECT().PeriodPayments(mock.Anything, "sub_1", mock.Anything, mock.Anything).Return([]domain.PaymentInfo{{
 		Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: now,
@@ -70,7 +70,7 @@ func TestCancelNowCancelsLocallyBeforeProviderAndSurvivesProviderFailure(t *test
 	}}, nil).Once()
 	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").
 		RunAndReturn(func(context.Context, string) error {
-			assert.Equal(t, domain.StatusCanceled, f.store.subs[f.sub.ID()].Status(), "local cancel is committed first")
+			assert.Equal(t, domain.SubscriptionStatusCanceled, f.store.subs[f.sub.ID()].Status(), "local cancel is committed first")
 			return errors.New("stripe down")
 		}).Once()
 	submitted := 0
@@ -83,7 +83,7 @@ func TestCancelNowCancelsLocallyBeforeProviderAndSurvivesProviderFailure(t *test
 			}, nil
 		}).Once()
 
-	err := f.canceller.CancelNow(context.Background(), f.ws, domain.RefundReasonCancelNow, "u", false)
+	err := f.subscriptionCanceller.CancelNow(context.Background(), f.ws, domain.RefundReasonCancelNow, "u", false)
 
 	require.NoError(t, err)
 	assert.Equal(t, 1, submitted)

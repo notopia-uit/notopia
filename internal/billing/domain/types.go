@@ -76,43 +76,43 @@ func (i Interval) String() string {
 	}
 }
 
-// StatusNone is the zero value and a real state: the workspace has no subscription.
-type Status uint8
+// SubscriptionStatusNone is the zero value and a real state: the workspace has no subscription.
+type SubscriptionStatus uint8
 
 const (
-	StatusNone Status = iota
-	StatusIncomplete
-	StatusActive
-	StatusPastDue
-	StatusUnpaid
-	StatusCanceled
-	StatusIncompleteExpired
+	SubscriptionStatusNone SubscriptionStatus = iota
+	SubscriptionStatusIncomplete
+	SubscriptionStatusActive
+	SubscriptionStatusPastDue
+	SubscriptionStatusUnpaid
+	SubscriptionStatusCanceled
+	SubscriptionStatusIncompleteExpired
 )
 
-func (s Status) IsValid() bool {
+func (s SubscriptionStatus) IsValid() bool {
 	switch s {
-	case StatusNone, StatusIncomplete, StatusActive, StatusPastDue, StatusUnpaid, StatusCanceled, StatusIncompleteExpired:
+	case SubscriptionStatusNone, SubscriptionStatusIncomplete, SubscriptionStatusActive, SubscriptionStatusPastDue, SubscriptionStatusUnpaid, SubscriptionStatusCanceled, SubscriptionStatusIncompleteExpired:
 		return true
 	default:
 		return false
 	}
 }
 
-func (s Status) String() string {
+func (s SubscriptionStatus) String() string {
 	switch s {
-	case StatusNone:
+	case SubscriptionStatusNone:
 		return "none"
-	case StatusIncomplete:
+	case SubscriptionStatusIncomplete:
 		return "incomplete"
-	case StatusActive:
+	case SubscriptionStatusActive:
 		return "active"
-	case StatusPastDue:
+	case SubscriptionStatusPastDue:
 		return "past_due"
-	case StatusUnpaid:
+	case SubscriptionStatusUnpaid:
 		return "unpaid"
-	case StatusCanceled:
+	case SubscriptionStatusCanceled:
 		return "canceled"
-	case StatusIncompleteExpired:
+	case SubscriptionStatusIncompleteExpired:
 		return "incomplete_expired"
 	default:
 		return "unknown"

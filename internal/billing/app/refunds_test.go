@@ -15,7 +15,7 @@ import (
 
 func runRefundWithError(t *testing.T, createErr error) *domain.Refund {
 	t.Helper()
-	f := newCancellerFixture(t, domain.StatusActive)
+	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
 	quote := domain.RefundQuote{Lines: []domain.RefundLine{{
 		PaymentRef: "pi_1", PaidAmount: domain.Money{Amount: 30000, Currency: "vnd"}, Amount: domain.Money{Amount: 10000, Currency: "vnd"},
 	}}}

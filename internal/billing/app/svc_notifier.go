@@ -9,7 +9,7 @@ import (
 
 // Notifier publishes best-effort notifications after commit. Implementations log errors and never fail.
 type Notifier interface {
-	SubscriptionChanged(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.Status)
+	SubscriptionChanged(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.SubscriptionStatus)
 }
 
 func notifySubscription(ctx context.Context, n Notifier, s *domain.Subscription) {

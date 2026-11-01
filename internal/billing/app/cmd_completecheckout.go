@@ -136,7 +136,13 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 		return err
 	}
 	if duplicate {
-		cancelAtProvider(ctx, h.provider, s.ProviderSubscriptionID)
+		if err := h.provider.CancelSubscriptionNow(ctx, s.ProviderSubscriptionID); err != nil {
+			slog.ErrorContext(
+				ctx, "cancelling subscription at the provider failed; reconcile will retry",
+				slog.String("provider_subscription_id", s.ProviderSubscriptionID),
+				slog.Any("error", err),
+			)
+		}
 		return h.refunds.Run(ctx, saved.ID())
 	}
 	notifySubscription(ctx, h.notifier, saved)
@@ -212,7 +218,14 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 		return err
 	}
 	if replacing {
-		cancelAtProvider(ctx, h.provider, *cur.ProviderSubscriptionID())
+		providerSubscriptionID := *cur.ProviderSubscriptionID()
+		if err := h.provider.CancelSubscriptionNow(ctx, providerSubscriptionID); err != nil {
+			slog.ErrorContext(
+				ctx, "cancelling subscription at the provider failed; reconcile will retry",
+				slog.String("provider_subscription_id", providerSubscriptionID),
+				slog.Any("error", err),
+			)
+		}
 	}
 	for _, id := range toRefund {
 		if err := h.refunds.Run(ctx, id); err != nil {

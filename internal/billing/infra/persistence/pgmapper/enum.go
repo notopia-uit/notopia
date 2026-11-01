@@ -59,42 +59,42 @@ func ToInterval(i pgsqlc.BillingInterval) domain.Interval {
 	}
 }
 
-func FromStatus(s domain.Status) pgsqlc.SubscriptionStatus {
+func FromStatus(s domain.SubscriptionStatus) pgsqlc.SubscriptionStatus {
 	switch s {
-	case domain.StatusIncomplete:
+	case domain.SubscriptionStatusIncomplete:
 		return pgsqlc.SubscriptionStatusIncomplete
-	case domain.StatusActive:
+	case domain.SubscriptionStatusActive:
 		return pgsqlc.SubscriptionStatusActive
-	case domain.StatusPastDue:
+	case domain.SubscriptionStatusPastDue:
 		return pgsqlc.SubscriptionStatusPastDue
-	case domain.StatusUnpaid:
+	case domain.SubscriptionStatusUnpaid:
 		return pgsqlc.SubscriptionStatusUnpaid
-	case domain.StatusCanceled:
+	case domain.SubscriptionStatusCanceled:
 		return pgsqlc.SubscriptionStatusCanceled
-	case domain.StatusIncompleteExpired:
+	case domain.SubscriptionStatusIncompleteExpired:
 		return pgsqlc.SubscriptionStatusIncompleteExpired
-	case domain.StatusNone:
+	case domain.SubscriptionStatusNone:
 		return ""
 	}
 	return ""
 }
 
-func ToStatus(s pgsqlc.SubscriptionStatus) domain.Status {
+func ToStatus(s pgsqlc.SubscriptionStatus) domain.SubscriptionStatus {
 	switch s {
 	case pgsqlc.SubscriptionStatusIncomplete:
-		return domain.StatusIncomplete
+		return domain.SubscriptionStatusIncomplete
 	case pgsqlc.SubscriptionStatusActive:
-		return domain.StatusActive
+		return domain.SubscriptionStatusActive
 	case pgsqlc.SubscriptionStatusPastDue:
-		return domain.StatusPastDue
+		return domain.SubscriptionStatusPastDue
 	case pgsqlc.SubscriptionStatusUnpaid:
-		return domain.StatusUnpaid
+		return domain.SubscriptionStatusUnpaid
 	case pgsqlc.SubscriptionStatusCanceled:
-		return domain.StatusCanceled
+		return domain.SubscriptionStatusCanceled
 	case pgsqlc.SubscriptionStatusIncompleteExpired:
-		return domain.StatusIncompleteExpired
+		return domain.SubscriptionStatusIncompleteExpired
 	default:
-		return domain.StatusNone
+		return domain.SubscriptionStatusNone
 	}
 }
 

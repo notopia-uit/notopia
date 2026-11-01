@@ -2,6 +2,9 @@ package pgrepo
 
 import (
 	"context"
+	"errors"
+
+	"github.com/jackc/pgx/v5"
 
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
@@ -13,11 +16,11 @@ type policyRepo struct{ q *pgsqlc.Queries }
 
 func (r *policyRepo) Get(ctx context.Context, forUpdate bool) (*domain.BillingPolicy, error) {
 	row, err := r.q.GetPolicy(ctx, pgsqlc.GetPolicyParams{ForUpdate: forUpdate})
-	if notFound(err) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, errs.NewNotFound("billing policy not seeded")
 	}
 	if err != nil {
-		return nil, wrap("get policy", err)
+		return nil, errs.NewInternal("failed to get policy", err)
 	}
 	return pgmapper.ToPolicy(row), nil
 }
@@ -30,5 +33,8 @@ func (r *policyRepo) Save(ctx context.Context, p *domain.BillingPolicy) error {
 		UpdatedAt:                p.UpdatedAt(),
 	})
 	drain(ctx, p.PopEvents())
-	return wrap("save policy", err)
+	if err != nil {
+		return errs.NewInternal("failed to save policy", err)
+	}
+	return nil
 }

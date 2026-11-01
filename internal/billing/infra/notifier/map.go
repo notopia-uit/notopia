@@ -20,7 +20,7 @@ func toSharePlan(t domain.PlanTier) (share.SubscriptionChangedEventPlan, error) 
 	return "", fmt.Errorf("invalid plan tier: %v", t)
 }
 
-func toShareStatus(s domain.Status) (string, error) {
+func toShareStatus(s domain.SubscriptionStatus) (string, error) {
 	if !s.IsValid() {
 		return "", fmt.Errorf("invalid subscription status: %v", s)
 	}

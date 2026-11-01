@@ -51,7 +51,7 @@ func (k *Kafka) publish(ctx context.Context, topic string, payload any) {
 	}
 }
 
-func (k *Kafka) SubscriptionChanged(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.Status) {
+func (k *Kafka) SubscriptionChanged(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.SubscriptionStatus) {
 	sharePlan, err := toSharePlan(plan)
 	if err == nil {
 		var shareStatus string

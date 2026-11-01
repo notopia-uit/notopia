@@ -8,7 +8,7 @@ var ProviderSet = wire.NewSet(
 	ProvideQueries,
 
 	ProvideRefundRunner,
-	ProvideCanceller,
+	ProvideSubscriptionCanceller,
 
 	ProvideArchivePriceHandler,
 	ProvideCancelNowHandler,

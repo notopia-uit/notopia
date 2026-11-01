@@ -59,7 +59,7 @@ func (f *fixture) expectSubscribeSession(subID string) {
 		Payer: testPayer, CustomerID: "cus_1", ProviderSubscriptionID: subID,
 	}, nil)
 	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, subID).Return(domain.ProviderSnapshot{
-		ProviderSubscriptionID: subID, ProviderPriceID: "price_plus", WorkspaceID: f.ws, Status: domain.StatusActive,
+		ProviderSubscriptionID: subID, ProviderPriceID: "price_plus", WorkspaceID: f.ws, Status: domain.SubscriptionStatusActive,
 		CurrentPeriodStart: now, CurrentPeriodEnd: end,
 	}, nil).Maybe()
 	f.provider.EXPECT().PeriodPayments(mock.Anything, subID, mock.Anything, mock.Anything).Return([]domain.PaymentInfo{{
@@ -115,7 +115,7 @@ func TestDuplicateCheckoutIsCanceledAndRefunded(t *testing.T) {
 		RunAndReturn(func(context.Context, string) error {
 			dup := f.byProviderSubscription("sub_2")
 			require.NotNil(t, dup, "duplicate row is committed before the provider cancel")
-			assert.Equal(t, domain.StatusCanceled, dup.Status())
+			assert.Equal(t, domain.SubscriptionStatusCanceled, dup.Status())
 			return nil
 		}).Once()
 	refunded := f.expectRefund()
@@ -139,7 +139,7 @@ func TestLifetimeReplacesRecurring(t *testing.T) {
 		RunAndReturn(func(context.Context, string) error {
 			old := f.byProviderSubscription("sub_1")
 			require.NotNil(t, old)
-			assert.Equal(t, domain.StatusCanceled, old.Status(), "old subscription is canceled locally before the provider cancel")
+			assert.Equal(t, domain.SubscriptionStatusCanceled, old.Status(), "old subscription is canceled locally before the provider cancel")
 			assert.Equal(t, domain.IntervalLifetime, f.current(t).Interval(), "lifetime is already committed")
 			return nil
 		}).Once()

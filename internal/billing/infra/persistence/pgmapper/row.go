@@ -27,7 +27,7 @@ func ToPrice(row *pgsqlc.Price) *domain.Price {
 	return domain.UnmarshalPrice(domain.UnmarshalPriceParams{
 		ID: row.ID, Plan: ToPlanTier(row.Plan), Interval: ToInterval(row.BillingInterval),
 		Amount: domain.Money{Amount: row.Amount, Currency: row.Currency}, ProviderPriceID: row.ProviderPriceID,
-		LookupKey: row.LookupKey, Active: row.Active, CreatedAt: row.CreatedAt, ArchivedAt: row.ArchivedAt,
+		ProviderLookupKey: row.LookupKey, Active: row.Active, CreatedAt: row.CreatedAt, ArchivedAt: row.ArchivedAt,
 	})
 }
 

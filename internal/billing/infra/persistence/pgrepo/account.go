@@ -2,6 +2,10 @@ package pgrepo
 
 import (
 	"context"
+	"errors"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/notopia-uit/notopia/internal/billing/errs"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
@@ -13,11 +17,11 @@ type accountRepo struct{ q *pgsqlc.Queries }
 
 func (r *accountRepo) GetByWorkspace(ctx context.Context, workspaceID uuid.UUID, forUpdate bool) (*domain.BillingAccount, error) {
 	row, err := r.q.GetBillingAccount(ctx, pgsqlc.GetBillingAccountParams{WorkspaceID: workspaceID, ForUpdate: forUpdate})
-	if notFound(err) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
-		return nil, wrap("get billing account", err)
+		return nil, errs.NewInternal("failed to get billing account", err)
 	}
 	return pgmapper.ToAccount(row), nil
 }
@@ -25,7 +29,7 @@ func (r *accountRepo) GetByWorkspace(ctx context.Context, workspaceID uuid.UUID,
 func (r *accountRepo) ListByPayer(ctx context.Context, payerID string) ([]*domain.BillingAccount, error) {
 	rows, err := r.q.ListBillingAccountsByPayer(ctx, payerID)
 	if err != nil {
-		return nil, wrap("list billing accounts by payer", err)
+		return nil, errs.NewInternal("failed to list billing accounts by payer", err)
 	}
 	out := make([]*domain.BillingAccount, 0, len(rows))
 	for _, row := range rows {
@@ -42,5 +46,8 @@ func (r *accountRepo) Save(ctx context.Context, a *domain.BillingAccount) error 
 		CreatedAt: a.CreatedAt(), UpdatedAt: a.UpdatedAt(),
 	})
 	drain(ctx, a.PopEvents())
-	return wrap("save billing account", err)
+	if err != nil {
+		return errs.NewInternal("failed to save billing account", err)
+	}
+	return nil
 }

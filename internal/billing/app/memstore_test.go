@@ -109,7 +109,7 @@ func (r memSubs) ListCanceledAwaitingProviderCancel(_ context.Context, limit int
 		if len(out) == limit {
 			break
 		}
-		if s.Status() == domain.StatusCanceled && s.ProviderSubscriptionID() != nil && s.CanceledAt() != nil &&
+		if s.Status() == domain.SubscriptionStatusCanceled && s.ProviderSubscriptionID() != nil && s.CanceledAt() != nil &&
 			!s.ProviderSyncedAt().After(*s.CanceledAt()) {
 			out = append(out, s)
 		}

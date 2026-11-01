@@ -12,7 +12,7 @@ import (
 )
 
 func TestSyncRefundOfDashboardRefundOnRecurringPaymentReducesNextQuote(t *testing.T) {
-	f := newCancellerFixture(t, domain.StatusActive)
+	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
 	f.provider.EXPECT().GetRefund(mock.Anything, "re_dash").Return(RefundResult{
 		ProviderRefundID: "re_dash", RefundID: nil, PaymentRef: "pi_1", Amount: domain.Money{Amount: 10000, Currency: "vnd"},
 		Status: domain.RefundStatusSucceeded, FailureMessage: nil, ProviderSubscriptionID: "sub_1",
@@ -32,7 +32,7 @@ func TestSyncRefundOfDashboardRefundOnRecurringPaymentReducesNextQuote(t *testin
 		Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: now,
 		CoverageStart: now, CoverageEnd: now.Add(30 * 24 * time.Hour),
 	}}, nil).Once()
-	quote, err := f.canceller.Quote(context.Background(), f.ws)
+	quote, err := f.subscriptionCanceller.Quote(context.Background(), f.ws)
 	require.NoError(t, err)
 	assert.EqualValues(t, 20000, quote.Amount.Amount, "quote is capped by what is left of the payment")
 }

@@ -38,7 +38,7 @@ func (p *Provider) CreatePrice(ctx context.Context, in app.PriceInput) (string, 
 		Product:           stripego.String(productID(tier)),
 		Currency:          stripego.String(in.Amount.Currency),
 		UnitAmount:        stripego.Int64(in.Amount.Amount),
-		LookupKey:         stripego.String(domain.LookupKey(in.Plan, in.Interval)),
+		LookupKey:         stripego.String(domain.PriceLookupKey(in.Plan, in.Interval)),
 		TransferLookupKey: stripego.Bool(true),
 		Metadata:          map[string]string{"price_id": in.PriceID.String()},
 	}

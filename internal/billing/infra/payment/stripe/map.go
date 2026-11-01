@@ -69,22 +69,22 @@ func toAppCheckoutPurpose(s string) app.CheckoutPurpose {
 	}
 }
 
-func toDomainStatus(s stripego.SubscriptionStatus) domain.Status {
+func toDomainStatus(s stripego.SubscriptionStatus) domain.SubscriptionStatus {
 	switch s {
 	case stripego.SubscriptionStatusActive, stripego.SubscriptionStatusTrialing:
-		return domain.StatusActive
+		return domain.SubscriptionStatusActive
 	case stripego.SubscriptionStatusPastDue:
-		return domain.StatusPastDue
+		return domain.SubscriptionStatusPastDue
 	case stripego.SubscriptionStatusIncomplete:
-		return domain.StatusIncomplete
+		return domain.SubscriptionStatusIncomplete
 	case stripego.SubscriptionStatusIncompleteExpired:
-		return domain.StatusIncompleteExpired
+		return domain.SubscriptionStatusIncompleteExpired
 	case stripego.SubscriptionStatusCanceled:
-		return domain.StatusCanceled
+		return domain.SubscriptionStatusCanceled
 	case stripego.SubscriptionStatusUnpaid, stripego.SubscriptionStatusPaused:
-		return domain.StatusUnpaid
+		return domain.SubscriptionStatusUnpaid
 	default:
-		return domain.StatusUnpaid
+		return domain.SubscriptionStatusUnpaid
 	}
 }
 

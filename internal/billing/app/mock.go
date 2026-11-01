@@ -329,7 +329,7 @@ func (_m *MockNotifier) EXPECT() *MockNotifier_Expecter {
 }
 
 // SubscriptionChanged provides a mock function for the type MockNotifier
-func (_mock *MockNotifier) SubscriptionChanged(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.Status) {
+func (_mock *MockNotifier) SubscriptionChanged(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.SubscriptionStatus) {
 	_mock.Called(ctx, workspaceID, plan, status)
 	return
 }
@@ -343,12 +343,12 @@ type MockNotifier_SubscriptionChanged_Call struct {
 //   - ctx context.Context
 //   - workspaceID uuid.UUID
 //   - plan domain.PlanTier
-//   - status domain.Status
+//   - status domain.SubscriptionStatus
 func (_e *MockNotifier_Expecter) SubscriptionChanged(ctx any, workspaceID any, plan any, status any) *MockNotifier_SubscriptionChanged_Call {
 	return &MockNotifier_SubscriptionChanged_Call{Call: _e.mock.On("SubscriptionChanged", ctx, workspaceID, plan, status)}
 }
 
-func (_c *MockNotifier_SubscriptionChanged_Call) Run(run func(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.Status)) *MockNotifier_SubscriptionChanged_Call {
+func (_c *MockNotifier_SubscriptionChanged_Call) Run(run func(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.SubscriptionStatus)) *MockNotifier_SubscriptionChanged_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -362,9 +362,9 @@ func (_c *MockNotifier_SubscriptionChanged_Call) Run(run func(ctx context.Contex
 		if args[2] != nil {
 			arg2 = args[2].(domain.PlanTier)
 		}
-		var arg3 domain.Status
+		var arg3 domain.SubscriptionStatus
 		if args[3] != nil {
-			arg3 = args[3].(domain.Status)
+			arg3 = args[3].(domain.SubscriptionStatus)
 		}
 		run(
 			arg0,
@@ -381,7 +381,7 @@ func (_c *MockNotifier_SubscriptionChanged_Call) Return() *MockNotifier_Subscrip
 	return _c
 }
 
-func (_c *MockNotifier_SubscriptionChanged_Call) RunAndReturn(run func(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.Status)) *MockNotifier_SubscriptionChanged_Call {
+func (_c *MockNotifier_SubscriptionChanged_Call) RunAndReturn(run func(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.SubscriptionStatus)) *MockNotifier_SubscriptionChanged_Call {
 	_c.Run(run)
 	return _c
 }

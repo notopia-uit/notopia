@@ -28,21 +28,21 @@ func newBillingInterval(i domain.Interval) BillingInterval {
 	return BillingIntervalUnspecified
 }
 
-func newSubscriptionStatus(s domain.Status) SubscriptionStatus {
+func newSubscriptionStatus(s domain.SubscriptionStatus) SubscriptionStatus {
 	switch s {
-	case domain.StatusIncomplete:
+	case domain.SubscriptionStatusIncomplete:
 		return SubscriptionStatusIncomplete
-	case domain.StatusActive:
+	case domain.SubscriptionStatusActive:
 		return SubscriptionStatusActive
-	case domain.StatusPastDue:
+	case domain.SubscriptionStatusPastDue:
 		return SubscriptionStatusPastDue
-	case domain.StatusUnpaid:
+	case domain.SubscriptionStatusUnpaid:
 		return SubscriptionStatusUnpaid
-	case domain.StatusCanceled:
+	case domain.SubscriptionStatusCanceled:
 		return SubscriptionStatusCanceled
-	case domain.StatusIncompleteExpired:
+	case domain.SubscriptionStatusIncompleteExpired:
 		return SubscriptionStatusIncompleteExpired
-	case domain.StatusNone:
+	case domain.SubscriptionStatusNone:
 	}
 	return SubscriptionStatusNone
 }
@@ -104,7 +104,7 @@ func newPlan(p *domain.Plan) Plan {
 func newPrice(p *domain.Price) Price {
 	return Price{
 		ID: p.ID(), Plan: newPlanTier(p.Plan()), Interval: newBillingInterval(p.Interval()),
-		Amount: p.Amount().Amount, Currency: p.Amount().Currency, LookupKey: p.LookupKey(), Active: p.Active(),
+		Amount: p.Amount().Amount, Currency: p.Amount().Currency, LookupKey: p.ProviderLookupKey(), Active: p.Active(),
 		CreatedAt: p.CreatedAt(), ArchivedAt: p.ArchivedAt(),
 	}
 }

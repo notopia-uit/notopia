@@ -18,7 +18,7 @@ func (f *cancellerFixture) cancelLocally(t *testing.T) {
 	require.NoError(t, f.store.Subscription().Save(context.Background(), f.sub))
 }
 
-func (f *cancellerFixture) providerSnapshot(status domain.Status) domain.ProviderSnapshot {
+func (f *cancellerFixture) providerSnapshot(status domain.SubscriptionStatus) domain.ProviderSnapshot {
 	now := time.Now()
 	return domain.ProviderSnapshot{
 		ProviderSubscriptionID: "sub_1", ProviderPriceID: "price_plus", WorkspaceID: f.ws, Status: status,
@@ -34,34 +34,34 @@ func newSyncHandler(t *testing.T, f *cancellerFixture) *SyncSubscriptionHandler 
 }
 
 func TestSyncCancelsAtProviderWhenLocallyCanceledButProviderStillActive(t *testing.T) {
-	f := newCancellerFixture(t, domain.StatusActive)
+	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
 	f.cancelLocally(t)
-	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, "sub_1").Return(f.providerSnapshot(domain.StatusActive), nil).Once()
+	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, "sub_1").Return(f.providerSnapshot(domain.SubscriptionStatusActive), nil).Once()
 	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").Return(nil).Once()
 
 	err := newSyncHandler(t, f).Handle(context.Background(), &SyncSubscription{EventID: "", EventType: "", ProviderSubscriptionID: "sub_1"})
 
 	require.NoError(t, err)
-	assert.Equal(t, domain.StatusCanceled, f.store.subs[f.sub.ID()].Status(), "local cancel is never resurrected")
+	assert.Equal(t, domain.SubscriptionStatusCanceled, f.store.subs[f.sub.ID()].Status(), "local cancel is never resurrected")
 }
 
 func TestSyncMarksLocallyCanceledSubscriptionSyncedOnceProviderCanceled(t *testing.T) {
-	f := newCancellerFixture(t, domain.StatusActive)
+	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
 	f.cancelLocally(t)
-	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, "sub_1").Return(f.providerSnapshot(domain.StatusCanceled), nil).Once()
+	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, "sub_1").Return(f.providerSnapshot(domain.SubscriptionStatusCanceled), nil).Once()
 
 	err := newSyncHandler(t, f).Handle(context.Background(), &SyncSubscription{EventID: "", EventType: "", ProviderSubscriptionID: "sub_1"})
 
 	require.NoError(t, err)
 	saved := f.store.subs[f.sub.ID()]
-	assert.Equal(t, domain.StatusCanceled, saved.Status())
+	assert.Equal(t, domain.SubscriptionStatusCanceled, saved.Status())
 	assert.True(t, saved.ProviderSyncedAt().After(*saved.CanceledAt()))
 }
 
 func TestReconcileCancelsLocallyCanceledSubscriptionAtProvider(t *testing.T) {
-	f := newCancellerFixture(t, domain.StatusActive)
+	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
 	f.cancelLocally(t)
-	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, "sub_1").Return(f.providerSnapshot(domain.StatusActive), nil).Once()
+	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, "sub_1").Return(f.providerSnapshot(domain.SubscriptionStatusActive), nil).Once()
 	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").Return(nil).Once()
 	settings := &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"}
 	handler := NewReconcileSubscriptionsHandler(f.store, newSyncHandler(t, f), NewRefundRunner(f.store, f.provider, settings))

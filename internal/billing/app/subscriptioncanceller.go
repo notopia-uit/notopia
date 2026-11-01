@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+	"errors"
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,20 +11,20 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/errs"
 )
 
-type Canceller struct {
+type SubscriptionCanceller struct {
 	uow      domain.UnitOfWork
 	provider PaymentProvider
 	notifier Notifier
 	refunds  *RefundRunner
 }
 
-func NewCanceller(uow domain.UnitOfWork, provider PaymentProvider, notifier Notifier, refunds *RefundRunner) *Canceller {
-	return &Canceller{uow: uow, provider: provider, notifier: notifier, refunds: refunds}
+func NewSubscriptionCanceller(uow domain.UnitOfWork, provider PaymentProvider, notifier Notifier, refunds *RefundRunner) *SubscriptionCanceller {
+	return &SubscriptionCanceller{uow: uow, provider: provider, notifier: notifier, refunds: refunds}
 }
 
-var ProvideCanceller = NewCanceller
+var ProvideSubscriptionCanceller = NewSubscriptionCanceller
 
-func (c *Canceller) load(ctx context.Context, ws uuid.UUID) (*domain.Subscription, *domain.BillingPolicy, error) {
+func (c *SubscriptionCanceller) load(ctx context.Context, ws uuid.UUID) (*domain.Subscription, *domain.BillingPolicy, error) {
 	var sub *domain.Subscription
 	var policy *domain.BillingPolicy
 	err := c.uow.Execute(ctx, func(r domain.RepoRegistry) error {
@@ -39,7 +41,7 @@ func (c *Canceller) load(ctx context.Context, ws uuid.UUID) (*domain.Subscriptio
 	return sub, policy, err
 }
 
-func (c *Canceller) payments(ctx context.Context, sub *domain.Subscription) ([]domain.PaymentInfo, error) {
+func (c *SubscriptionCanceller) payments(ctx context.Context, sub *domain.Subscription) ([]domain.PaymentInfo, error) {
 	if sub.Interval() == domain.IntervalLifetime {
 		p, err := c.provider.PaymentForIntent(ctx, *sub.ProviderPaymentID())
 		return []domain.PaymentInfo{p}, err
@@ -50,7 +52,7 @@ func (c *Canceller) payments(ctx context.Context, sub *domain.Subscription) ([]d
 	return c.provider.PeriodPayments(ctx, *sub.ProviderSubscriptionID(), *sub.CurrentPeriodStart(), *sub.CurrentPeriodEnd())
 }
 
-func (c *Canceller) Quote(ctx context.Context, ws uuid.UUID) (domain.RefundQuote, error) {
+func (c *SubscriptionCanceller) Quote(ctx context.Context, ws uuid.UUID) (domain.RefundQuote, error) {
 	sub, policy, err := c.load(ctx, ws)
 	if err != nil {
 		return domain.RefundQuote{}, err
@@ -65,7 +67,7 @@ func (c *Canceller) Quote(ctx context.Context, ws uuid.UUID) (domain.RefundQuote
 // CancelNow cancels locally and commits, then cancels at the provider (retried by reconcile on
 // failure), then submits the refunds.
 // refundOptional=true (workspace deleted) cancels even when no refund is due (lifetime past its window).
-func (c *Canceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.RefundReason, actor string, refundOptional bool) error {
+func (c *SubscriptionCanceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.RefundReason, actor string, refundOptional bool) error {
 	sub, policy, err := c.load(ctx, ws)
 	if err != nil {
 		return err
@@ -77,7 +79,9 @@ func (c *Canceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.R
 	now := time.Now()
 	quote, err := sub.QuoteCancelNow(now, policy, payments)
 	if err != nil {
-		if !refundOptional || !hasCode(err, errs.CodeRefundWindowExpired) {
+		var errsErr errs.Error
+		isRefundWindowExpired := errors.As(err, &errsErr) && errsErr.Code() == errs.CodeRefundWindowExpired
+		if !refundOptional || !isRefundWindowExpired {
 			return err
 		}
 		var noRefund domain.RefundQuote
@@ -98,7 +102,14 @@ func (c *Canceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.R
 		return err
 	}
 	if saved.ProviderSubscriptionID() != nil {
-		cancelAtProvider(ctx, c.provider, *saved.ProviderSubscriptionID())
+		providerSubscriptionID := *saved.ProviderSubscriptionID()
+		if err := c.provider.CancelSubscriptionNow(ctx, providerSubscriptionID); err != nil {
+			slog.ErrorContext(
+				ctx, "cancelling subscription at the provider failed; reconcile will retry",
+				slog.String("provider_subscription_id", providerSubscriptionID),
+				slog.Any("error", err),
+			)
+		}
 	}
 	notifySubscription(ctx, c.notifier, saved)
 	return c.refunds.Run(ctx, saved.ID())

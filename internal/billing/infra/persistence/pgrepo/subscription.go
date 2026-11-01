@@ -2,8 +2,11 @@ package pgrepo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
@@ -24,20 +27,20 @@ func (r *subscriptionRepo) hydrate(ctx context.Context, rows []*pgsqlc.Subscript
 	}
 	refundRows, err := r.q.ListRefundsBySubscriptionIDs(ctx, ids)
 	if err != nil {
-		return nil, wrap("list refunds", err)
+		return nil, errs.NewInternal("failed to list refunds", err)
 	}
 	return pgmapper.ToSubscriptions(rows, refundRows), nil
 }
 
 func (r *subscriptionRepo) one(ctx context.Context, row *pgsqlc.Subscription, err error, missingIsNil bool, what string) (*domain.Subscription, error) {
-	if notFound(err) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		if missingIsNil {
 			return nil, nil
 		}
 		return nil, errs.NewNotFound(fmt.Sprintf("subscription %s not found", what))
 	}
 	if err != nil {
-		return nil, wrap("get subscription", err)
+		return nil, errs.NewInternal("failed to get subscription", err)
 	}
 	subs, err := r.hydrate(ctx, []*pgsqlc.Subscription{row})
 	if err != nil {
@@ -68,11 +71,11 @@ func (r *subscriptionRepo) GetByProviderPaymentID(ctx context.Context, id string
 
 func (r *subscriptionRepo) GetByRefundID(ctx context.Context, refundID uuid.UUID, forUpdate bool) (*domain.Subscription, error) {
 	subID, err := r.q.GetSubscriptionIDByRefundID(ctx, refundID)
-	if notFound(err) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
-		return nil, wrap("get subscription id by refund", err)
+		return nil, errs.NewInternal("failed to get subscription id by refund", err)
 	}
 	return r.GetByID(ctx, subID, forUpdate)
 }
@@ -80,7 +83,7 @@ func (r *subscriptionRepo) GetByRefundID(ctx context.Context, refundID uuid.UUID
 func (r *subscriptionRepo) ListCurrentByWorkspaces(ctx context.Context, workspaceIDs []uuid.UUID) ([]*domain.Subscription, error) {
 	rows, err := r.q.ListCurrentSubscriptionsByWorkspaces(ctx, workspaceIDs)
 	if err != nil {
-		return nil, wrap("list current subscriptions", err)
+		return nil, errs.NewInternal("failed to list current subscriptions", err)
 	}
 	return r.hydrate(ctx, rows)
 }
@@ -88,7 +91,7 @@ func (r *subscriptionRepo) ListCurrentByWorkspaces(ctx context.Context, workspac
 func (r *subscriptionRepo) ListIDsWithUnsubmittedRefunds(ctx context.Context, limit int) ([]uuid.UUID, error) {
 	ids, err := r.q.ListSubscriptionIDsWithUnsubmittedRefunds(ctx, int32(limit))
 	if err != nil {
-		return nil, wrap("list subscriptions with unsubmitted refunds", err)
+		return nil, errs.NewInternal("failed to list subscriptions with unsubmitted refunds", err)
 	}
 	return ids, nil
 }
@@ -96,7 +99,7 @@ func (r *subscriptionRepo) ListIDsWithUnsubmittedRefunds(ctx context.Context, li
 func (r *subscriptionRepo) ListNeedingReconcile(ctx context.Context, now time.Time, limit int) ([]*domain.Subscription, error) {
 	rows, err := r.q.ListSubscriptionsNeedingReconcile(ctx, &pgsqlc.ListSubscriptionsNeedingReconcileParams{Now: now, RowLimit: int32(limit)})
 	if err != nil {
-		return nil, wrap("list subscriptions needing reconcile", err)
+		return nil, errs.NewInternal("failed to list subscriptions needing reconcile", err)
 	}
 	return r.hydrate(ctx, rows)
 }
@@ -104,7 +107,7 @@ func (r *subscriptionRepo) ListNeedingReconcile(ctx context.Context, now time.Ti
 func (r *subscriptionRepo) ListCanceledAwaitingProviderCancel(ctx context.Context, limit int) ([]*domain.Subscription, error) {
 	rows, err := r.q.ListCanceledSubscriptionsAwaitingProviderCancel(ctx, int32(limit))
 	if err != nil {
-		return nil, wrap("list canceled subscriptions awaiting provider cancel", err)
+		return nil, errs.NewInternal("failed to list canceled subscriptions awaiting provider cancel", err)
 	}
 	return r.hydrate(ctx, rows)
 }
@@ -118,7 +121,7 @@ func (r *subscriptionRepo) Save(ctx context.Context, s *domain.Subscription) err
 		ProviderSyncedAt: s.ProviderSyncedAt(), CreatedAt: s.CreatedAt(), UpdatedAt: s.UpdatedAt(),
 	})
 	if err != nil {
-		return wrap("save subscription", err)
+		return errs.NewInternal("failed to save subscription", err)
 	}
 	for _, rf := range s.Refunds() {
 		if err := r.q.UpsertRefund(ctx, &pgsqlc.UpsertRefundParams{
@@ -126,7 +129,7 @@ func (r *subscriptionRepo) Save(ctx context.Context, s *domain.Subscription) err
 			Amount: rf.Amount().Amount, Currency: rf.Amount().Currency, Reason: pgmapper.FromRefundReason(rf.Reason()),
 			Status: pgmapper.FromRefundStatus(rf.Status()), FailureMessage: rf.FailureMessage(), CreatedAt: rf.CreatedAt(), UpdatedAt: rf.UpdatedAt(),
 		}); err != nil {
-			return wrap("save refund", err)
+			return errs.NewInternal("failed to save refund", err)
 		}
 	}
 	drain(ctx, s.PopEvents())
