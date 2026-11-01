@@ -23,16 +23,16 @@ func NewOutbox(
 	publisher Publisher,
 	logger watermill.LoggerAdapter,
 	schemaAdapter sql.SchemaAdapter,
+	offsetsAdapter sql.OffsetsAdapter,
 	pgxConn sql.Conn,
 ) (*Outbox, error) {
 	subcriber, err := sql.NewSubscriber(
 		sql.BeginnerFromPgx(pgxConn),
 		sql.SubscriberConfig{
 			PollInterval:     time.Second,
-			InitializeSchema: true,
+			InitializeSchema: false,
 			SchemaAdapter:    schemaAdapter,
-			ConsumerGroup:    "", // NOTE: If scale, we should care about this
-			OffsetsAdapter:   sql.DefaultPostgreSQLOffsetsAdapter{},
+			OffsetsAdapter:   offsetsAdapter,
 		},
 		logger,
 	)
@@ -49,7 +49,8 @@ func NewOutbox(
 		publisher,
 		logger,
 		forwarder.Config{
-			Router: router,
+			Router:         router,
+			ForwarderTopic: ForwarderTopic,
 		},
 	)
 	if err != nil {
