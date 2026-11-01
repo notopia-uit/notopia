@@ -1205,8 +1205,8 @@ importers:
         specifier: 1.2.3
         version: 1.2.3(mermaid@11.13.0)(vue@3.5.44(@typescript/typescript6@6.0.2))
       vitepress-openapi:
-        specifier: 0.2.5
-        version: 0.2.5(vitepress@2.0.0-alpha.21(@types/node@25.9.9)(@typescript/typescript6@6.0.2)(axios@1.16.0(debug@4.4.3(supports-color@7.2.0)))(change-case@5.4.4)(esbuild@0.28.1)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(postcss@8.5.32)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.44(@typescript/typescript6@6.0.2))
+        specifier: 0.2.6
+        version: 0.2.6(vitepress@2.0.0-alpha.21(@types/node@25.9.9)(@typescript/typescript6@6.0.2)(axios@1.16.0(debug@4.4.3(supports-color@7.2.0)))(change-case@5.4.4)(esbuild@0.28.1)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(postcss@8.5.32)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.44(@typescript/typescript6@6.0.2))
       vitepress-plugin-pagefind:
         specifier: 0.4.25
         version: 0.4.25(pagefind@1.5.2)(vitepress@2.0.0-alpha.21(@types/node@25.9.9)(@typescript/typescript6@6.0.2)(axios@1.16.0(debug@4.4.3(supports-color@7.2.0)))(change-case@5.4.4)(esbuild@0.28.1)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(postcss@8.5.32)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.44(@typescript/typescript6@6.0.2))
@@ -16617,8 +16617,8 @@ packages:
       '@mermaid-js/mermaid-zenuml':
         optional: true
 
-  vitepress-openapi@0.2.5:
-    resolution: {integrity: sha512-524n7Ia+Gp4WJYm+PLdpbghAE5O28tYiOw2mw6wGI6KK7jCh4/BgzqpZnofIfCF2zP45B4fzI/lIad/X3CcSNw==}
+  vitepress-openapi@0.2.6:
+    resolution: {integrity: sha512-xIzuXhqGnRy6gvlXycam5pUVBLC+9DpbRY6r5XnN9ugQx1trzxQFKzuvx8bAVIdASkQdnA08d+czZ2bJ/tGPoA==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24.0.0}
     peerDependencies:
       vitepress: '>=1.0.0'
@@ -36180,7 +36180,7 @@ snapshots:
       mermaid: 11.13.0
       vue: 3.5.44(@typescript/typescript6@6.0.2)
 
-  vitepress-openapi@0.2.5(vitepress@2.0.0-alpha.21(@types/node@25.9.9)(@typescript/typescript6@6.0.2)(axios@1.16.0(debug@4.4.3(supports-color@7.2.0)))(change-case@5.4.4)(esbuild@0.28.1)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(postcss@8.5.32)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.44(@typescript/typescript6@6.0.2)):
+  vitepress-openapi@0.2.6(vitepress@2.0.0-alpha.21(@types/node@25.9.9)(@typescript/typescript6@6.0.2)(axios@1.16.0(debug@4.4.3(supports-color@7.2.0)))(change-case@5.4.4)(esbuild@0.28.1)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(postcss@8.5.32)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.44(@typescript/typescript6@6.0.2)):
     dependencies:
       '@lucide/vue': 1.61.0(vue@3.5.44(@typescript/typescript6@6.0.2))
       '@vueuse/core': 14.4.0(vue@3.5.44(@typescript/typescript6@6.0.2))
