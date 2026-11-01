@@ -14,13 +14,35 @@ var t0 = time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
 
 func price(t *testing.T, plan domain.PlanTier, interval domain.Interval, amount int64) *domain.Price {
 	t.Helper()
-	p, err := domain.NewPrice(uuid.New(), plan, interval, domain.Money{Amount: amount, Currency: "vnd"}, "price_x", t0, "u")
+	p, err := domain.NewPrice(uuid.New(), plan, interval, vnd(t, amount), "price_x", t0, "u")
 	require.NoError(t, err)
 	return p
 }
 
+func vnd(t *testing.T, amount int64) domain.Money {
+	t.Helper()
+	m, err := domain.NewMoney(amount, domain.CurrencyVND)
+	require.NoError(t, err)
+	return m
+}
+
 func snap(status domain.SubscriptionStatus, start, end time.Time) domain.ProviderSnapshot {
-	return domain.ProviderSnapshot{ProviderSubscriptionID: "sub_1", Status: status, CurrentPeriodStart: start, CurrentPeriodEnd: end}
+	s, err := domain.NewProviderSnapshot(domain.ProviderSnapshotParams{
+		ProviderSubscriptionID: "sub_1", Status: status, CurrentPeriodStart: start, CurrentPeriodEnd: end,
+	})
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
+func payment(t *testing.T, amount int64, ref string, paidAt, start, end time.Time) domain.PaymentInfo {
+	t.Helper()
+	p, err := domain.NewPaymentInfo(domain.PaymentInfoParams{
+		Amount: vnd(t, amount), PaymentRef: ref, PaidAt: paidAt, CoverageStart: start, CoverageEnd: end,
+	})
+	require.NoError(t, err)
+	return p
 }
 
 func eventNames(events []domain.Event) []string {
@@ -98,16 +120,19 @@ func TestQuoteCancelNow(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0)
 	end := t0.Add(30 * 24 * time.Hour)
 	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), snap(domain.SubscriptionStatusActive, t0, end), t0, "u")
-	pay := domain.PaymentInfo{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: t0, CoverageStart: t0, CoverageEnd: end}
+	pay := payment(t, 30000, "pi_1", t0, t0, end)
 
 	q, err := s.QuoteCancelNow(t0.Add(10*24*time.Hour), policy, []domain.PaymentInfo{pay})
 	require.NoError(t, err)
-	assert.EqualValues(t, 20000, q.Amount.Amount)
+	assert.EqualValues(t, 20000, q.Amount().Amount())
 
 	_, err = s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, q, "u")
 	require.NoError(t, err)
 	// A second refund against the same payment must not exceed what was paid.
-	over := domain.RefundQuote{Amount: domain.Money{Amount: 20000, Currency: "vnd"}, Lines: []domain.RefundLine{{PaymentRef: "pi_1", PaidAmount: pay.Amount, Amount: domain.Money{Amount: 20000, Currency: "vnd"}}}}
+	overLine, err := domain.NewRefundLine(domain.RefundLineParams{PaymentRef: "pi_1", PaidAmount: pay.Amount(), Amount: vnd(t, 20000)})
+	require.NoError(t, err)
+	over, err := domain.NewRefundQuote([]domain.RefundLine{overLine}, 0, 0)
+	require.NoError(t, err)
 	_, err = s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, over, "u")
 	assert.Error(t, err, "non-current subscription / over-refund")
 }
@@ -118,16 +143,17 @@ func TestQuoteCancelNowAfterUpgrade(t *testing.T) {
 	day := func(n int) time.Time { return t0.Add(time.Duration(n) * 24 * time.Hour) }
 	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPro, domain.IntervalMonth, 90000), snap(domain.SubscriptionStatusActive, t0, day(30)), t0, "u")
 	payments := []domain.PaymentInfo{
-		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_a", PaidAt: t0, CoverageStart: t0, CoverageEnd: day(30)},
-		{Amount: domain.Money{Amount: 40000, Currency: "vnd"}, PaymentRef: "pi_b", PaidAt: day(10), CoverageStart: day(10), CoverageEnd: day(30)},
+		payment(t, 30000, "pi_a", t0, t0, day(30)),
+		payment(t, 40000, "pi_b", day(10), day(10), day(30)),
 	}
 
 	q, err := s.QuoteCancelNow(day(20), policy, payments)
 	require.NoError(t, err)
-	require.Len(t, q.Lines, 2)
-	assert.EqualValues(t, 10000, q.Lines[0].Amount.Amount)
-	assert.EqualValues(t, 20000, q.Lines[1].Amount.Amount)
-	assert.EqualValues(t, 30000, q.Amount.Amount)
+	lines := q.Lines()
+	require.Len(t, lines, 2)
+	assert.EqualValues(t, 10000, lines[0].Amount().Amount())
+	assert.EqualValues(t, 20000, lines[1].Amount().Amount())
+	assert.EqualValues(t, 30000, q.Amount().Amount())
 
 	refunds, err := s.CancelNow(day(20), domain.RefundReasonCancelNow, q, "u")
 	require.NoError(t, err)
@@ -138,11 +164,11 @@ func TestQuoteCancelNowAfterUpgrade(t *testing.T) {
 func TestLifetimeRefundWindow(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0) // 14 days
 	s, _ := domain.NewLifetimeSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPro, domain.IntervalLifetime, 2490000), "pi_l", t0, t0, "u")
-	pay := []domain.PaymentInfo{{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_l", PaidAt: t0}}
+	pay := []domain.PaymentInfo{payment(t, 2490000, "pi_l", t0, time.Time{}, time.Time{})}
 
 	q, err := s.QuoteCancelNow(t0.Add(13*24*time.Hour), policy, pay)
 	require.NoError(t, err)
-	assert.EqualValues(t, 2490000, q.Amount.Amount)
+	assert.EqualValues(t, 2490000, q.Amount().Amount())
 
 	_, err = s.QuoteCancelNow(t0.Add(15*24*time.Hour), policy, pay)
 	require.Error(t, err, "refundWindowExpired after 14 days")
@@ -156,8 +182,8 @@ func TestQuoteCancelNowWithoutPayments(t *testing.T) {
 
 	q, err := s.QuoteCancelNow(t0.Add(time.Hour), policy, nil)
 	require.NoError(t, err)
-	assert.Zero(t, q.Amount.Amount)
-	assert.Empty(t, q.Lines)
+	assert.Zero(t, q.Amount().Amount())
+	assert.Empty(t, q.Lines())
 
 	refunds, err := s.CancelNow(t0.Add(time.Hour), domain.RefundReasonCancelNow, q, "u")
 	require.NoError(t, err)
@@ -212,17 +238,18 @@ func TestQuoteCancelNowAfterMonthToYearUpgrade(t *testing.T) {
 	day := func(n int) time.Time { return t0.Add(time.Duration(n) * 24 * time.Hour) }
 	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPro, domain.IntervalYear, 300000), snap(domain.SubscriptionStatusActive, day(15), day(15+365)), day(15), "u")
 	payments := []domain.PaymentInfo{
-		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_m", PaidAt: t0, CoverageStart: t0, CoverageEnd: day(30)},
-		{Amount: domain.Money{Amount: 285000, Currency: "vnd"}, PaymentRef: "pi_y", PaidAt: day(15), CoverageStart: day(15), CoverageEnd: day(15 + 365)},
+		payment(t, 30000, "pi_m", t0, t0, day(30)),
+		payment(t, 285000, "pi_y", day(15), day(15), day(15+365)),
 	}
 
 	q, err := s.QuoteCancelNow(day(15), policy, payments)
 
 	require.NoError(t, err)
-	require.Len(t, q.Lines, 2)
-	assert.EqualValues(t, 15000, q.Lines[0].Amount.Amount)
-	assert.EqualValues(t, 285000, q.Lines[1].Amount.Amount)
-	assert.EqualValues(t, 300000, q.Amount.Amount)
+	lines := q.Lines()
+	require.Len(t, lines, 2)
+	assert.EqualValues(t, 15000, lines[0].Amount().Amount())
+	assert.EqualValues(t, 285000, lines[1].Amount().Amount())
+	assert.EqualValues(t, 300000, q.Amount().Amount())
 }
 
 func TestQuoteCancelNowIgnoresPaymentOfPreviousPeriod(t *testing.T) {
@@ -230,17 +257,17 @@ func TestQuoteCancelNowIgnoresPaymentOfPreviousPeriod(t *testing.T) {
 	day := func(n int) time.Time { return t0.Add(time.Duration(n) * 24 * time.Hour) }
 	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 30000), snap(domain.SubscriptionStatusActive, t0, day(30)), t0, "u")
 	payments := []domain.PaymentInfo{
-		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_prev", PaidAt: day(-30), CoverageStart: day(-30), CoverageEnd: t0},
-		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_cur", PaidAt: t0, CoverageStart: t0, CoverageEnd: day(30)},
+		payment(t, 30000, "pi_prev", day(-30), day(-30), t0),
+		payment(t, 30000, "pi_cur", t0, t0, day(30)),
 	}
 
 	q, err := s.QuoteCancelNow(day(5), policy, payments)
 
 	require.NoError(t, err)
-	assert.EqualValues(t, 25000, q.Amount.Amount)
-	for _, l := range q.Lines {
-		if l.PaymentRef == "pi_prev" {
-			assert.Zero(t, l.Amount.Amount)
+	assert.EqualValues(t, 25000, q.Amount().Amount())
+	for _, l := range q.Lines() {
+		if l.PaymentRef() == "pi_prev" {
+			assert.Zero(t, l.Amount().Amount())
 		}
 	}
 }

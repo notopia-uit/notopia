@@ -11,11 +11,11 @@ import (
 
 func (p *Provider) CreateCustomer(ctx context.Context, workspaceID uuid.UUID, payer domain.Payer) (string, error) {
 	params := &stripego.CustomerCreateParams{
-		Email: stripego.String(payer.Email),
-		Name:  stripego.String(payer.Name),
+		Email: stripego.String(payer.Email()),
+		Name:  stripego.String(payer.Name()),
 		Metadata: map[string]string{
 			"workspace_id": workspaceID.String(),
-			"payer_id":     payer.ID,
+			"payer_id":     payer.ID(),
 		},
 	}
 	params.SetIdempotencyKey("customer:" + workspaceID.String())
@@ -28,9 +28,9 @@ func (p *Provider) CreateCustomer(ctx context.Context, workspaceID uuid.UUID, pa
 
 func (p *Provider) UpdateCustomerContact(ctx context.Context, customerID string, payer domain.Payer) error {
 	_, err := p.sc.V1Customers.Update(ctx, customerID, &stripego.CustomerUpdateParams{
-		Email:    stripego.String(payer.Email),
-		Name:     stripego.String(payer.Name),
-		Metadata: map[string]string{"payer_id": payer.ID},
+		Email:    stripego.String(payer.Email()),
+		Name:     stripego.String(payer.Name()),
+		Metadata: map[string]string{"payer_id": payer.ID()},
 	})
 	return providerErr("update customer", err)
 }
@@ -42,9 +42,9 @@ func (p *Provider) CreateCheckoutSession(ctx context.Context, in app.CheckoutInp
 	}
 	meta := map[string]string{
 		"workspace_id": in.WorkspaceID.String(),
-		"payer_id":     in.Payer.ID,
-		"payer_email":  in.Payer.Email,
-		"payer_name":   in.Payer.Name,
+		"payer_id":     in.Payer.ID(),
+		"payer_email":  in.Payer.Email(),
+		"payer_name":   in.Payer.Name(),
 		"purpose":      purpose,
 	}
 	if in.PriceID != uuid.Nil {
@@ -101,19 +101,23 @@ func (p *Provider) GetCheckoutSession(ctx context.Context, id string) (app.Check
 		s.PaymentStatus == stripego.CheckoutSessionPaymentStatusNoPaymentRequired
 	var payment domain.PaymentInfo
 	if s.PaymentIntent != nil {
-		payment = paymentFromIntent(s.PaymentIntent)
+		if payment, err = paymentFromIntent(s.PaymentIntent); err != nil {
+			return app.CheckoutSessionResult{}, err
+		}
+	}
+	var payer domain.Payer
+	if id := s.Metadata["payer_id"]; id != "" {
+		if payer, err = domain.NewPayer(id, s.Metadata["payer_email"], s.Metadata["payer_name"]); err != nil {
+			return app.CheckoutSessionResult{}, err
+		}
 	}
 
 	res := app.CheckoutSessionResult{
-		ID:          s.ID,
-		Purpose:     toAppCheckoutPurpose(s.Metadata["purpose"]),
-		Complete:    s.Status == stripego.CheckoutSessionStatusComplete && paid,
-		WorkspaceID: ws,
-		Payer: domain.Payer{
-			ID:    s.Metadata["payer_id"],
-			Email: s.Metadata["payer_email"],
-			Name:  s.Metadata["payer_name"],
-		},
+		ID:                     s.ID,
+		Purpose:                toAppCheckoutPurpose(s.Metadata["purpose"]),
+		Complete:               s.Status == stripego.CheckoutSessionStatusComplete && paid,
+		WorkspaceID:            ws,
+		Payer:                  payer,
 		PriceID:                priceID,
 		CustomerID:             "",
 		ProviderSubscriptionID: "",

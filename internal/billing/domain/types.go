@@ -303,15 +303,43 @@ func ParseLimitKey(s string) (LimitKey, error) {
 	return LimitKeyUnspecified, errs.NewInvalid(fmt.Sprintf("unknown limit %q", s))
 }
 
+type Currency uint8
+
+const (
+	CurrencyUnspecified Currency = iota
+	CurrencyVND
+)
+
+var Currencies = []Currency{CurrencyVND}
+
+func (c Currency) IsValid() bool {
+	switch c {
+	case CurrencyVND:
+		return true
+	case CurrencyUnspecified:
+		return false
+	}
+	return false
+}
+
+func (c Currency) String() string {
+	switch c {
+	case CurrencyUnspecified:
+		return "unspecified"
+	case CurrencyVND:
+		return "vnd"
+	default:
+		return "unknown"
+	}
+}
+
+func ParseCurrency(s string) (Currency, error) {
+	for _, c := range Currencies {
+		if c.String() == s {
+			return c, nil
+		}
+	}
+	return CurrencyUnspecified, errs.NewInvalid(fmt.Sprintf("unknown currency %q", s))
+}
+
 const Unlimited int64 = -1
-
-type Money struct {
-	Amount   int64
-	Currency string
-}
-
-type Payer struct {
-	ID    string
-	Email string
-	Name  string
-}

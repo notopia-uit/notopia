@@ -58,7 +58,7 @@ func ensureAccount(ctx context.Context, uow domain.UnitOfWork, provider PaymentP
 			account = existing
 			return err
 		}
-		account = domain.OpenBillingAccount(ws, customerID, payer, time.Now(), payer.ID)
+		account = domain.OpenBillingAccount(ws, customerID, payer, time.Now(), payer.ID())
 		return r.BillingAccount().Save(ctx, account)
 	})
 	return account, err
@@ -87,7 +87,10 @@ func (h *StartCheckoutHandler) Handle(ctx context.Context, q *StartCheckout) (st
 	if cur != nil && !lifetimeUpgrade {
 		return "", errs.New(errs.CodeSubscriptionAlreadyActive, "workspace already has a subscription; use the portal to change plan", nil)
 	}
-	payer := toDomainPayer(q.Payer)
+	payer, err := toDomainPayer(q.Payer)
+	if err != nil {
+		return "", err
+	}
 	account, err := ensureAccount(ctx, h.uow, h.provider, q.WorkspaceID, payer)
 	if err != nil {
 		return "", err

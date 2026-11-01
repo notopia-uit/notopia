@@ -23,34 +23,49 @@ func ToPolicy(row *pgsqlc.BillingPolicy) *domain.BillingPolicy {
 	return domain.UnmarshalBillingPolicy(int(row.PastDueGraceDays), int(row.LifetimeRefundWindowDays), row.PortalConfigurationID, row.UpdatedAt)
 }
 
-func ToPrice(row *pgsqlc.Price) *domain.Price {
+func ToPrice(row *pgsqlc.Price) (*domain.Price, error) {
+	amount, err := ToMoney(row.Amount, row.Currency)
+	if err != nil {
+		return nil, err
+	}
 	return domain.UnmarshalPrice(domain.UnmarshalPriceParams{
 		ID: row.ID, Plan: ToPlanTier(row.Plan), Interval: ToInterval(row.BillingInterval),
-		Amount: domain.Money{Amount: row.Amount, Currency: row.Currency}, ProviderPriceID: row.ProviderPriceID,
+		Amount: amount, ProviderPriceID: row.ProviderPriceID,
 		ProviderLookupKey: row.LookupKey, Active: row.Active, CreatedAt: row.CreatedAt, ArchivedAt: row.ArchivedAt,
-	})
+	}), nil
 }
 
-func ToPrices(rows []*pgsqlc.Price) []*domain.Price {
+func ToPrices(rows []*pgsqlc.Price) ([]*domain.Price, error) {
 	out := make([]*domain.Price, 0, len(rows))
 	for _, row := range rows {
-		out = append(out, ToPrice(row))
+		p, err := ToPrice(row)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, p)
 	}
-	return out
+	return out, nil
 }
 
-func ToAccount(row *pgsqlc.BillingAccount) *domain.BillingAccount {
-	return domain.UnmarshalBillingAccount(row.WorkspaceID, row.ProviderCustomerID,
-		domain.Payer{ID: row.PayerID, Email: row.PayerEmail, Name: row.PayerName},
-		row.PayerMissingSince, row.CreatedAt, row.UpdatedAt)
+func ToAccount(row *pgsqlc.BillingAccount) (*domain.BillingAccount, error) {
+	payer, err := domain.NewPayer(row.PayerID, row.PayerEmail, row.PayerName)
+	if err != nil {
+		return nil, err
+	}
+	return domain.UnmarshalBillingAccount(row.WorkspaceID, row.ProviderCustomerID, payer,
+		row.PayerMissingSince, row.CreatedAt, row.UpdatedAt), nil
 }
 
-func ToSubscriptions(rows []*pgsqlc.Subscription, refundRows []*pgsqlc.Refund) []*domain.Subscription {
+func ToSubscriptions(rows []*pgsqlc.Subscription, refundRows []*pgsqlc.Refund) ([]*domain.Subscription, error) {
 	refunds := map[uuid.UUID][]*domain.Refund{}
 	for _, rr := range refundRows {
+		amount, err := ToMoney(rr.Amount, rr.Currency)
+		if err != nil {
+			return nil, err
+		}
 		refunds[rr.SubscriptionID] = append(refunds[rr.SubscriptionID], domain.UnmarshalRefund(domain.UnmarshalRefundParams{
 			ID: rr.ID, ProviderRefundID: rr.ProviderRefundID, PaymentRef: rr.PaymentRef,
-			Amount: domain.Money{Amount: rr.Amount, Currency: rr.Currency}, Reason: ToRefundReason(rr.Reason),
+			Amount: amount, Reason: ToRefundReason(rr.Reason),
 			Status: ToRefundStatus(rr.Status), FailureMessage: rr.FailureMessage, CreatedAt: rr.CreatedAt, UpdatedAt: rr.UpdatedAt,
 		}))
 	}
@@ -64,5 +79,5 @@ func ToSubscriptions(rows []*pgsqlc.Subscription, refundRows []*pgsqlc.Refund) [
 			ProviderSyncedAt: row.ProviderSyncedAt, CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt, Refunds: refunds[row.ID],
 		}))
 	}
-	return out
+	return out, nil
 }

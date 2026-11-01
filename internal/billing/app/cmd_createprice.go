@@ -30,15 +30,20 @@ type CreatePriceCmd commonhandler.Cmd[CreatePrice]
 var _ CreatePriceCmd = (*CreatePriceHandler)(nil)
 
 func (h *CreatePriceHandler) Handle(ctx context.Context, cmd *CreatePrice) error {
+	currency, err := domain.ParseCurrency(cmd.Currency)
+	if err != nil {
+		return err
+	}
+	amount, err := domain.NewMoney(cmd.Amount, currency)
+	if err != nil {
+		return err
+	}
 	return h.catalog.createPrice(
 		ctx,
 		cmd.ID,
 		toDomainPlanTier(cmd.Plan),
 		toDomainInterval(cmd.Interval),
-		domain.Money{
-			Amount:   cmd.Amount,
-			Currency: cmd.Currency,
-		},
+		amount,
 		cmd.UserID,
 	)
 }

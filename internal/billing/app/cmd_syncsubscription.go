@@ -51,14 +51,14 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 		}
 		if !sub.IsCurrent() {
 			// canceled locally (cancel-now / duplicate / replaced): never resurrect
-			if snap.Status == domain.SubscriptionStatusCanceled || snap.Status == domain.SubscriptionStatusIncompleteExpired {
+			if snap.Status() == domain.SubscriptionStatusCanceled || snap.Status() == domain.SubscriptionStatusIncompleteExpired {
 				sub.MarkProviderSynced(time.Now())
 				return r.Subscription().Save(ctx, sub)
 			}
 			cancelRemotely = true
 			return nil
 		}
-		price, err := r.Price().GetByProviderPriceID(ctx, snap.ProviderPriceID)
+		price, err := r.Price().GetByProviderPriceID(ctx, snap.ProviderPriceID())
 		if err != nil {
 			return err
 		}

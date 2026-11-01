@@ -32,7 +32,7 @@ func NewPrice(id uuid.UUID, plan PlanTier, interval Interval, amount Money, prov
 	if !interval.IsValid() {
 		return nil, errs.NewInvalid(fmt.Sprintf("invalid interval %q", interval))
 	}
-	if amount.Amount <= 0 || amount.Currency == "" {
+	if amount.amount <= 0 || !amount.currency.IsValid() {
 		return nil, errs.NewInvalid("price amount must be > 0 with a currency")
 	}
 	p := &Price{

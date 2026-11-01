@@ -10,15 +10,16 @@ import (
 	stripego "github.com/stripe/stripe-go/v87"
 )
 
-func toRefundResult(r *stripego.Refund) app.RefundResult {
+func toRefundResult(r *stripego.Refund) (app.RefundResult, error) {
+	amount, err := toDomainMoney(r.Amount, r.Currency)
+	if err != nil {
+		return app.RefundResult{}, err
+	}
 	res := app.RefundResult{
-		ProviderRefundID: r.ID,
-		RefundID:         nil,
-		PaymentRef:       "",
-		Amount: domain.Money{
-			Amount:   r.Amount,
-			Currency: string(r.Currency),
-		},
+		ProviderRefundID:       r.ID,
+		RefundID:               nil,
+		PaymentRef:             "",
+		Amount:                 amount,
 		Status:                 toDomainRefundStatus(r.Status),
 		FailureMessage:         nil,
 		ProviderSubscriptionID: "",
@@ -32,13 +33,13 @@ func toRefundResult(r *stripego.Refund) app.RefundResult {
 	if r.FailureReason != "" {
 		res.FailureMessage = new(string(r.FailureReason))
 	}
-	return res
+	return res, nil
 }
 
 func (p *Provider) CreateRefund(ctx context.Context, refundID uuid.UUID, paymentRef string, amount domain.Money) (app.RefundResult, error) {
 	params := &stripego.RefundCreateParams{
 		PaymentIntent: stripego.String(paymentRef),
-		Amount:        stripego.Int64(amount.Amount),
+		Amount:        stripego.Int64(amount.Amount()),
 		Metadata:      map[string]string{"refund_id": refundID.String()},
 	}
 	params.SetIdempotencyKey("refund:" + refundID.String())
@@ -49,7 +50,7 @@ func (p *Provider) CreateRefund(ctx context.Context, refundID uuid.UUID, payment
 	if err != nil {
 		return app.RefundResult{}, providerErr("create refund", err)
 	}
-	return toRefundResult(r), nil
+	return toRefundResult(r)
 }
 
 // subscriptionOfPayment resolves the subscription that owns a payment intent through its invoice payment.
@@ -80,7 +81,10 @@ func (p *Provider) GetRefund(ctx context.Context, providerRefundID string) (app.
 	if err != nil {
 		return app.RefundResult{}, providerErr("retrieve refund", err)
 	}
-	res := toRefundResult(r)
+	res, err := toRefundResult(r)
+	if err != nil {
+		return app.RefundResult{}, err
+	}
 	if res.RefundID == nil && res.PaymentRef != "" {
 		if res.ProviderSubscriptionID, err = p.subscriptionOfPayment(ctx, res.PaymentRef); err != nil {
 			return app.RefundResult{}, err

@@ -143,7 +143,7 @@ func (r memAccounts) GetByWorkspace(_ context.Context, ws uuid.UUID, _ bool) (*d
 func (r memAccounts) ListByPayer(_ context.Context, payerID string) ([]*domain.BillingAccount, error) {
 	var out []*domain.BillingAccount
 	for _, a := range r.m.accounts {
-		if a.Payer().ID == payerID {
+		if a.Payer().ID() == payerID {
 			out = append(out, a)
 		}
 	}
@@ -174,9 +174,9 @@ func (r memPrices) GetByProviderPriceID(_ context.Context, id string) (*domain.P
 	return nil, errs.NewNotFound("price")
 }
 
-func (r memPrices) GetActive(_ context.Context, plan domain.PlanTier, iv domain.Interval, cur string, _ bool) (*domain.Price, error) {
+func (r memPrices) GetActive(_ context.Context, plan domain.PlanTier, iv domain.Interval, cur domain.Currency, _ bool) (*domain.Price, error) {
 	for _, p := range r.m.prices {
-		if p.Active() && p.Plan() == plan && p.Interval() == iv && p.Amount().Currency == cur {
+		if p.Active() && p.Plan() == plan && p.Interval() == iv && p.Amount().Currency() == cur {
 			return p, nil
 		}
 	}

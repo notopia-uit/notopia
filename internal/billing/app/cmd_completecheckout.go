@@ -81,8 +81,8 @@ func (h *CompleteCheckoutHandler) setPayer(ctx context.Context, r domain.RepoReg
 	if err != nil || account == nil {
 		return err
 	}
-	if account.Payer().ID != payer.ID || account.PayerMissingSince() != nil {
-		account.ChangePayer(payer, now, payer.ID)
+	if account.Payer().ID() != payer.ID() || account.PayerMissingSince() != nil {
+		account.ChangePayer(payer, now, payer.ID())
 		return r.BillingAccount().Save(ctx, account)
 	}
 	return nil
@@ -100,7 +100,7 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 	duplicate := cur != nil && (cur.ProviderSubscriptionID() == nil || *cur.ProviderSubscriptionID() != s.ProviderSubscriptionID)
 	var payments []domain.PaymentInfo
 	if duplicate {
-		if payments, err = h.provider.PeriodPayments(ctx, s.ProviderSubscriptionID, snap.CurrentPeriodStart, snap.CurrentPeriodEnd); err != nil {
+		if payments, err = h.provider.PeriodPayments(ctx, s.ProviderSubscriptionID, snap.CurrentPeriodStart(), snap.CurrentPeriodEnd()); err != nil {
 			return err
 		}
 	}
@@ -114,7 +114,7 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 		if existing, err := r.Subscription().GetByProviderSubscriptionID(ctx, s.ProviderSubscriptionID, true); err != nil || existing != nil {
 			return err
 		}
-		price, err := r.Price().GetByProviderPriceID(ctx, snap.ProviderPriceID)
+		price, err := r.Price().GetByProviderPriceID(ctx, snap.ProviderPriceID())
 		if err != nil {
 			return err
 		}
@@ -123,7 +123,11 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 			return err
 		}
 		if duplicate {
-			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, domain.FullRefundQuote(payments...), actor); err != nil {
+			quote, err := domain.FullRefundQuote(payments...)
+			if err != nil {
+				return err
+			}
+			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, quote, actor); err != nil {
 				return err
 			}
 		} else if err := h.setPayer(ctx, r, s.WorkspaceID, s.Payer, now); err != nil {
@@ -157,7 +161,7 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 	var replaced []domain.PaymentInfo
 	replacing := cur != nil && cur.Interval() != domain.IntervalLifetime
 	duplicate := cur != nil && cur.Interval() == domain.IntervalLifetime &&
-		(cur.ProviderPaymentID() == nil || *cur.ProviderPaymentID() != s.Payment.PaymentRef)
+		(cur.ProviderPaymentID() == nil || *cur.ProviderPaymentID() != s.Payment.PaymentRef())
 	if replacing {
 		if replaced, err = h.provider.PeriodPayments(ctx, *cur.ProviderSubscriptionID(), *cur.CurrentPeriodStart(), *cur.CurrentPeriodEnd()); err != nil {
 			return err
@@ -171,7 +175,7 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 		if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, eventCheckoutCompleted); err != nil || !first {
 			return err
 		}
-		if existing, err := r.Subscription().GetByProviderPaymentID(ctx, s.Payment.PaymentRef, true); err != nil || existing != nil {
+		if existing, err := r.Subscription().GetByProviderPaymentID(ctx, s.Payment.PaymentRef(), true); err != nil || existing != nil {
 			return err
 		}
 		price, err := r.Price().GetByID(ctx, s.PriceID, false)
@@ -199,12 +203,16 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 			}
 			toRefund = append(toRefund, old.ID())
 		}
-		sub, err := domain.NewLifetimeSubscription(uuid.Must(uuid.NewV7()), s.WorkspaceID, price, s.Payment.PaymentRef, s.Payment.PaidAt, now, actor)
+		sub, err := domain.NewLifetimeSubscription(uuid.Must(uuid.NewV7()), s.WorkspaceID, price, s.Payment.PaymentRef(), s.Payment.PaidAt(), now, actor)
 		if err != nil {
 			return err
 		}
 		if duplicate {
-			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, domain.FullRefundQuote(s.Payment), actor); err != nil {
+			quote, err := domain.FullRefundQuote(s.Payment)
+			if err != nil {
+				return err
+			}
+			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, quote, actor); err != nil {
 				return err
 			}
 			toRefund = append(toRefund, sub.ID())
@@ -286,7 +294,7 @@ func (h *CompleteCheckoutHandler) payerChange(ctx context.Context, cmd *Complete
 		if err != nil {
 			return err
 		}
-		sub.ResumeCancel(now, s.Payer.ID)
+		sub.ResumeCancel(now, s.Payer.ID())
 		return r.Subscription().Save(ctx, sub)
 	})
 	if err == nil && cur != nil {

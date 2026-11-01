@@ -104,7 +104,7 @@ func newPlan(p *domain.Plan) Plan {
 func newPrice(p *domain.Price) Price {
 	return Price{
 		ID: p.ID(), Plan: newPlanTier(p.Plan()), Interval: newBillingInterval(p.Interval()),
-		Amount: p.Amount().Amount, Currency: p.Amount().Currency, LookupKey: p.ProviderLookupKey(), Active: p.Active(),
+		Amount: p.Amount().Amount(), Currency: p.Amount().Currency().String(), LookupKey: p.ProviderLookupKey(), Active: p.Active(),
 		CreatedAt: p.CreatedAt(), ArchivedAt: p.ArchivedAt(),
 	}
 }
@@ -132,7 +132,7 @@ func newSubscription(s *domain.Subscription, policy *domain.BillingPolicy) Subsc
 	refunds := make([]Refund, 0, len(s.Refunds()))
 	for _, r := range s.Refunds() {
 		refunds = append(refunds, Refund{
-			ID: r.ID(), Amount: r.Amount().Amount, Currency: r.Amount().Currency,
+			ID: r.ID(), Amount: r.Amount().Amount(), Currency: r.Amount().Currency().String(),
 			Reason: newRefundReason(r.Reason()), Status: newRefundStatus(r.Status()), CreatedAt: r.CreatedAt(),
 		})
 	}
@@ -145,15 +145,20 @@ func newSubscription(s *domain.Subscription, policy *domain.BillingPolicy) Subsc
 
 func newPayer(a *domain.BillingAccount) Payer {
 	p := a.Payer()
-	return Payer{ID: p.ID, Email: p.Email, Name: p.Name, MissingSince: a.PayerMissingSince()}
+	return Payer{ID: p.ID(), Email: p.Email(), Name: p.Name(), MissingSince: a.PayerMissingSince()}
 }
 
 func newRefundQuote(q domain.RefundQuote) RefundQuote {
-	lines := make([]RefundQuoteLine, 0, len(q.Lines))
-	for _, l := range q.Lines {
-		lines = append(lines, RefundQuoteLine{PaidAmount: l.PaidAmount.Amount, Amount: l.Amount.Amount, CoverageSeconds: l.CoverageSeconds, UnusedSeconds: l.UnusedSeconds})
+	quoteLines := q.Lines()
+	lines := make([]RefundQuoteLine, 0, len(quoteLines))
+	for _, l := range quoteLines {
+		lines = append(lines, RefundQuoteLine{PaidAmount: l.PaidAmount().Amount(), Amount: l.Amount().Amount(), CoverageSeconds: l.CoverageSeconds(), UnusedSeconds: l.UnusedSeconds()})
 	}
-	return RefundQuote{Amount: q.Amount.Amount, Currency: q.Amount.Currency, UnusedSeconds: q.UnusedSeconds, PeriodSeconds: q.PeriodSeconds, Lines: lines}
+	currency := ""
+	if c := q.Amount().Currency(); c.IsValid() {
+		currency = c.String()
+	}
+	return RefundQuote{Amount: q.Amount().Amount(), Currency: currency, UnusedSeconds: q.UnusedSeconds(), PeriodSeconds: q.PeriodSeconds(), Lines: lines}
 }
 
 func toDomainPlanTier(t PlanTier) domain.PlanTier {
@@ -182,8 +187,8 @@ func toDomainInterval(i BillingInterval) domain.Interval {
 	return domain.IntervalUnspecified
 }
 
-func toDomainPayer(p Payer) domain.Payer {
-	return domain.Payer{ID: p.ID, Email: p.Email, Name: p.Name}
+func toDomainPayer(p Payer) (domain.Payer, error) {
+	return domain.NewPayer(p.ID, p.Email, p.Name)
 }
 
 // parseFeatures/parseLimits reject keys the domain does not know (errs.NewInvalid → 400).

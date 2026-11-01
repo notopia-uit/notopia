@@ -44,7 +44,7 @@ func (h *HandlePayerRemovedHandler) Handle(ctx context.Context, cmd *HandlePayer
 	}); err != nil {
 		return err
 	}
-	if account == nil || account.Payer().ID != cmd.UserID || account.PayerMissingSince() != nil {
+	if account == nil || account.Payer().ID() != cmd.UserID || account.PayerMissingSince() != nil {
 		return nil
 	}
 	recurring := sub != nil && sub.ProviderSubscriptionID() != nil

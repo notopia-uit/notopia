@@ -23,7 +23,7 @@ func (r *accountRepo) GetByWorkspace(ctx context.Context, workspaceID uuid.UUID,
 	if err != nil {
 		return nil, errs.NewInternal("failed to get billing account", err)
 	}
-	return pgmapper.ToAccount(row), nil
+	return pgmapper.ToAccount(row)
 }
 
 func (r *accountRepo) ListByPayer(ctx context.Context, payerID string) ([]*domain.BillingAccount, error) {
@@ -33,7 +33,11 @@ func (r *accountRepo) ListByPayer(ctx context.Context, payerID string) ([]*domai
 	}
 	out := make([]*domain.BillingAccount, 0, len(rows))
 	for _, row := range rows {
-		out = append(out, pgmapper.ToAccount(row))
+		a, err := pgmapper.ToAccount(row)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, a)
 	}
 	return out, nil
 }
@@ -42,7 +46,7 @@ func (r *accountRepo) Save(ctx context.Context, a *domain.BillingAccount) error 
 	p := a.Payer()
 	err := r.q.UpsertBillingAccount(ctx, &pgsqlc.UpsertBillingAccountParams{
 		WorkspaceID: a.WorkspaceID(), ProviderCustomerID: a.ProviderCustomerID(),
-		PayerID: p.ID, PayerEmail: p.Email, PayerName: p.Name, PayerMissingSince: a.PayerMissingSince(),
+		PayerID: p.ID(), PayerEmail: p.Email(), PayerName: p.Name(), PayerMissingSince: a.PayerMissingSince(),
 		CreatedAt: a.CreatedAt(), UpdatedAt: a.UpdatedAt(),
 	})
 	drain(ctx, a.PopEvents())

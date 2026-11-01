@@ -84,8 +84,9 @@ func (c *SubscriptionCanceller) CancelNow(ctx context.Context, ws uuid.UUID, rea
 		if !refundOptional || !isRefundWindowExpired {
 			return err
 		}
-		var noRefund domain.RefundQuote
-		quote = noRefund
+		if quote, err = domain.NewRefundQuote(nil, 0, 0); err != nil {
+			return err
+		}
 	}
 	var saved *domain.Subscription
 	if err := c.uow.Execute(ctx, func(r domain.RepoRegistry) error {

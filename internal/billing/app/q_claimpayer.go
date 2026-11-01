@@ -46,14 +46,18 @@ func (h *ClaimPayerHandler) Handle(ctx context.Context, q *ClaimPayer) (string, 
 	if account == nil {
 		return "", errs.New(errs.CodeNoBillingAccount, "workspace has no billing account", nil)
 	}
-	if account.Payer().ID == q.Payer.ID && account.PayerMissingSince() == nil {
+	payer, err := toDomainPayer(q.Payer)
+	if err != nil {
+		return "", err
+	}
+	if account.Payer().ID() == payer.ID() && account.PayerMissingSince() == nil {
 		return "", errs.New(errs.CodeAlreadyPayer, "you are already the payer", nil)
 	}
 	return h.provider.CreateCheckoutSession(ctx, CheckoutInput{
 		Purpose:         CheckoutPurposePayerChange,
 		WorkspaceID:     q.WorkspaceID,
 		CustomerID:      account.ProviderCustomerID(),
-		Payer:           toDomainPayer(q.Payer),
+		Payer:           payer,
 		PriceID:         uuid.Nil,
 		ProviderPriceID: "",
 		SuccessURL:      billingPageURL(h.settings, q.WorkspaceID, "payer"),

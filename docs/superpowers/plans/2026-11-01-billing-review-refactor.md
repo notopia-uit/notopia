@@ -24,10 +24,10 @@ Deferred (not this PR): handler decorator refactor, see `tmp/billing/deferred-ha
 
 ## T2 Immutable value objects (sonnet)
 
-- [ ] `Money`, `Payer`, `ProviderSnapshot`, `PaymentInfo`, `RefundLine`, `RefundQuote`: private fields, getters, validating constructors (`NewMoney`, `NewPayer`, `NewProviderSnapshot(ProviderSnapshotParams)`, `NewPaymentInfo(...)`, `NewRefundLine(...)`, `NewRefundQuote(lines, unusedSeconds, periodSeconds)` computing the total)
-- [ ] `Money.Add(Money) (Money, error)`, currency mismatch → invalid
-- [ ] `Currency` uint8 enum (`CurrencyUSD`, … whatever is in use) with `String`/`IsValid`/`ParseCurrency`; explicit mappers at ports
-- [ ] `QuoteCancelNow`/`FullRefundQuote` build lines then `NewRefundQuote`, no field mutation
+- [x] `Money`, `Payer`, `ProviderSnapshot`, `PaymentInfo`, `RefundLine`, `RefundQuote`: private fields, getters, validating constructors (`NewMoney`, `NewPayer`, `NewProviderSnapshot(ProviderSnapshotParams)`, `NewPaymentInfo(...)`, `NewRefundLine(...)`, `NewRefundQuote(lines, unusedSeconds, periodSeconds)` computing the total)
+- [x] `Money.Add(Money) (Money, error)`, currency mismatch → invalid
+- [x] `Currency` uint8 enum (`CurrencyUSD`, … whatever is in use) with `String`/`IsValid`/`ParseCurrency`; explicit mappers at ports
+- [x] `QuoteCancelNow`/`FullRefundQuote` build lines then `NewRefundQuote`, no field mutation
 
 ## T3 Singleton repos + Save guard (sonnet)
 

@@ -24,7 +24,7 @@ func (r *priceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 	if err != nil {
 		return nil, errs.NewInternal("failed to get price", err)
 	}
-	return pgmapper.ToPrice(row), nil
+	return pgmapper.ToPrice(row)
 }
 
 func (r *priceRepo) GetByProviderPriceID(ctx context.Context, id string) (*domain.Price, error) {
@@ -35,12 +35,12 @@ func (r *priceRepo) GetByProviderPriceID(ctx context.Context, id string) (*domai
 	if err != nil {
 		return nil, errs.NewInternal("failed to get price by provider id", err)
 	}
-	return pgmapper.ToPrice(row), nil
+	return pgmapper.ToPrice(row)
 }
 
-func (r *priceRepo) GetActive(ctx context.Context, plan domain.PlanTier, interval domain.Interval, currency string, forUpdate bool) (*domain.Price, error) {
+func (r *priceRepo) GetActive(ctx context.Context, plan domain.PlanTier, interval domain.Interval, currency domain.Currency, forUpdate bool) (*domain.Price, error) {
 	row, err := r.q.GetActivePrice(ctx, &pgsqlc.GetActivePriceParams{
-		Plan: pgmapper.FromPlanTier(plan), BillingInterval: pgmapper.FromInterval(interval), Currency: currency, ForUpdate: forUpdate,
+		Plan: pgmapper.FromPlanTier(plan), BillingInterval: pgmapper.FromInterval(interval), Currency: pgmapper.FromCurrency(currency), ForUpdate: forUpdate,
 	})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
@@ -48,7 +48,7 @@ func (r *priceRepo) GetActive(ctx context.Context, plan domain.PlanTier, interva
 	if err != nil {
 		return nil, errs.NewInternal("failed to get active price", err)
 	}
-	return pgmapper.ToPrice(row), nil
+	return pgmapper.ToPrice(row)
 }
 
 func (r *priceRepo) ListActive(ctx context.Context) ([]*domain.Price, error) {
@@ -56,7 +56,7 @@ func (r *priceRepo) ListActive(ctx context.Context) ([]*domain.Price, error) {
 	if err != nil {
 		return nil, errs.NewInternal("failed to list active prices", err)
 	}
-	return pgmapper.ToPrices(rows), nil
+	return pgmapper.ToPrices(rows)
 }
 
 func (r *priceRepo) List(ctx context.Context) ([]*domain.Price, error) {
@@ -64,13 +64,13 @@ func (r *priceRepo) List(ctx context.Context) ([]*domain.Price, error) {
 	if err != nil {
 		return nil, errs.NewInternal("failed to list prices", err)
 	}
-	return pgmapper.ToPrices(rows), nil
+	return pgmapper.ToPrices(rows)
 }
 
 func (r *priceRepo) Save(ctx context.Context, p *domain.Price) error {
 	err := r.q.UpsertPrice(ctx, &pgsqlc.UpsertPriceParams{
 		ID: p.ID(), Plan: pgmapper.FromPlanTier(p.Plan()), BillingInterval: pgmapper.FromInterval(p.Interval()),
-		Amount: p.Amount().Amount, Currency: p.Amount().Currency, ProviderPriceID: p.ProviderPriceID(),
+		Amount: p.Amount().Amount(), Currency: pgmapper.FromCurrency(p.Amount().Currency()), ProviderPriceID: p.ProviderPriceID(),
 		LookupKey: p.ProviderLookupKey(), Active: p.Active(), CreatedAt: p.CreatedAt(), ArchivedAt: p.ArchivedAt(),
 	})
 	drain(ctx, p.PopEvents())

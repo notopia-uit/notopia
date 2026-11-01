@@ -44,7 +44,7 @@ func (c *catalog) createPrice(
 	var previous *domain.Price
 	err = c.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		var err error
-		if previous, err = r.Price().GetActive(ctx, plan, interval, amount.Currency, true); err != nil {
+		if previous, err = r.Price().GetActive(ctx, plan, interval, amount.Currency(), true); err != nil {
 			return err
 		}
 		if previous != nil {

@@ -25,13 +25,10 @@ func newCancellerFixture(t *testing.T, status domain.SubscriptionStatus) *cancel
 	t.Helper()
 	store := newMemStore()
 	now := time.Now()
-	plus, _ := domain.NewPrice(uuid.New(), domain.PlanTierPlus, domain.IntervalMonth, domain.Money{Amount: 30000, Currency: "vnd"}, "price_plus", now, "u")
+	plus, _ := domain.NewPrice(uuid.New(), domain.PlanTierPlus, domain.IntervalMonth, vnd(t, 30000), "price_plus", now, "u")
 	store.prices[plus.ID()] = plus
 	ws := uuid.New()
-	snap := domain.ProviderSnapshot{
-		ProviderSubscriptionID: "sub_1", ProviderPriceID: "price_plus", WorkspaceID: ws, Status: status,
-		CurrentPeriodStart: now, CurrentPeriodEnd: now.Add(30 * 24 * time.Hour),
-	}
+	snap := newTestSnapshot(t, "sub_1", "price_plus", ws, status, now, now.Add(30*24*time.Hour))
 	sub, err := domain.NewSubscription(uuid.New(), ws, plus, snap, now, "u")
 	require.NoError(t, err)
 	require.NoError(t, store.Subscription().Save(context.Background(), sub))
@@ -64,10 +61,7 @@ func TestCancelNowPastDueWithoutPeriodPayments(t *testing.T) {
 func TestCancelNowCancelsLocallyBeforeProviderAndSurvivesProviderFailure(t *testing.T) {
 	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
 	now := time.Now()
-	f.provider.EXPECT().PeriodPayments(mock.Anything, "sub_1", mock.Anything, mock.Anything).Return([]domain.PaymentInfo{{
-		Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: now,
-		CoverageStart: now, CoverageEnd: now.Add(30 * 24 * time.Hour),
-	}}, nil).Once()
+	f.provider.EXPECT().PeriodPayments(mock.Anything, "sub_1", mock.Anything, mock.Anything).Return([]domain.PaymentInfo{newTestPayment(t, 30000, "pi_1", now, now, now.Add(30*24*time.Hour))}, nil).Once()
 	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").
 		RunAndReturn(func(context.Context, string) error {
 			assert.Equal(t, domain.SubscriptionStatusCanceled, f.store.subs[f.sub.ID()].Status(), "local cancel is committed first")

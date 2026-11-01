@@ -95,7 +95,7 @@ func TestCreateRefundMapsInvalidRequestToInvalid(t *testing.T) {
 		return http.StatusBadRequest, `{"error":{"type":"invalid_request_error","message":"Refund amount is greater than unrefunded amount on charge"}}`
 	})
 
-	_, err := p.CreateRefund(context.Background(), uuid.New(), "pi_1", domain.Money{Amount: 10000, Currency: "vnd"})
+	_, err := p.CreateRefund(context.Background(), uuid.New(), "pi_1", vnd(t, 10000))
 
 	var e errs.Error
 	require.ErrorAs(t, err, &e)
@@ -107,7 +107,7 @@ func TestCreateRefundKeepsTransientErrorsAsProviderErrors(t *testing.T) {
 		return http.StatusTooManyRequests, `{"error":{"type":"rate_limit_error","message":"slow down"}}`
 	})
 
-	_, err := p.CreateRefund(context.Background(), uuid.New(), "pi_1", domain.Money{Amount: 10000, Currency: "vnd"})
+	_, err := p.CreateRefund(context.Background(), uuid.New(), "pi_1", vnd(t, 10000))
 
 	var e errs.Error
 	require.ErrorAs(t, err, &e)
@@ -149,8 +149,15 @@ func TestPeriodPaymentsAfterMonthToYearUpgradeIncludesTheOriginalMonthlyInvoice(
 	require.NoError(t, err)
 	refs := make([]string, 0, len(got))
 	for _, pay := range got {
-		refs = append(refs, pay.PaymentRef)
+		refs = append(refs, pay.PaymentRef())
 	}
 	assert.ElementsMatch(t, []string{"pi_y", "pi_m"}, refs)
 	assert.LessOrEqual(t, createdGTE, periodStart.Add(-365*day).Unix(), "the created window reaches the longest billing interval back")
+}
+
+func vnd(t *testing.T, amount int64) domain.Money {
+	t.Helper()
+	m, err := domain.NewMoney(amount, domain.CurrencyVND)
+	require.NoError(t, err)
+	return m
 }

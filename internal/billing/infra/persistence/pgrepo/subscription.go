@@ -29,7 +29,7 @@ func (r *subscriptionRepo) hydrate(ctx context.Context, rows []*pgsqlc.Subscript
 	if err != nil {
 		return nil, errs.NewInternal("failed to list refunds", err)
 	}
-	return pgmapper.ToSubscriptions(rows, refundRows), nil
+	return pgmapper.ToSubscriptions(rows, refundRows)
 }
 
 func (r *subscriptionRepo) one(ctx context.Context, row *pgsqlc.Subscription, err error, missingIsNil bool, what string) (*domain.Subscription, error) {
@@ -126,7 +126,7 @@ func (r *subscriptionRepo) Save(ctx context.Context, s *domain.Subscription) err
 	for _, rf := range s.Refunds() {
 		if err := r.q.UpsertRefund(ctx, &pgsqlc.UpsertRefundParams{
 			ID: rf.ID(), SubscriptionID: s.ID(), ProviderRefundID: rf.ProviderRefundID(), PaymentRef: rf.PaymentRef(),
-			Amount: rf.Amount().Amount, Currency: rf.Amount().Currency, Reason: pgmapper.FromRefundReason(rf.Reason()),
+			Amount: rf.Amount().Amount(), Currency: pgmapper.FromCurrency(rf.Amount().Currency()), Reason: pgmapper.FromRefundReason(rf.Reason()),
 			Status: pgmapper.FromRefundStatus(rf.Status()), FailureMessage: rf.FailureMessage(), CreatedAt: rf.CreatedAt(), UpdatedAt: rf.UpdatedAt(),
 		}); err != nil {
 			return errs.NewInternal("failed to save refund", err)
