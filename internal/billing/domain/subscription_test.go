@@ -75,6 +75,8 @@ func fmtType(e domain.Event) string {
 		return "canceled_now"
 	case *domain.RefundRequestedEvent:
 		return "refund_requested"
+	case *domain.RefundSucceededEvent:
+		return "refund_succeeded"
 	default:
 		return "other"
 	}
@@ -302,4 +304,23 @@ func TestQuoteCancelNowIgnoresPaymentOfPreviousPeriod(t *testing.T) {
 			assert.Zero(t, l.Amount().Amount())
 		}
 	}
+}
+
+func TestRecordExternalRefundRecordsOnlyItsSettlement(t *testing.T) {
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), snap(domain.SubscriptionStatusActive, t0, t0.AddDate(0, 1, 0)), t0, "u")
+	s.PopEvents()
+
+	require.NoError(t, s.RecordExternalRefund("re_ext", "pi_1", vnd(t, 5000), domain.RefundStatusSucceeded, nil, t0, "u"))
+
+	assert.Equal(t, []string{"refund_succeeded"}, eventNames(s.PopEvents()))
+}
+
+func TestUpdateRefundNeverReopensSettledRefund(t *testing.T) {
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), snap(domain.SubscriptionStatusActive, t0, t0.AddDate(0, 1, 0)), t0, "u")
+	require.NoError(t, s.RecordExternalRefund("re_ext", "pi_1", vnd(t, 5000), domain.RefundStatusSucceeded, nil, t0, "u"))
+	rf := s.RefundByProviderID("re_ext")
+
+	require.NoError(t, s.UpdateRefund(rf.ID(), "re_ext", domain.RefundStatusPending, nil, t0, "u"))
+
+	assert.Equal(t, domain.RefundStatusSucceeded, rf.Status())
 }

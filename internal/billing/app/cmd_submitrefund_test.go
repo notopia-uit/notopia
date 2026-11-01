@@ -77,7 +77,7 @@ func TestSubmitRefundReturnsTransientProviderErrorAndKeepsRefundPending(t *testi
 
 func TestSubmitRefundSkipsExternalRefund(t *testing.T) {
 	f := newCancellerFixture(t, domain.SubscriptionStatusActive)
-	f.sub.RecordExternalRefund("re_ext", "pi_1", vnd(t, 5000), domain.RefundStatusPending, time.Now(), "u")
+	require.NoError(t, f.sub.RecordExternalRefund("re_ext", "pi_1", vnd(t, 5000), domain.RefundStatusPending, nil, time.Now(), "u"))
 	require.NoError(t, f.store.Subscription().Save(context.Background(), f.sub))
 	external := f.sub.RefundByProviderID("re_ext")
 

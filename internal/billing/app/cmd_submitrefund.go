@@ -79,6 +79,10 @@ func (h *SubmitRefundHandler) update(ctx context.Context, cmd *SubmitRefund, app
 		if err != nil {
 			return err
 		}
+		// the refund webhook (SyncRefund) may have recorded the provider refund meanwhile; it read live state
+		if rf := s.Refund(cmd.RefundID); rf == nil || !rf.AwaitingSubmission() {
+			return nil
+		}
 		if err := apply(s, time.Now()); err != nil {
 			return err
 		}

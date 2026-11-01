@@ -401,20 +401,28 @@ func (s *Subscription) UpdateRefund(refundID uuid.UUID, providerRefundID string,
 		if r.id != refundID {
 			continue
 		}
+		// a stale pending (e.g. the CreateRefund response landing after the webhook) never reopens a settled refund
+		if r.status.IsSettled() && !status.IsSettled() {
+			return nil
+		}
 		prev := r.status
 		r.providerRefundID, r.status, r.failureMessage, r.updatedAt = &providerRefundID, status, failureMessage, now
 		if prev != status {
-			switch status {
-			case RefundStatusSucceeded:
-				s.record(&RefundSucceededEvent{BaseEvent: s.base(userID), RefundID: refundID})
-			case RefundStatusFailed, RefundStatusCanceled:
-				s.record(&RefundFailedEvent{BaseEvent: s.base(userID), RefundID: refundID})
-			case RefundStatusUnspecified, RefundStatusPending:
-			}
+			s.recordRefundSettled(refundID, status, userID)
 		}
 		return nil
 	}
 	return errs.NewNotFound(fmt.Sprintf("refund %s not found", refundID))
+}
+
+func (s *Subscription) recordRefundSettled(refundID uuid.UUID, status RefundStatus, userID string) {
+	switch status {
+	case RefundStatusSucceeded:
+		s.record(&RefundSucceededEvent{BaseEvent: s.base(userID), RefundID: refundID})
+	case RefundStatusFailed, RefundStatusCanceled:
+		s.record(&RefundFailedEvent{BaseEvent: s.base(userID), RefundID: refundID})
+	case RefundStatusUnspecified, RefundStatusPending:
+	}
 }
 
 // FailRefund marks a refund the provider will never accept; it keeps no provider refund id.
@@ -451,10 +459,18 @@ func (s *Subscription) RefundByProviderID(providerRefundID string) *Refund {
 	return nil
 }
 
-func (s *Subscription) RecordExternalRefund(providerRefundID, paymentRef string, amount Money, status RefundStatus, now time.Time, userID string) {
+// RecordExternalRefund tracks a refund made outside Notopia (e.g. the provider dashboard). It is already
+// submitted, so it records no RefundRequestedEvent (that event drives SubmitRefund), only its settlement.
+func (s *Subscription) RecordExternalRefund(
+	providerRefundID, paymentRef string,
+	amount Money,
+	status RefundStatus,
+	failureMessage *string,
+	now time.Time,
+	userID string,
+) error {
 	if r := s.RefundByProviderID(providerRefundID); r != nil {
-		_ = s.UpdateRefund(r.id, providerRefundID, status, nil, now, userID)
-		return
+		return s.UpdateRefund(r.id, providerRefundID, status, failureMessage, now, userID)
 	}
 	id := uuid.Must(uuid.NewV7())
 	s.refunds = append(s.refunds, &Refund{
@@ -464,11 +480,12 @@ func (s *Subscription) RecordExternalRefund(providerRefundID, paymentRef string,
 		amount:           amount,
 		reason:           RefundReasonExternal,
 		status:           status,
-		failureMessage:   nil,
+		failureMessage:   failureMessage,
 		createdAt:        now,
 		updatedAt:        now,
 	})
-	s.record(&RefundRequestedEvent{BaseEvent: s.base(userID), RefundID: id, Amount: amount})
+	s.recordRefundSettled(id, status, userID)
+	return nil
 }
 
 func (s *Subscription) IsCurrent() bool {

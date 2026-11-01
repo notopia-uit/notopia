@@ -16,7 +16,7 @@ order: 3
 
 - **Aggregates**: `Subscription` (owns the child entity `Refund`, because "refunded total <= paid" is a subscription invariant), `BillingAccount`, `Price`, `Plan`, `BillingPolicy` (singleton). Each has its own repo.
 - **Value objects are immutable**: unexported fields, validated constructors (`NewMoney`, `NewPayer`, `NewProviderSnapshot`, `NewPaymentInfo`, `NewRefundLine`, `NewRefundQuote`), getters only, defensive copies of pointers and slices. `Money` carries a `Currency` enum (VND only for now).
-- **Aggregates raise events**: every mutating method records a domain event; `PopEvents` drains them on `Save`. `SubscriptionStateChangedEvent` is recorded whenever the plan or status changes.
+- **Aggregates raise events**: every mutating method records a domain event; `PopEvents` drains them on `Save`. `SubscriptionStateChangedEvent` is recorded whenever the plan or status changes, except on a duplicate checkout (`NewDuplicate*Subscription`), which never was the workspace's subscription. An external refund records only its settlement (`RefundSucceeded`/`RefundFailed`), never `RefundRequested`.
 - **Writes go through `UnitOfWork.Execute`**, which hands out a `RepoRegistry` bound to one transaction. Events popped by `Save` are written to the outbox in that same transaction.
 - **Reads use singleton repos**: the same repo interfaces are injected directly for reads (no transaction). Their `Save` and locking reads (`forUpdate = true`) fail outside a unit of work, so a write cannot silently run without a transaction.
 - Provider webhook de-duplication (`ProviderEventLog`) is part of `RepoRegistry`, so "processed" commits together with its effect.
@@ -268,6 +268,8 @@ AggregateRoot(Subscription) {
 
     NewSubscription()
     NewLifetimeSubscription()
+    NewDuplicateSubscription()
+    NewDuplicateLifetimeSubscription()
     ApplySnapshot()
     ScheduleCancel()
     ResumeCancel()

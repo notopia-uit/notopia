@@ -183,6 +183,17 @@ func (s RefundStatus) IsValid() bool {
 	return false
 }
 
+// IsSettled reports a final provider outcome. succeeded can still turn failed, but never back to pending.
+func (s RefundStatus) IsSettled() bool {
+	switch s {
+	case RefundStatusSucceeded, RefundStatusFailed, RefundStatusCanceled:
+		return true
+	case RefundStatusUnspecified, RefundStatusPending:
+		return false
+	}
+	return false
+}
+
 func (s RefundStatus) String() string {
 	switch s {
 	case RefundStatusUnspecified:
