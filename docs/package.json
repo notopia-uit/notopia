@@ -7,7 +7,7 @@
     "pagefind": "1.5.2",
     "vitepress-mermaid-renderer": "1.2.3",
     "vitepress-openapi": "0.2.6",
-    "vitepress-plugin-pagefind": "0.4.25"
+    "vitepress-plugin-pagefind": "0.4.26"
   },
   "devDependencies": {
     "get-port": "7.2.0",
