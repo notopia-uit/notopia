@@ -42,6 +42,8 @@ func (p *Provider) CreateRefund(ctx context.Context, refundID uuid.UUID, payment
 		Amount:        stripego.Int64(amount.Amount()),
 		Metadata:      map[string]string{"refund_id": refundID.String()},
 	}
+	// NOTE: Stripe keeps idempotency keys for 24h. A retry after that, with both the first response and
+	// its refund.created webhook (which records the provider refund id) lost, would refund again.
 	params.SetIdempotencyKey("refund:" + refundID.String())
 	r, err := p.sc.V1Refunds.Create(ctx, params)
 	if isInvalidRequest(err) {
