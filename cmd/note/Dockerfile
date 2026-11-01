@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 \
   -o note \
   ./cmd/note
 
-FROM alpine:3.23 AS final
+FROM alpine:3.24 AS final
 WORKDIR /app
 COPY --from=builder /app/note .
 EXPOSE 8081 18081 28081
