@@ -18,7 +18,7 @@ function setup(pages: { id: string }[][]) {
   repo.find.mockResolvedValue([]);
   const noteService = {
     batchGetNoteWorkspaces: vi.fn<(documentIds: string[]) => Promise<Map<string, string>>>(
-      async (documentIds) => new Map(documentIds.map((id) => [id, 'w1']))
+      (documentIds) => Promise.resolve(new Map(documentIds.map((id) => [id, 'w1'])))
     ),
   };
   const billingService = {
