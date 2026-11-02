@@ -7,38 +7,33 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type HandlerProvider commonhandler.HandlerProvider
-
-func NewHandlerProvider(traceProvider trace.TracerProvider, logger *slog.Logger) *HandlerProvider {
-	return (*HandlerProvider)(commonhandler.NewHandlerProvider(
-		commonhandler.WithTracer(traceProvider.Tracer("billing-app")),
-		commonhandler.WithLogger(logger),
-	))
-}
-
-var ProvideHandlerProvider = NewHandlerProvider
+const tracerName = "billing-app"
 
 type Cmds struct {
-	ArchivePrice              ArchivePriceCmd
-	CancelNow                 CancelNowCmd
-	CompleteCheckout          CompleteCheckoutCmd
-	CreatePrice               CreatePriceCmd
-	EnsureDefaults            EnsureDefaultsCmd
-	EnsurePortalConfiguration EnsurePortalConfigurationCmd
-	HandlePayerRemoved        HandlePayerRemovedCmd
-	HandleWorkspaceDeleted    HandleWorkspaceDeletedCmd
-	PruneProviderEvents       PruneProviderEventsCmd
-	ReconcileSubscriptions    ReconcileSubscriptionsCmd
-	SyncRefund                SyncRefundCmd
-	SyncSubscription          SyncSubscriptionCmd
-	UpdatePlan                UpdatePlanCmd
-	UpdatePolicy              UpdatePolicyCmd
+	ArchivePrice               ArchivePriceCmd
+	CancelNow                  CancelNowCmd
+	CancelProviderSubscription CancelProviderSubscriptionCmd
+	CompleteCheckout           CompleteCheckoutCmd
+	CreatePrice                CreatePriceCmd
+	EnsureDefaults             EnsureDefaultsCmd
+	EnsurePortalConfiguration  EnsurePortalConfigurationCmd
+	HandlePayerRemoved         HandlePayerRemovedCmd
+	HandleWorkspaceDeleted     HandleWorkspaceDeletedCmd
+	PruneProviderEvents        PruneProviderEventsCmd
+	ReconcileSubscriptions     ReconcileSubscriptionsCmd
+	SubmitRefund               SubmitRefundCmd
+	SyncRefund                 SyncRefundCmd
+	SyncSubscription           SyncSubscriptionCmd
+	UpdatePlan                 UpdatePlanCmd
+	UpdatePolicy               UpdatePolicyCmd
 }
 
 func NewCmds(
-	handlerProvider *HandlerProvider,
+	traceProvider trace.TracerProvider,
+	logger *slog.Logger,
 	archivePriceHandler *ArchivePriceHandler,
 	cancelNowHandler *CancelNowHandler,
+	cancelProviderSubscriptionHandler *CancelProviderSubscriptionHandler,
 	completeCheckoutHandler *CompleteCheckoutHandler,
 	createPriceHandler *CreatePriceHandler,
 	ensureDefaultsHandler *EnsureDefaultsHandler,
@@ -47,27 +42,33 @@ func NewCmds(
 	handleWorkspaceDeletedHandler *HandleWorkspaceDeletedHandler,
 	pruneProviderEventsHandler *PruneProviderEventsHandler,
 	reconcileSubscriptionsHandler *ReconcileSubscriptionsHandler,
+	submitRefundHandler *SubmitRefundHandler,
 	syncRefundHandler *SyncRefundHandler,
 	syncSubscriptionHandler *SyncSubscriptionHandler,
 	updatePlanHandler *UpdatePlanHandler,
 	updatePolicyHandler *UpdatePolicyHandler,
 ) *Cmds {
-	hp := (*commonhandler.HandlerProvider)(handlerProvider)
+	d := commonhandler.NewDecorator(
+		commonhandler.WithTracer(traceProvider.Tracer(tracerName)),
+		commonhandler.WithLogger(logger),
+	)
 	return &Cmds{
-		ArchivePrice:              commonhandler.DecorateCmd(hp, archivePriceHandler),
-		CancelNow:                 commonhandler.DecorateCmd(hp, cancelNowHandler),
-		CompleteCheckout:          commonhandler.DecorateCmd(hp, completeCheckoutHandler),
-		CreatePrice:               commonhandler.DecorateCmd(hp, createPriceHandler),
-		EnsureDefaults:            commonhandler.DecorateCmd(hp, ensureDefaultsHandler),
-		EnsurePortalConfiguration: commonhandler.DecorateCmd(hp, ensurePortalConfigurationHandler),
-		HandlePayerRemoved:        commonhandler.DecorateCmd(hp, handlePayerRemovedHandler),
-		HandleWorkspaceDeleted:    commonhandler.DecorateCmd(hp, handleWorkspaceDeletedHandler),
-		PruneProviderEvents:       commonhandler.DecorateCmd(hp, pruneProviderEventsHandler),
-		ReconcileSubscriptions:    commonhandler.DecorateCmd(hp, reconcileSubscriptionsHandler),
-		SyncRefund:                commonhandler.DecorateCmd(hp, syncRefundHandler),
-		SyncSubscription:          commonhandler.DecorateCmd(hp, syncSubscriptionHandler),
-		UpdatePlan:                commonhandler.DecorateCmd(hp, updatePlanHandler),
-		UpdatePolicy:              commonhandler.DecorateCmd(hp, updatePolicyHandler),
+		ArchivePrice:               d.Cmd(archivePriceHandler),
+		CancelNow:                  d.Cmd(cancelNowHandler),
+		CancelProviderSubscription: d.Cmd(cancelProviderSubscriptionHandler),
+		CompleteCheckout:           d.Cmd(completeCheckoutHandler),
+		CreatePrice:                d.Cmd(createPriceHandler),
+		EnsureDefaults:             d.Cmd(ensureDefaultsHandler),
+		EnsurePortalConfiguration:  d.Cmd(ensurePortalConfigurationHandler),
+		HandlePayerRemoved:         d.Cmd(handlePayerRemovedHandler),
+		HandleWorkspaceDeleted:     d.Cmd(handleWorkspaceDeletedHandler),
+		PruneProviderEvents:        d.Cmd(pruneProviderEventsHandler),
+		ReconcileSubscriptions:     d.Cmd(reconcileSubscriptionsHandler),
+		SubmitRefund:               d.Cmd(submitRefundHandler),
+		SyncRefund:                 d.Cmd(syncRefundHandler),
+		SyncSubscription:           d.Cmd(syncSubscriptionHandler),
+		UpdatePlan:                 d.Cmd(updatePlanHandler),
+		UpdatePolicy:               d.Cmd(updatePolicyHandler),
 	}
 }
 
@@ -90,7 +91,8 @@ type Queries struct {
 }
 
 func NewQueries(
-	handlerProvider *HandlerProvider,
+	traceProvider trace.TracerProvider,
+	logger *slog.Logger,
 	batchGetEntitlementsHandler *BatchGetEntitlementsHandler,
 	claimPayerHandler *ClaimPayerHandler,
 	getEntitlementsHandler *GetEntitlementsHandler,
@@ -105,21 +107,24 @@ func NewQueries(
 	startCheckoutHandler *StartCheckoutHandler,
 	startPortalHandler *StartPortalHandler,
 ) *Queries {
-	hp := (*commonhandler.HandlerProvider)(handlerProvider)
+	d := commonhandler.NewDecorator(
+		commonhandler.WithTracer(traceProvider.Tracer(tracerName)),
+		commonhandler.WithLogger(logger),
+	)
 	return &Queries{
-		BatchGetEntitlements: commonhandler.DecorateQuery(hp, batchGetEntitlementsHandler),
-		ClaimPayer:           commonhandler.DecorateQuery(hp, claimPayerHandler),
-		GetEntitlements:      commonhandler.DecorateQuery(hp, getEntitlementsHandler),
-		GetPlan:              commonhandler.DecorateQuery(hp, getPlanHandler),
-		GetPolicy:            commonhandler.DecorateQuery(hp, getPolicyHandler),
-		GetPrice:             commonhandler.DecorateQuery(hp, getPriceHandler),
-		GetWorkspaceBilling:  commonhandler.DecorateQuery(hp, getWorkspaceBillingHandler),
-		GetWorkspacePayer:    commonhandler.DecorateQuery(hp, getWorkspacePayerHandler),
-		ListPlans:            commonhandler.DecorateQuery(hp, listPlansHandler),
-		ListPrices:           commonhandler.DecorateQuery(hp, listPricesHandler),
-		PreviewCancelNow:     commonhandler.DecorateQuery(hp, previewCancelNowHandler),
-		StartCheckout:        commonhandler.DecorateQuery(hp, startCheckoutHandler),
-		StartPortal:          commonhandler.DecorateQuery(hp, startPortalHandler),
+		BatchGetEntitlements: d.Query(batchGetEntitlementsHandler),
+		ClaimPayer:           d.Query(claimPayerHandler),
+		GetEntitlements:      d.Query(getEntitlementsHandler),
+		GetPlan:              d.Query(getPlanHandler),
+		GetPolicy:            d.Query(getPolicyHandler),
+		GetPrice:             d.Query(getPriceHandler),
+		GetWorkspaceBilling:  d.Query(getWorkspaceBillingHandler),
+		GetWorkspacePayer:    d.Query(getWorkspacePayerHandler),
+		ListPlans:            d.Query(listPlansHandler),
+		ListPrices:           d.Query(listPricesHandler),
+		PreviewCancelNow:     d.Query(previewCancelNowHandler),
+		StartCheckout:        d.Query(startCheckoutHandler),
+		StartPortal:          d.Query(startPortalHandler),
 	}
 }
 

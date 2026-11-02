@@ -34,11 +34,15 @@ func (p *Provider) CreatePrice(ctx context.Context, in app.PriceInput) (string, 
 	if err := p.ensureProduct(ctx, tier); err != nil {
 		return "", err
 	}
+	currency, err := toStripeCurrency(in.Amount.Currency())
+	if err != nil {
+		return "", err
+	}
 	params := &stripego.PriceCreateParams{
 		Product:           stripego.String(productID(tier)),
-		Currency:          stripego.String(in.Amount.Currency),
-		UnitAmount:        stripego.Int64(in.Amount.Amount),
-		LookupKey:         stripego.String(domain.LookupKey(in.Plan, in.Interval)),
+		Currency:          stripego.String(string(currency)),
+		UnitAmount:        stripego.Int64(in.Amount.Amount()),
+		LookupKey:         stripego.String(domain.PriceLookupKey(in.Plan, in.Interval)),
 		TransferLookupKey: stripego.Bool(true),
 		Metadata:          map[string]string{"price_id": in.PriceID.String()},
 	}

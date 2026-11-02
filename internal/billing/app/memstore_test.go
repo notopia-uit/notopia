@@ -11,13 +11,14 @@ import (
 )
 
 type memStore struct {
-	mu       sync.Mutex
-	subs     map[uuid.UUID]*domain.Subscription
-	accounts map[uuid.UUID]*domain.BillingAccount
-	prices   map[uuid.UUID]*domain.Price
-	plans    map[domain.PlanTier]*domain.Plan
-	policy   *domain.BillingPolicy
-	events   map[string]bool
+	mu        sync.Mutex
+	subs      map[uuid.UUID]*domain.Subscription
+	accounts  map[uuid.UUID]*domain.BillingAccount
+	prices    map[uuid.UUID]*domain.Price
+	plans     map[domain.PlanTier]*domain.Plan
+	policy    *domain.BillingPolicy
+	events    map[string]bool
+	published []domain.Event
 }
 
 func newMemStore() *memStore {
@@ -37,6 +38,15 @@ func (m *memStore) Execute(ctx context.Context, fn func(domain.RepoRegistry) err
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return fn(m)
+}
+
+func (m *memStore) hasPublished(pred func(domain.Event) bool) bool {
+	for _, e := range m.published {
+		if pred(e) {
+			return true
+		}
+	}
+	return false
 }
 
 func (m *memStore) Subscription() domain.SubscriptionRepo     { return memSubs{m} }
@@ -109,16 +119,27 @@ func (r memSubs) ListCanceledAwaitingProviderCancel(_ context.Context, limit int
 		if len(out) == limit {
 			break
 		}
-		if s.Status() == domain.StatusCanceled && s.ProviderSubscriptionID() != nil && s.CanceledAt() != nil &&
-			!s.ProviderSyncedAt().After(*s.CanceledAt()) {
+		if s.AwaitingProviderCancel() {
 			out = append(out, s)
 		}
 	}
 	return out, nil
 }
 
-func (r memSubs) ListIDsWithUnsubmittedRefunds(context.Context, int) ([]uuid.UUID, error) {
-	return nil, nil
+func (r memSubs) ListIDsWithUnsubmittedRefunds(_ context.Context, limit int) ([]uuid.UUID, error) {
+	var out []uuid.UUID
+	for _, s := range r.m.subs {
+		if len(out) == limit {
+			break
+		}
+		for _, rf := range s.Refunds() {
+			if rf.AwaitingSubmission() {
+				out = append(out, s.ID())
+				break
+			}
+		}
+	}
+	return out, nil
 }
 
 func (r memSubs) Save(_ context.Context, s *domain.Subscription) error {
@@ -129,7 +150,7 @@ func (r memSubs) Save(_ context.Context, s *domain.Subscription) error {
 			return errs.NewInternal("unique current subscription violated", nil)
 		}
 	}
-	s.PopEvents()
+	r.m.published = append(r.m.published, s.PopEvents()...)
 	r.m.subs[s.ID()] = s
 	return nil
 }
@@ -143,7 +164,7 @@ func (r memAccounts) GetByWorkspace(_ context.Context, ws uuid.UUID, _ bool) (*d
 func (r memAccounts) ListByPayer(_ context.Context, payerID string) ([]*domain.BillingAccount, error) {
 	var out []*domain.BillingAccount
 	for _, a := range r.m.accounts {
-		if a.Payer().ID == payerID {
+		if a.Payer().ID() == payerID {
 			out = append(out, a)
 		}
 	}
@@ -151,7 +172,7 @@ func (r memAccounts) ListByPayer(_ context.Context, payerID string) ([]*domain.B
 }
 
 func (r memAccounts) Save(_ context.Context, a *domain.BillingAccount) error {
-	a.PopEvents()
+	r.m.published = append(r.m.published, a.PopEvents()...)
 	r.m.accounts[a.WorkspaceID()] = a
 	return nil
 }
@@ -174,9 +195,9 @@ func (r memPrices) GetByProviderPriceID(_ context.Context, id string) (*domain.P
 	return nil, errs.NewNotFound("price")
 }
 
-func (r memPrices) GetActive(_ context.Context, plan domain.PlanTier, iv domain.Interval, cur string, _ bool) (*domain.Price, error) {
+func (r memPrices) GetActive(_ context.Context, plan domain.PlanTier, iv domain.Interval, cur domain.Currency, _ bool) (*domain.Price, error) {
 	for _, p := range r.m.prices {
-		if p.Active() && p.Plan() == plan && p.Interval() == iv && p.Amount().Currency == cur {
+		if p.Active() && p.Plan() == plan && p.Interval() == iv && p.Amount().Currency() == cur {
 			return p, nil
 		}
 	}
@@ -194,7 +215,7 @@ func (r memPrices) ListActive(context.Context) ([]*domain.Price, error) {
 }
 func (r memPrices) List(ctx context.Context) ([]*domain.Price, error) { return r.ListActive(ctx) }
 func (r memPrices) Save(_ context.Context, p *domain.Price) error {
-	p.PopEvents()
+	r.m.published = append(r.m.published, p.PopEvents()...)
 	r.m.prices[p.ID()] = p
 	return nil
 }

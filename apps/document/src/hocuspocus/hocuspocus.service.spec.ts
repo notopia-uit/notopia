@@ -28,12 +28,14 @@ describe('HocuspocusService.onNoteDeleted', () => {
     (hocuspocus.closeConnections as unknown as Mock).mockImplementation(
       () => void calls.push('close')
     );
-    (hocuspocus.waitForPendingStores as unknown as Mock).mockImplementation(
-      async () => void calls.push('drain')
-    );
-    (documentService.deleteById as unknown as Mock).mockImplementation(
-      async () => void calls.push('delete')
-    );
+    (hocuspocus.waitForPendingStores as unknown as Mock).mockImplementation(() => {
+      calls.push('drain');
+      return Promise.resolve();
+    });
+    (documentService.deleteById as unknown as Mock).mockImplementation(() => {
+      calls.push('delete');
+      return Promise.resolve();
+    });
 
     await service.onNoteDeleted('n1');
 

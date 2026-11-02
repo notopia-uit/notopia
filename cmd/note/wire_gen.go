@@ -13,7 +13,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
-	"github.com/notopia-uit/notopia/internal/note/controller/cron"
+	cron2 "github.com/notopia-uit/notopia/internal/note/controller/cron"
 	"github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
@@ -30,6 +30,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/service"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 	"github.com/notopia-uit/notopia/pkg/common/http"
+	"github.com/notopia-uit/notopia/pkg/cron"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -99,7 +100,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger, global)
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, global)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
-	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
 	services := &configConfig.Services
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
 	authorization, cleanup5, err := service.NewAuthorization(services, loggingLogger, global)
@@ -114,9 +114,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	domainEvent := advanced.DomainEvent
 	loggerAdapter := logging.NewWatermill(logger)
 	configDomainEvent := &advanced.DomainEvent
-	defaultPostgreSQLSchema := outbox.NewSchemaAdapter(configDomainEvent)
+	postgreSQLQueueSchema := outbox.NewSchemaAdapter(configDomainEvent)
 	jsonMarshaler := component.NewWatermillJsonMarshaler()
-	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName, jsonMarshaler, global)
+	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, postgreSQLQueueSchema, serviceName, jsonMarshaler, global)
 	runInTx := pgrepo.NewRunInTx(fromPersistenceToQSLForwarder)
 	unitOfWork := pgrepo.NewUnitOfWork(pool, fromPersistenceToQSLForwarder, runInTx)
 	changeWorkspaceSlugHandler := app.NewChangeWorkspaceSlugHandler(authorization, unitOfWork)
@@ -170,7 +170,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization, billing)
-	cmds := app.NewCmds(handlerProvider, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, emptyTrashHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, purgeExpiredTrashHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
+	cmds := app.NewCmds(tracerProvider, logger, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, emptyTrashHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, purgeExpiredTrashHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
 	billingChangedHandler := app.NewBillingChangedHandler(workspaceEventHub, commonconfigIdentity)
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
@@ -247,7 +247,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	searchUsersHandler := app.NewSearchUsersHandler(identityAuthentik, authorization)
 	showTrash := pgreadmodel.NewShowTrash(queries)
 	showTrashHandler := app.NewShowTrashHandler(authorization, showTrash)
-	appQueries := app.NewQueries(handlerProvider, batchGetNoteWorkspacesHandler, checkWorkspaceSlugExistsHandler, getMyWorkspacesHandler, getNoteGraphHandler, getNoteHandler, getNoteLinksHandler, getWorkspaceByNoteHandler, getWorkspaceGraphHandler, getWorkspaceBySlugHandler, getWorkspaceMembersHandler, getWorkspaceSearchTokenHandler, getWorkspaceTreeHandler, searchUsersHandler, showTrashHandler)
+	appQueries := app.NewQueries(tracerProvider, logger, batchGetNoteWorkspacesHandler, checkWorkspaceSlugExistsHandler, getMyWorkspacesHandler, getNoteGraphHandler, getNoteHandler, getNoteLinksHandler, getWorkspaceByNoteHandler, getWorkspaceGraphHandler, getWorkspaceBySlugHandler, getWorkspaceMembersHandler, getWorkspaceSearchTokenHandler, getWorkspaceTreeHandler, searchUsersHandler, showTrashHandler)
 	server := &app.Server{
 		Cmds:              cmds,
 		Events:            events,
@@ -308,7 +308,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	v2, err := common.NewCronLocker(redisClient)
+	locker, err := cron.NewRedisLocker(redisClient)
 	if err != nil {
 		cleanup10()
 		cleanup9()
@@ -323,7 +323,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	configCron := &configConfig.Cron
-	cronCron, err := cron.New(server, v2, configCron, logger)
+	cronCron, err := cron2.New(server, locker, configCron, logger)
 	if err != nil {
 		cleanup10()
 		cleanup9()
@@ -337,7 +337,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, defaultPostgreSQLSchema, pool)
+	postgreSQLQueueOffsetsAdapter := outbox.NewOffsetsAdapter(configDomainEvent)
+	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, postgreSQLQueueSchema, postgreSQLQueueOffsetsAdapter, pool)
 	if err != nil {
 		cleanup10()
 		cleanup9()

@@ -5,7 +5,7 @@
   "tags": ["scope:api", "type:proto"],
   "targets": {
     "gen": {
-      "inputs": ["protoFiles"],
+      "inputs": ["protoFiles", "bufVersion"],
       "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/pkg/pb", "{workspaceRoot}/packages/pb/src"],
       "options": {

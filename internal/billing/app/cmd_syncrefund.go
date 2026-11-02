@@ -64,7 +64,9 @@ func (h *SyncRefundHandler) Handle(ctx context.Context, cmd *SyncRefund) error {
 			slog.InfoContext(ctx, "ignoring external refund of an unknown payment", slog.String("refund", res.ProviderRefundID))
 			return nil
 		}
-		sub.RecordExternalRefund(res.ProviderRefundID, res.PaymentRef, res.Amount, res.Status, now, actor)
+		if err := sub.RecordExternalRefund(res.ProviderRefundID, res.PaymentRef, res.Amount, res.Status, res.FailureMessage, now, actor); err != nil {
+			return err
+		}
 		return r.Subscription().Save(ctx, sub)
 	})
 }

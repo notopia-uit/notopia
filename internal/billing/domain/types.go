@@ -76,43 +76,43 @@ func (i Interval) String() string {
 	}
 }
 
-// StatusNone is the zero value and a real state: the workspace has no subscription.
-type Status uint8
+// SubscriptionStatusNone is the zero value and a real state: the workspace has no subscription.
+type SubscriptionStatus uint8
 
 const (
-	StatusNone Status = iota
-	StatusIncomplete
-	StatusActive
-	StatusPastDue
-	StatusUnpaid
-	StatusCanceled
-	StatusIncompleteExpired
+	SubscriptionStatusNone SubscriptionStatus = iota
+	SubscriptionStatusIncomplete
+	SubscriptionStatusActive
+	SubscriptionStatusPastDue
+	SubscriptionStatusUnpaid
+	SubscriptionStatusCanceled
+	SubscriptionStatusIncompleteExpired
 )
 
-func (s Status) IsValid() bool {
+func (s SubscriptionStatus) IsValid() bool {
 	switch s {
-	case StatusNone, StatusIncomplete, StatusActive, StatusPastDue, StatusUnpaid, StatusCanceled, StatusIncompleteExpired:
+	case SubscriptionStatusNone, SubscriptionStatusIncomplete, SubscriptionStatusActive, SubscriptionStatusPastDue, SubscriptionStatusUnpaid, SubscriptionStatusCanceled, SubscriptionStatusIncompleteExpired:
 		return true
 	default:
 		return false
 	}
 }
 
-func (s Status) String() string {
+func (s SubscriptionStatus) String() string {
 	switch s {
-	case StatusNone:
+	case SubscriptionStatusNone:
 		return "none"
-	case StatusIncomplete:
+	case SubscriptionStatusIncomplete:
 		return "incomplete"
-	case StatusActive:
+	case SubscriptionStatusActive:
 		return "active"
-	case StatusPastDue:
+	case SubscriptionStatusPastDue:
 		return "past_due"
-	case StatusUnpaid:
+	case SubscriptionStatusUnpaid:
 		return "unpaid"
-	case StatusCanceled:
+	case SubscriptionStatusCanceled:
 		return "canceled"
-	case StatusIncompleteExpired:
+	case SubscriptionStatusIncompleteExpired:
 		return "incomplete_expired"
 	default:
 		return "unknown"
@@ -178,6 +178,17 @@ func (s RefundStatus) IsValid() bool {
 	case RefundStatusPending, RefundStatusSucceeded, RefundStatusFailed, RefundStatusCanceled:
 		return true
 	case RefundStatusUnspecified:
+		return false
+	}
+	return false
+}
+
+// IsSettled reports a final provider outcome. succeeded can still turn failed, but never back to pending.
+func (s RefundStatus) IsSettled() bool {
+	switch s {
+	case RefundStatusSucceeded, RefundStatusFailed, RefundStatusCanceled:
+		return true
+	case RefundStatusUnspecified, RefundStatusPending:
 		return false
 	}
 	return false
@@ -303,15 +314,43 @@ func ParseLimitKey(s string) (LimitKey, error) {
 	return LimitKeyUnspecified, errs.NewInvalid(fmt.Sprintf("unknown limit %q", s))
 }
 
+type Currency uint8
+
+const (
+	CurrencyUnspecified Currency = iota
+	CurrencyVND
+)
+
+var Currencies = []Currency{CurrencyVND}
+
+func (c Currency) IsValid() bool {
+	switch c {
+	case CurrencyVND:
+		return true
+	case CurrencyUnspecified:
+		return false
+	}
+	return false
+}
+
+func (c Currency) String() string {
+	switch c {
+	case CurrencyUnspecified:
+		return "unspecified"
+	case CurrencyVND:
+		return "vnd"
+	default:
+		return "unknown"
+	}
+}
+
+func ParseCurrency(s string) (Currency, error) {
+	for _, c := range Currencies {
+		if c.String() == s {
+			return c, nil
+		}
+	}
+	return CurrencyUnspecified, errs.NewInvalid(fmt.Sprintf("unknown currency %q", s))
+}
+
 const Unlimited int64 = -1
-
-type Money struct {
-	Amount   int64
-	Currency string
-}
-
-type Payer struct {
-	ID    string
-	Email string
-	Name  string
-}

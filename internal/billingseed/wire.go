@@ -4,6 +4,7 @@ import (
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	billingconfig "github.com/notopia-uit/notopia/internal/billing/config"
+	"github.com/notopia-uit/notopia/internal/billing/infra/outbox"
 	stripeadapter "github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
@@ -59,6 +60,8 @@ var ProviderSet = wire.NewSet(
 		"Stripe",
 	),
 	persistence.ProviderSet,
+	outbox.PublisherProviderSet,
+	billingconfig.ProvideDefaultDomainEvent,
 	stripeadapter.Provide,
 	wire.Bind(new(app.PaymentProvider), new(*stripeadapter.Provider)),
 	app.ProvideEnsureDefaultsHandler,

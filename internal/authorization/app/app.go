@@ -8,22 +8,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type HandlerProvider commonhandler.HandlerProvider
-
-func NewHandlerProvider(
-	traceProvider trace.TracerProvider,
-	logger *slog.Logger,
-) *HandlerProvider {
-	tracer := traceProvider.Tracer("authorization-app")
-	return (*HandlerProvider)(
-		commonhandler.NewHandlerProvider(
-			commonhandler.WithTracer(tracer),
-			commonhandler.WithLogger(logger),
-		),
-	)
-}
-
-var ProvideHandlerProvider = NewHandlerProvider
+const tracerName = "authorization-app"
 
 type Cmds struct {
 	CreateWorkspace        CreateWorkspaceCmd
@@ -33,18 +18,22 @@ type Cmds struct {
 }
 
 func NewCmds(
-	handlerProvider *HandlerProvider,
+	traceProvider trace.TracerProvider,
+	logger *slog.Logger,
 	createWorkspace *CreateWorkspaceHandler,
 	deleteWorkspace *DeleteWorkspaceHandler,
 	updateWorkspaceMembers *UpdateWorkspaceMembersHandler,
 	leaveWorkspace *LeaveWorkspaceHandler,
 ) *Cmds {
-	hp := (*commonhandler.HandlerProvider)(handlerProvider)
+	d := commonhandler.NewDecorator(
+		commonhandler.WithTracer(traceProvider.Tracer(tracerName)),
+		commonhandler.WithLogger(logger),
+	)
 	return &Cmds{
-		CreateWorkspace:        commonhandler.DecorateCmd(hp, createWorkspace),
-		DeleteWorkspace:        commonhandler.DecorateCmd(hp, deleteWorkspace),
-		UpdateWorkspaceMembers: commonhandler.DecorateCmd(hp, updateWorkspaceMembers),
-		LeaveWorkspace:         commonhandler.DecorateCmd(hp, leaveWorkspace),
+		CreateWorkspace:        d.Cmd(createWorkspace),
+		DeleteWorkspace:        d.Cmd(deleteWorkspace),
+		UpdateWorkspaceMembers: d.Cmd(updateWorkspaceMembers),
+		LeaveWorkspace:         d.Cmd(leaveWorkspace),
 	}
 }
 
@@ -59,20 +48,24 @@ type Queries struct {
 }
 
 func NewQueries(
-	handlerProvider *HandlerProvider,
+	traceProvider trace.TracerProvider,
+	logger *slog.Logger,
 	getUserWorkspaceItemPermissions *GetUserWorkspaceItemPermissionsHandler,
 	getUserWorkspaces *GetUserWorkspacesHandler,
 	getWorkspaceMembers *GetWorkspaceMembersHandler,
 	hasWorkspaceItemPermission *HasWorkspaceItemPermissionHandler,
 	hasWorkspacePermission *HasWorkspacePermissionHandler,
 ) *Queries {
-	hp := (*commonhandler.HandlerProvider)(handlerProvider)
+	d := commonhandler.NewDecorator(
+		commonhandler.WithTracer(traceProvider.Tracer(tracerName)),
+		commonhandler.WithLogger(logger),
+	)
 	return &Queries{
-		GetUserWorkspaceItemPermissions: commonhandler.DecorateQuery(hp, getUserWorkspaceItemPermissions),
-		GetUserWorkspaces:               commonhandler.DecorateQuery(hp, getUserWorkspaces),
-		GetWorkspaceMembers:             commonhandler.DecorateQuery(hp, getWorkspaceMembers),
-		HasWorkspaceItemPermission:      commonhandler.DecorateQuery(hp, hasWorkspaceItemPermission),
-		HasWorkspacePermission:          commonhandler.DecorateQuery(hp, hasWorkspacePermission),
+		GetUserWorkspaceItemPermissions: d.Query(getUserWorkspaceItemPermissions),
+		GetUserWorkspaces:               d.Query(getUserWorkspaces),
+		GetWorkspaceMembers:             d.Query(getWorkspaceMembers),
+		HasWorkspaceItemPermission:      d.Query(hasWorkspaceItemPermission),
+		HasWorkspacePermission:          d.Query(hasWorkspacePermission),
 	}
 }
 

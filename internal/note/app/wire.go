@@ -64,7 +64,6 @@ var ProviderSetQuery = wire.NewSet(
 )
 
 var ProviderSet = wire.NewSet(
-	ProvideHandlerProvider,
 	ProviderSetCommand,
 	ProviderSetEvent,
 	ProviderSetQuery,

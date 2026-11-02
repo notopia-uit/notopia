@@ -69,22 +69,22 @@ func toAppCheckoutPurpose(s string) app.CheckoutPurpose {
 	}
 }
 
-func toDomainStatus(s stripego.SubscriptionStatus) domain.Status {
+func toDomainStatus(s stripego.SubscriptionStatus) domain.SubscriptionStatus {
 	switch s {
 	case stripego.SubscriptionStatusActive, stripego.SubscriptionStatusTrialing:
-		return domain.StatusActive
+		return domain.SubscriptionStatusActive
 	case stripego.SubscriptionStatusPastDue:
-		return domain.StatusPastDue
+		return domain.SubscriptionStatusPastDue
 	case stripego.SubscriptionStatusIncomplete:
-		return domain.StatusIncomplete
+		return domain.SubscriptionStatusIncomplete
 	case stripego.SubscriptionStatusIncompleteExpired:
-		return domain.StatusIncompleteExpired
+		return domain.SubscriptionStatusIncompleteExpired
 	case stripego.SubscriptionStatusCanceled:
-		return domain.StatusCanceled
+		return domain.SubscriptionStatusCanceled
 	case stripego.SubscriptionStatusUnpaid, stripego.SubscriptionStatusPaused:
-		return domain.StatusUnpaid
+		return domain.SubscriptionStatusUnpaid
 	default:
-		return domain.StatusUnpaid
+		return domain.SubscriptionStatusUnpaid
 	}
 }
 
@@ -116,7 +116,7 @@ func snapshotFromSubscription(s *stripego.Subscription) (domain.ProviderSnapshot
 	if s.CanceledAt > 0 {
 		canceledAt = new(time.Unix(s.CanceledAt, 0))
 	}
-	return domain.ProviderSnapshot{
+	return domain.NewProviderSnapshot(domain.ProviderSnapshotParams{
 		ProviderSubscriptionID: s.ID,
 		ProviderPriceID:        item.Price.ID,
 		WorkspaceID:            ws,
@@ -125,18 +125,43 @@ func snapshotFromSubscription(s *stripego.Subscription) (domain.ProviderSnapshot
 		CurrentPeriodEnd:       time.Unix(item.CurrentPeriodEnd, 0),
 		CancelAtPeriodEnd:      s.CancelAtPeriodEnd || s.CancelAt > 0,
 		CanceledAt:             canceledAt,
-	}, nil
+	})
 }
 
-func paymentFromIntent(pi *stripego.PaymentIntent) domain.PaymentInfo {
-	return domain.PaymentInfo{
-		Amount: domain.Money{
-			Amount:   pi.AmountReceived,
-			Currency: string(pi.Currency),
-		},
+func paymentFromIntent(pi *stripego.PaymentIntent) (domain.PaymentInfo, error) {
+	amount, err := toDomainMoney(pi.AmountReceived, pi.Currency)
+	if err != nil {
+		return domain.PaymentInfo{}, err
+	}
+	return domain.NewPaymentInfo(domain.PaymentInfoParams{
+		Amount:        amount,
 		PaymentRef:    pi.ID,
 		PaidAt:        time.Unix(pi.Created, 0),
 		CoverageStart: time.Time{},
 		CoverageEnd:   time.Time{},
+	})
+}
+
+func toDomainCurrency(c stripego.Currency) (domain.Currency, error) {
+	if c == stripego.CurrencyVND {
+		return domain.CurrencyVND, nil
 	}
+	return domain.CurrencyUnspecified, errs.NewInternal("unsupported stripe currency "+string(c), nil)
+}
+
+func toStripeCurrency(c domain.Currency) (stripego.Currency, error) {
+	switch c {
+	case domain.CurrencyVND:
+		return stripego.CurrencyVND, nil
+	case domain.CurrencyUnspecified:
+	}
+	return "", errs.NewInvalid("unsupported currency " + c.String())
+}
+
+func toDomainMoney(amount int64, c stripego.Currency) (domain.Money, error) {
+	currency, err := toDomainCurrency(c)
+	if err != nil {
+		return domain.Money{}, err
+	}
+	return domain.NewMoney(amount, currency)
 }

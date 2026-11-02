@@ -1,6 +1,7 @@
 {
   "name": "@notopia-uit/search-worker",
   "private": true,
+  "type": "module",
   "scripts": {
     "seed": "tsx ./seed/seed.ts",
     "fixtures": "tsx ./fixtures/fixtures.ts",

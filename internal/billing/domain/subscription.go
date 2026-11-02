@@ -2,64 +2,12 @@ package domain
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
 )
-
-type ProviderSnapshot struct {
-	ProviderSubscriptionID string
-	ProviderPriceID        string
-	WorkspaceID            uuid.UUID
-	Status                 Status
-	CurrentPeriodStart     time.Time
-	CurrentPeriodEnd       time.Time
-	CancelAtPeriodEnd      bool
-	CanceledAt             *time.Time
-}
-
-// PaymentInfo is one paid invoice payment. CoverageStart/End is the service window it paid
-// for (invoice line periods); zero for lifetime.
-type PaymentInfo struct {
-	Amount        Money
-	PaymentRef    string
-	PaidAt        time.Time
-	CoverageStart time.Time
-	CoverageEnd   time.Time
-}
-
-type RefundLine struct {
-	PaymentRef      string
-	PaidAmount      Money
-	Amount          Money
-	CoverageSeconds int64
-	UnusedSeconds   int64
-}
-
-// RefundQuote.Amount is the sum of Lines; each line becomes one Refund.
-type RefundQuote struct {
-	Amount        Money
-	UnusedSeconds int64
-	PeriodSeconds int64
-	Lines         []RefundLine
-}
-
-// FullRefundQuote refunds every payment in full (duplicate checkout).
-func FullRefundQuote(payments ...PaymentInfo) RefundQuote {
-	var q RefundQuote
-	for _, p := range payments {
-		q.Lines = append(q.Lines, RefundLine{
-			PaymentRef:      p.PaymentRef,
-			PaidAmount:      p.Amount,
-			Amount:          p.Amount,
-			CoverageSeconds: 0,
-			UnusedSeconds:   0,
-		})
-		q.Amount = Money{Amount: q.Amount.Amount + p.Amount.Amount, Currency: p.Amount.Currency}
-	}
-	return q
-}
 
 type Subscription struct {
 	eventRecorder
@@ -68,7 +16,7 @@ type Subscription struct {
 	plan                   PlanTier
 	interval               Interval
 	priceID                uuid.UUID
-	status                 Status
+	status                 SubscriptionStatus
 	providerSubscriptionID *string
 	providerPaymentID      *string
 	currentPeriodStart     *time.Time
@@ -85,11 +33,15 @@ type Subscription struct {
 
 func (s *Subscription) base(userID string) BaseEvent { return NewBaseEvent(s.id.String(), userID) }
 
+func (s *Subscription) recordStateChanged(userID string) {
+	s.record(&SubscriptionStateChangedEvent{BaseEvent: s.base(userID), WorkspaceID: s.workspaceID, Plan: s.plan, Status: s.status})
+}
+
 func NewSubscription(id, workspaceID uuid.UUID, price *Price, snap ProviderSnapshot, now time.Time, userID string) (*Subscription, error) {
 	if price.Interval() == IntervalLifetime {
 		return nil, errs.NewInvalid("recurring subscription needs a recurring price")
 	}
-	providerID := snap.ProviderSubscriptionID
+	providerID := snap.providerSubscriptionID
 	s := &Subscription{
 		eventRecorder:          eventRecorder{events: nil},
 		id:                     id,
@@ -97,7 +49,7 @@ func NewSubscription(id, workspaceID uuid.UUID, price *Price, snap ProviderSnaps
 		plan:                   price.Plan(),
 		interval:               price.Interval(),
 		priceID:                price.ID(),
-		status:                 StatusIncomplete,
+		status:                 SubscriptionStatusIncomplete,
 		providerSubscriptionID: &providerID,
 		providerPaymentID:      nil,
 		currentPeriodStart:     nil,
@@ -127,7 +79,7 @@ func NewLifetimeSubscription(id, workspaceID uuid.UUID, price *Price, providerPa
 		plan:                   price.Plan(),
 		interval:               IntervalLifetime,
 		priceID:                price.ID(),
-		status:                 StatusActive,
+		status:                 SubscriptionStatusActive,
 		providerSubscriptionID: nil,
 		providerPaymentID:      &providerPaymentID,
 		currentPeriodStart:     nil,
@@ -143,7 +95,57 @@ func NewLifetimeSubscription(id, workspaceID uuid.UUID, price *Price, providerPa
 	}
 	s.record(&SubscriptionCreatedEvent{BaseEvent: s.base(userID), Plan: s.plan, Interval: s.interval})
 	s.record(&SubscriptionActivatedEvent{BaseEvent: s.base(userID)})
+	s.recordStateChanged(userID)
 	return s, nil
+}
+
+// NewDuplicateSubscription records a checkout that duplicated the workspace's current subscription:
+// canceled at once with every payment refunded in full.
+func NewDuplicateSubscription(
+	id, workspaceID uuid.UUID,
+	price *Price,
+	snap ProviderSnapshot,
+	payments []PaymentInfo,
+	now time.Time,
+	userID string,
+) (*Subscription, error) {
+	s, err := NewSubscription(id, workspaceID, price, snap, now, userID)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.cancelDuplicate(payments, now, userID); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+// NewDuplicateLifetimeSubscription is NewDuplicateSubscription for a lifetime checkout.
+func NewDuplicateLifetimeSubscription(id, workspaceID uuid.UUID, price *Price, payment PaymentInfo, now time.Time, userID string) (*Subscription, error) {
+	s, err := NewLifetimeSubscription(id, workspaceID, price, payment.paymentRef, payment.paidAt, now, userID)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.cancelDuplicate([]PaymentInfo{payment}, now, userID); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+// cancelDuplicate drops SubscriptionStateChangedEvent: a duplicate never was the workspace's subscription,
+// so reporting it would override the workspace's current one downstream.
+func (s *Subscription) cancelDuplicate(payments []PaymentInfo, now time.Time, userID string) error {
+	quote, err := FullRefundQuote(payments...)
+	if err != nil {
+		return err
+	}
+	if _, err := s.CancelNow(now, RefundReasonDuplicateCheckout, quote, userID); err != nil {
+		return err
+	}
+	s.events = slices.DeleteFunc(s.events, func(e Event) bool {
+		_, ok := e.(*SubscriptionStateChangedEvent)
+		return ok
+	})
+	return nil
 }
 
 type UnmarshalSubscriptionParams struct {
@@ -152,7 +154,7 @@ type UnmarshalSubscriptionParams struct {
 	Plan                   PlanTier
 	Interval               Interval
 	PriceID                uuid.UUID
-	Status                 Status
+	Status                 SubscriptionStatus
 	ProviderSubscriptionID *string
 	ProviderPaymentID      *string
 	CurrentPeriodStart     *time.Time
@@ -194,26 +196,26 @@ func UnmarshalSubscription(p UnmarshalSubscriptionParams) *Subscription {
 func (s *Subscription) ApplySnapshot(snap ProviderSnapshot, price *Price, now time.Time, userID string) {
 	prevStatus, prevPlan, prevCancel := s.status, s.plan, s.cancelAtPeriodEnd
 	prevEnd, prevStart := s.currentPeriodEnd, s.currentPeriodStart
-	isNew := prevStatus == StatusIncomplete && prevEnd == nil
+	isNew := prevStatus == SubscriptionStatusIncomplete && prevEnd == nil
 
-	start, end := snap.CurrentPeriodStart, snap.CurrentPeriodEnd
-	s.status = snap.Status
+	start, end := snap.currentPeriodStart, snap.currentPeriodEnd
+	s.status = snap.status
 	s.plan, s.interval, s.priceID = price.Plan(), price.Interval(), price.ID()
 	s.currentPeriodStart, s.currentPeriodEnd = &start, &end
-	s.cancelAtPeriodEnd = snap.CancelAtPeriodEnd
-	s.canceledAt = snap.CanceledAt
+	s.cancelAtPeriodEnd = snap.cancelAtPeriodEnd
+	s.canceledAt = snap.CanceledAt()
 	s.providerSyncedAt, s.updatedAt = now, now
 	s.trackPastDue(prevStatus, prevStart, now)
 
 	switch {
-	case s.status == StatusActive && prevStatus != StatusActive:
+	case s.status == SubscriptionStatusActive && prevStatus != SubscriptionStatusActive:
 		s.paidAt = &now
 		s.record(&SubscriptionActivatedEvent{BaseEvent: s.base(userID)})
-	case s.status == StatusActive && prevEnd != nil && end.After(*prevEnd):
+	case s.status == SubscriptionStatusActive && prevEnd != nil && end.After(*prevEnd):
 		s.paidAt = &now
 		s.record(&SubscriptionRenewedEvent{BaseEvent: s.base(userID)})
 	}
-	if s.status == StatusPastDue && prevStatus != StatusPastDue {
+	if s.status == SubscriptionStatusPastDue && prevStatus != SubscriptionStatusPastDue {
 		s.record(&SubscriptionPastDueEvent{BaseEvent: s.base(userID)})
 	}
 	if !isNew && prevPlan != s.plan {
@@ -228,13 +230,16 @@ func (s *Subscription) ApplySnapshot(snap ProviderSnapshot, price *Price, now ti
 	if !s.IsCurrent() && (prevStatus != s.status) && !isNew {
 		s.record(&SubscriptionEndedEvent{BaseEvent: s.base(userID)})
 	}
+	if isNew || prevStatus != s.status || prevPlan != s.plan {
+		s.recordStateChanged(userID)
+	}
 }
 
-func (s *Subscription) trackPastDue(prevStatus Status, prevStart *time.Time, now time.Time) {
+func (s *Subscription) trackPastDue(prevStatus SubscriptionStatus, prevStart *time.Time, now time.Time) {
 	switch {
-	case s.status != StatusPastDue:
+	case s.status != SubscriptionStatusPastDue:
 		s.pastDueSince = nil
-	case prevStatus != StatusPastDue:
+	case prevStatus != SubscriptionStatusPastDue:
 		s.pastDueSince = &now
 	case s.pastDueSince == nil:
 		since := now
@@ -252,6 +257,12 @@ func (s *Subscription) pastDueStart() *time.Time {
 		return s.pastDueSince
 	}
 	return s.currentPeriodStart
+}
+
+// AwaitingProviderCancel reports a locally canceled subscription the provider has not confirmed canceled yet.
+func (s *Subscription) AwaitingProviderCancel() bool {
+	return s.status == SubscriptionStatusCanceled && s.providerSubscriptionID != nil && s.canceledAt != nil &&
+		!s.providerSyncedAt.After(*s.canceledAt)
 }
 
 // MarkProviderSynced records that the provider confirmed this (locally canceled) subscription ended.
@@ -283,7 +294,7 @@ func (s *Subscription) refundedFor(paymentRef string) int64 {
 	var total int64
 	for _, r := range s.refunds {
 		if r.paymentRef == paymentRef && r.status != RefundStatusFailed && r.status != RefundStatusCanceled {
-			total += r.amount.Amount
+			total += r.amount.amount
 		}
 	}
 	return total
@@ -297,72 +308,81 @@ func (s *Subscription) QuoteCancelNow(now time.Time, policy *BillingPolicy, paym
 	if !s.IsCurrent() {
 		return RefundQuote{}, errs.New(errs.CodeNoActiveSubscription, "no active subscription", nil)
 	}
-	var q RefundQuote
-	add := func(p PaymentInfo, amount, coverage, unused int64) {
-		amount = max(min(amount, p.Amount.Amount-s.refundedFor(p.PaymentRef)), 0)
-		q.Lines = append(q.Lines, RefundLine{
-			PaymentRef:      p.PaymentRef,
-			PaidAmount:      p.Amount,
-			Amount:          Money{Amount: amount, Currency: p.Amount.Currency},
+	var lines []RefundLine
+	add := func(p PaymentInfo, amount, coverage, unused int64) error {
+		amount = max(min(amount, p.amount.amount-s.refundedFor(p.paymentRef)), 0)
+		refundAmount, err := NewMoney(amount, p.amount.currency)
+		if err != nil {
+			return err
+		}
+		line, err := NewRefundLine(RefundLineParams{
+			PaymentRef:      p.paymentRef,
+			PaidAmount:      p.amount,
+			Amount:          refundAmount,
 			CoverageSeconds: coverage,
 			UnusedSeconds:   unused,
 		})
-		q.Amount = Money{Amount: q.Amount.Amount + amount, Currency: p.Amount.Currency}
+		if err != nil {
+			return err
+		}
+		lines = append(lines, line)
+		return nil
 	}
 	if s.interval == IntervalLifetime {
 		if s.paidAt == nil || now.Sub(*s.paidAt) > policy.LifetimeRefundWindow() {
 			return RefundQuote{}, errs.New(errs.CodeRefundWindowExpired, "lifetime refund window expired", nil)
 		}
 		for _, p := range payments {
-			add(p, p.Amount.Amount, 0, 0)
+			if err := add(p, p.amount.amount, 0, 0); err != nil {
+				return RefundQuote{}, err
+			}
 		}
-		return q, nil
+		return NewRefundQuote(lines, 0, 0)
 	}
 	if s.currentPeriodStart == nil || s.currentPeriodEnd == nil {
 		return RefundQuote{}, errs.NewInternal("subscription has no period", nil)
 	}
-	q.PeriodSeconds = int64(s.currentPeriodEnd.Sub(*s.currentPeriodStart).Seconds())
-	q.UnusedSeconds = max(int64(s.currentPeriodEnd.Sub(now).Seconds()), 0)
+	periodSeconds := int64(s.currentPeriodEnd.Sub(*s.currentPeriodStart).Seconds())
+	unusedSeconds := max(int64(s.currentPeriodEnd.Sub(now).Seconds()), 0)
 	for _, p := range payments {
-		coverage := int64(p.CoverageEnd.Sub(p.CoverageStart).Seconds())
+		coverage := int64(p.coverageEnd.Sub(p.coverageStart).Seconds())
 		if coverage <= 0 {
 			continue
 		}
-		unused := max(int64(p.CoverageEnd.Sub(latest(now, p.CoverageStart)).Seconds()), 0)
-		add(p, p.Amount.Amount*unused/coverage, coverage, unused)
+		from := now
+		if p.coverageStart.After(now) {
+			from = p.coverageStart
+		}
+		unused := max(int64(p.coverageEnd.Sub(from).Seconds()), 0)
+		if err := add(p, p.amount.amount*unused/coverage, coverage, unused); err != nil {
+			return RefundQuote{}, err
+		}
 	}
-	return q, nil
+	return NewRefundQuote(lines, unusedSeconds, periodSeconds)
 }
 
-func latest(a, b time.Time) time.Time {
-	if a.After(b) {
-		return a
-	}
-	return b
-}
-
-// CancelNow adds one pending Refund per quote line with a positive amount.
 func (s *Subscription) CancelNow(now time.Time, reason RefundReason, quote RefundQuote, userID string) ([]*Refund, error) {
 	if !s.IsCurrent() {
 		return nil, errs.New(errs.CodeNoActiveSubscription, "no active subscription", nil)
 	}
-	for _, l := range quote.Lines {
-		if l.Amount.Amount > 0 && s.refundedFor(l.PaymentRef)+l.Amount.Amount > l.PaidAmount.Amount {
-			return nil, errs.NewInvalid(fmt.Sprintf("refund %d on %s exceeds refundable amount", l.Amount.Amount, l.PaymentRef))
+	for _, l := range quote.lines {
+		if l.amount.amount > 0 && s.refundedFor(l.paymentRef)+l.amount.amount > l.paidAmount.amount {
+			return nil, errs.NewInvalid(fmt.Sprintf("refund %d on %s exceeds refundable amount", l.amount.amount, l.paymentRef))
 		}
 	}
-	s.status, s.canceledAt, s.cancelAtPeriodEnd, s.updatedAt = StatusCanceled, &now, false, now
+	s.status, s.canceledAt, s.cancelAtPeriodEnd, s.updatedAt = SubscriptionStatusCanceled, &now, false, now
 	s.record(&SubscriptionCanceledNowEvent{BaseEvent: s.base(userID), Reason: reason})
+	s.recordStateChanged(userID)
 	var refunds []*Refund
-	for _, l := range quote.Lines {
-		if l.Amount.Amount <= 0 {
+	for _, l := range quote.lines {
+		if l.amount.amount <= 0 {
 			continue
 		}
 		r := &Refund{
 			id:               uuid.Must(uuid.NewV7()),
 			providerRefundID: nil,
-			paymentRef:       l.PaymentRef,
-			amount:           l.Amount,
+			paymentRef:       l.paymentRef,
+			amount:           l.amount,
 			reason:           reason,
 			status:           RefundStatusPending,
 			failureMessage:   nil,
@@ -370,7 +390,7 @@ func (s *Subscription) CancelNow(now time.Time, reason RefundReason, quote Refun
 			updatedAt:        now,
 		}
 		s.refunds = append(s.refunds, r)
-		s.record(&RefundRequestedEvent{BaseEvent: s.base(userID), RefundID: r.id, Amount: l.Amount})
+		s.record(&RefundRequestedEvent{BaseEvent: s.base(userID), RefundID: r.id, Amount: l.amount})
 		refunds = append(refunds, r)
 	}
 	return refunds, nil
@@ -381,20 +401,28 @@ func (s *Subscription) UpdateRefund(refundID uuid.UUID, providerRefundID string,
 		if r.id != refundID {
 			continue
 		}
+		// a stale pending (e.g. the CreateRefund response landing after the webhook) never reopens a settled refund
+		if r.status.IsSettled() && !status.IsSettled() {
+			return nil
+		}
 		prev := r.status
 		r.providerRefundID, r.status, r.failureMessage, r.updatedAt = &providerRefundID, status, failureMessage, now
 		if prev != status {
-			switch status {
-			case RefundStatusSucceeded:
-				s.record(&RefundSucceededEvent{BaseEvent: s.base(userID), RefundID: refundID})
-			case RefundStatusFailed, RefundStatusCanceled:
-				s.record(&RefundFailedEvent{BaseEvent: s.base(userID), RefundID: refundID})
-			case RefundStatusUnspecified, RefundStatusPending:
-			}
+			s.recordRefundSettled(refundID, status, userID)
 		}
 		return nil
 	}
 	return errs.NewNotFound(fmt.Sprintf("refund %s not found", refundID))
+}
+
+func (s *Subscription) recordRefundSettled(refundID uuid.UUID, status RefundStatus, userID string) {
+	switch status {
+	case RefundStatusSucceeded:
+		s.record(&RefundSucceededEvent{BaseEvent: s.base(userID), RefundID: refundID})
+	case RefundStatusFailed, RefundStatusCanceled:
+		s.record(&RefundFailedEvent{BaseEvent: s.base(userID), RefundID: refundID})
+	case RefundStatusUnspecified, RefundStatusPending:
+	}
 }
 
 // FailRefund marks a refund the provider will never accept; it keeps no provider refund id.
@@ -413,6 +441,15 @@ func (s *Subscription) FailRefund(refundID uuid.UUID, failureMessage string, now
 	return errs.NewNotFound(fmt.Sprintf("refund %s not found", refundID))
 }
 
+func (s *Subscription) Refund(refundID uuid.UUID) *Refund {
+	for _, r := range s.refunds {
+		if r.id == refundID {
+			return r
+		}
+	}
+	return nil
+}
+
 func (s *Subscription) RefundByProviderID(providerRefundID string) *Refund {
 	for _, r := range s.refunds {
 		if r.providerRefundID != nil && *r.providerRefundID == providerRefundID {
@@ -422,10 +459,18 @@ func (s *Subscription) RefundByProviderID(providerRefundID string) *Refund {
 	return nil
 }
 
-func (s *Subscription) RecordExternalRefund(providerRefundID, paymentRef string, amount Money, status RefundStatus, now time.Time, userID string) {
+// RecordExternalRefund tracks a refund made outside Notopia (e.g. the provider dashboard). It is already
+// submitted, so it records no RefundRequestedEvent (that event drives SubmitRefund), only its settlement.
+func (s *Subscription) RecordExternalRefund(
+	providerRefundID, paymentRef string,
+	amount Money,
+	status RefundStatus,
+	failureMessage *string,
+	now time.Time,
+	userID string,
+) error {
 	if r := s.RefundByProviderID(providerRefundID); r != nil {
-		_ = s.UpdateRefund(r.id, providerRefundID, status, nil, now, userID)
-		return
+		return s.UpdateRefund(r.id, providerRefundID, status, failureMessage, now, userID)
 	}
 	id := uuid.Must(uuid.NewV7())
 	s.refunds = append(s.refunds, &Refund{
@@ -435,25 +480,26 @@ func (s *Subscription) RecordExternalRefund(providerRefundID, paymentRef string,
 		amount:           amount,
 		reason:           RefundReasonExternal,
 		status:           status,
-		failureMessage:   nil,
+		failureMessage:   failureMessage,
 		createdAt:        now,
 		updatedAt:        now,
 	})
-	s.record(&RefundRequestedEvent{BaseEvent: s.base(userID), RefundID: id, Amount: amount})
+	s.recordRefundSettled(id, status, userID)
+	return nil
 }
 
 func (s *Subscription) IsCurrent() bool {
-	return s.status != StatusCanceled && s.status != StatusIncompleteExpired
+	return s.status != SubscriptionStatusCanceled && s.status != SubscriptionStatusIncompleteExpired
 }
 
 func (s *Subscription) GrantsAccess(now time.Time, policy *BillingPolicy) bool {
 	switch s.status {
-	case StatusActive:
+	case SubscriptionStatusActive:
 		return true
-	case StatusPastDue:
+	case SubscriptionStatusPastDue:
 		since := s.pastDueStart()
 		return since != nil && now.Before(since.Add(policy.PastDueGrace()))
-	case StatusNone, StatusIncomplete, StatusUnpaid, StatusCanceled, StatusIncompleteExpired:
+	case SubscriptionStatusNone, SubscriptionStatusIncomplete, SubscriptionStatusUnpaid, SubscriptionStatusCanceled, SubscriptionStatusIncompleteExpired:
 		return false
 	default:
 		return false
@@ -464,14 +510,14 @@ func (s *Subscription) AccessUntil(policy *BillingPolicy) *time.Time {
 	switch {
 	case s.interval == IntervalLifetime || s.currentPeriodEnd == nil:
 		return nil
-	case s.status == StatusPastDue:
+	case s.status == SubscriptionStatusPastDue:
 		since := s.pastDueStart()
 		if since == nil {
 			return nil
 		}
 		t := since.Add(policy.PastDueGrace())
 		return &t
-	case s.status == StatusActive:
+	case s.status == SubscriptionStatusActive:
 		return s.currentPeriodEnd
 	default:
 		return nil
@@ -483,7 +529,7 @@ func (s *Subscription) WorkspaceID() uuid.UUID          { return s.workspaceID }
 func (s *Subscription) Plan() PlanTier                  { return s.plan }
 func (s *Subscription) Interval() Interval              { return s.interval }
 func (s *Subscription) PriceID() uuid.UUID              { return s.priceID }
-func (s *Subscription) Status() Status                  { return s.status }
+func (s *Subscription) Status() SubscriptionStatus      { return s.status }
 func (s *Subscription) ProviderSubscriptionID() *string { return s.providerSubscriptionID }
 func (s *Subscription) ProviderPaymentID() *string      { return s.providerPaymentID }
 func (s *Subscription) CurrentPeriodStart() *time.Time  { return s.currentPeriodStart }

@@ -1,0 +1,150 @@
+---
+order: 2
+---
+
+# Billing
+
+:::info
+
+- Stripe runs in **sandbox** only: Stripe doesn't onboard Vietnamese businesses for live payouts. See `story/BILLING_PAYMENT_PROVIDERS.md`.
+- Webhooks are **fetch-and-sync**: the payload only gives an id, and billing reads the current state back from Stripe, so event order doesn't matter.
+- Entitlements are always read from billing's own database. Other services call gRPC on every check and never cache.
+
+:::
+
+## Subscription States
+
+```mermaid
+stateDiagram-v2
+  [*] --> incomplete: checkout created subscription
+  incomplete --> active: first invoice paid
+  incomplete --> incomplete_expired: not paid in 23h
+  active --> past_due: renewal payment failed
+  past_due --> active: retry succeeded
+  past_due --> unpaid: retries exhausted
+  active --> canceled: period end after cancel_at_period_end / cancel-now
+  past_due --> canceled
+  unpaid --> canceled
+```
+
+`past_due` keeps paid features until period end + `pastDueGraceDays` (billing policy, default 3). Lifetime purchases have no Stripe subscription: they're created `active` and only leave it through cancel-now (refund window) or workspace deletion.
+
+## Checkout
+
+```mermaid
+sequenceDiagram
+    autonumber
+
+    actor U as Owner
+    participant B as Billing
+    participant AS as Authorization Service
+    participant S as Stripe
+
+    U->>+B: POST /workspaces/{id}/checkout-session {priceId}
+    B->>+AS: HasWorkspacePermission(billing_manage)
+    AS-->>-B: Ok
+    opt No billing account yet
+        B->>S: Create customer (idempotency key customer:{workspaceId})
+        B->>B: Save BillingAccount
+    end
+    B->>S: Create Checkout Session (metadata: workspace, price, purpose)
+    B-->>-U: { url }
+    U->>S: Pay on checkout.stripe.com
+    S-->>U: Redirect to /settings/billing?checkout=success
+```
+
+## Webhook Pipeline
+
+```mermaid
+sequenceDiagram
+    autonumber
+
+    participant S as Stripe
+    participant B as Billing
+    participant DB as Billing DB
+    participant K as Kafka
+
+    S->>+B: POST /billing/webhooks/stripe (signed)
+    B->>B: Verify signature on the raw body
+    B->>S: GET checkout session / subscription / refund (fetch-and-sync)
+    B->>DB: tx: MarkProcessed(event.id) + apply state
+    Note over B,DB: An event id already processed → no-op
+
+    Note over B,DB: Save also writes the aggregate's events to outbox_messages (same tx)
+    B-->>-S: 204
+
+    DB--)K: outbox forwarder: subscription.changed, subscription.canceled_now, subscription.refund_requested, ...
+    K--)B: Phase 2 (own events): CancelProviderSubscription / SubmitRefund
+    opt Duplicate or replaced subscription
+        B->>S: Cancel provider subscription (idempotent), then MarkProviderSynced
+    end
+    opt Refund due
+        B->>S: Create refund (idempotency key refund:{id})
+        B->>DB: Save provider refund id + status
+    end
+```
+
+Ordering rule for every webhook use case:
+
+1. Provider reads and idempotent mutations that must not be lost (change the default card) run **before** the write transaction. Checkout completion locks the workspace's billing account inside the transaction and decides duplicate / replace there, so concurrent checkouts of one workspace serialize.
+2. The write transaction records the event (`processed_provider_events`) together with the state change and the outbox events. Handlers end at commit.
+3. **Phase 2** is driven by billing's own outbox events, consumed in `controller/event`: `subscription.canceled_now` runs `CancelProviderSubscription` (cancel at the provider, then `MarkProviderSynced`), and `subscription.refund_requested` runs `SubmitRefund` (`CreateRefund` keyed by the refund id; a provider `invalid` error marks the refund `failed`). A locally canceled row is never resurrected.
+4. The hourly reconcile cron is the safety net: it retries provider cancels and refund submissions for rows still awaiting them.
+
+## Cancel Now
+
+```mermaid
+sequenceDiagram
+    autonumber
+
+    actor U as Owner
+    participant B as Billing
+    participant S as Stripe
+    participant DB as Billing DB
+
+    U->>+B: GET .../subscription/cancel-now/preview
+    B->>S: Period payments (recurring) / payment intent (lifetime)
+    B-->>-U: Refund quote (unused share of the period)
+    U->>+B: POST .../subscription/cancel-now
+    B->>DB: tx: Subscription canceled + pending Refund + outbox events
+    B-->>-U: Workspace billing (subscription: null)
+    DB--)B: outbox: subscription.canceled_now
+    B->>S: Cancel subscription now, then MarkProviderSynced
+    DB--)B: outbox: subscription.refund_requested
+    B->>S: Create refund (refund:{id})
+    B->>DB: Refund submitted
+    S->>B: refund.updated webhook → refund succeeded
+```
+
+## Payer Removed and Claimed
+
+```mermaid
+sequenceDiagram
+    autonumber
+
+    participant AS as Authorization Service
+    participant K as Kafka
+    participant B as Billing
+    participant S as Stripe
+    actor O as Another Owner
+
+    AS--)K: user_workspace_role_updated / workspace_member_removed
+    K--)B: Payer lost the owner role
+    B->>S: Cancel at period end + detach payment methods
+    B->>B: BillingAccount payer missing
+    O->>+B: POST .../payer/claim
+    B-->>-O: Setup-mode checkout URL
+    O->>S: Save a card
+    S->>B: checkout.session.completed (payer_change)
+    B->>S: Set default payment method, resume subscription
+    B->>B: Payer = new owner
+```
+
+## Crons
+
+| Job                               | Schedule                   | Effect                                                                                                                             |
+| --------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `billing:reconcile-subscriptions` | hourly                     | Re-syncs subscriptions past their period end or not synced for 24 h; retries provider cancels and refund submissions still pending |
+| `billing:prune-provider-events`   | daily 04:00 (process `TZ`) | Deletes processed webhook event ids older than 30 days                                                                             |
+
+Both use a Redis lock (`billing_redis`), so with several billing instances each tick runs once.

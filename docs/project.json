@@ -9,8 +9,7 @@
       "{projectRoot}/.vitepress/theme/**/*.{vue,ts,mts}",
       "{projectRoot}/src/**/*.md",
       "{projectRoot}/src/public/**",
-      "!{projectRoot}/src/public/diagrams/**",
-      "{projectRoot}/src/diagrams/**"
+      "!{projectRoot}/src/public/diagrams/**"
     ]
   },
   "targets": {

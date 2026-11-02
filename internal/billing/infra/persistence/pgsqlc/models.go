@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgjsonb"
 )
 
@@ -356,6 +357,15 @@ type BillingPolicy struct {
 	LifetimeRefundWindowDays int32
 	PortalConfigurationID    *string
 	UpdatedAt                time.Time
+}
+
+type OutboxMessage struct {
+	Offset    int32
+	Uuid      string
+	Payload   []byte
+	Metadata  []byte
+	Acked     bool
+	CreatedAt pgtype.Timestamptz
 }
 
 type Plan struct {

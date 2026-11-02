@@ -81,7 +81,6 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		cleanup()
 		return nil, nil, err
 	}
-	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(transactionalEnforcer)
 	kafka := &configConfig.Kafka
@@ -97,13 +96,13 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer, integrationPublisher)
 	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(transactionalEnforcer, integrationPublisher)
-	cmds := app.NewCmds(handlerProvider, createWorkspaceHandler, deleteWorkspaceHandler, updateWorkspaceMembersHandler, leaveWorkspaceHandler)
+	cmds := app.NewCmds(tracerProvider, logger, createWorkspaceHandler, deleteWorkspaceHandler, updateWorkspaceMembersHandler, leaveWorkspaceHandler)
 	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
 	getUserWorkspacesHandler := app.NewGetUserWorkspacesHandler(transactionalEnforcer)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
 	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
 	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
-	queries := app.NewQueries(handlerProvider, getUserWorkspaceItemPermissionsHandler, getUserWorkspacesHandler, getWorkspaceMembersHandler, hasWorkspaceItemPermissionHandler, hasWorkspacePermissionHandler)
+	queries := app.NewQueries(tracerProvider, logger, getUserWorkspaceItemPermissionsHandler, getUserWorkspacesHandler, getWorkspaceMembersHandler, hasWorkspaceItemPermissionHandler, hasWorkspacePermissionHandler)
 	appApp := &app.App{
 		Enforcer: transactionalEnforcer,
 		Cmds:     cmds,

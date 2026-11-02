@@ -11,7 +11,12 @@
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/../bundled/billing.json"],
-      "inputs": ["openapiFilesWithCommon"]
+      "inputs": [
+        "openapiFilesWithCommon",
+        {
+          "externalDependencies": ["@redocly/cli"]
+        }
+      ]
     },
     "build": {
       "dependsOn": ["bundle:json"]

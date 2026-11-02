@@ -12,6 +12,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
 	"github.com/notopia-uit/notopia/internal/billing/controller/http"
+	"github.com/notopia-uit/notopia/internal/billing/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
@@ -23,6 +24,7 @@ type Server struct {
 	http        *http.HTTP
 	grpc        *grpc.GRPC
 	event       *event.Event
+	outbox      *outbox.Forwarder
 	cron        *cron.Cron
 	health      *health.Health
 	logger      *slog.Logger
@@ -34,6 +36,7 @@ func NewServer(
 	http *http.HTTP,
 	grpc *grpc.GRPC,
 	event *event.Event,
+	outbox *outbox.Forwarder,
 	cron *cron.Cron,
 	health *health.Health,
 	logger *slog.Logger,
@@ -47,6 +50,7 @@ func NewServer(
 		http:        http,
 		grpc:        grpc,
 		event:       event,
+		outbox:      outbox,
 		cron:        cron,
 		health:      health,
 		logger:      logger,
@@ -110,6 +114,10 @@ func (s *Server) Run(ctx context.Context) error {
 			return fmt.Errorf("failed to run event router: %w", err)
 		}
 		return nil
+	})
+
+	g.Go(func() error {
+		return s.outbox.Run(ctx)
 	})
 
 	g.Go(func() error {

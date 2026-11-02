@@ -85,10 +85,11 @@ export class Hocuspocus implements BeforeApplicationShutdown {
         const entity = await documentService.getById(documentName);
         applyStoredModified(document, entity?.modified ?? false);
       },
-      afterUnloadDocument: async ({ documentName }) => {
+      afterUnloadDocument: ({ documentName }) => {
         this.deletedDocumentIds.delete(documentName);
         this.contributors.forget(documentName);
         if (this.hocuspocus.getDocumentsCount() === 0) this.onAllUnloaded?.();
+        return Promise.resolve();
       },
       onAuthenticate: (...args) => this.onAuthenticate(...args),
       onChange: (...args) => this.onChange(...args),

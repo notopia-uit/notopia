@@ -88,7 +88,10 @@
           "dependentTasksOutputFiles": "api/bundled/openapi.json",
           "transitive": true
         },
-        "{projectRoot}/openapi-ts.config.ts"
+        "{projectRoot}/openapi-ts.config.ts",
+        {
+          "externalDependencies": ["@hey-api/openapi-ts"]
+        }
       ],
       "executor": "nx:run-commands",
       "options": {
@@ -100,8 +103,14 @@
     "gen:document-nestjs-server": {
       "outputs": ["{workspaceRoot}/packages/api-document-nestjs-server/src"],
       "inputs": [
-        { "dependentTasksOutputFiles": "**/*.json", "transitive": true },
-        "{projectRoot}/openapitools.json"
+        {
+          "dependentTasksOutputFiles": "**/*.json",
+          "transitive": true
+        },
+        "{projectRoot}/openapitools.json",
+        {
+          "externalDependencies": ["@openapitools/openapi-generator-cli"]
+        }
       ],
       "executor": "nx:run-commands",
       "options": {
