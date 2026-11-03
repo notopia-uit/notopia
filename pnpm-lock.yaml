@@ -1001,6 +1001,9 @@ importers:
       '@nestjs/platform-express':
         specifier: 'catalog:'
         version: 11.2.8(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(supports-color@8.1.1)
+      '@nestjs/terminus':
+        specifier: 'catalog:'
+        version: 12.1.0(a15ecbb39c8edbfda0cb8fffedec75c1)
       '@notopia-uit/api-share-gen':
         specifier: 'workspace:'
         version: link:../../packages/api-share-gen
@@ -1049,6 +1052,9 @@ importers:
       nestjs-pino:
         specifier: 'catalog:'
         version: 4.6.1(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(pino-http@11.0.0)(pino@10.4.0)(rxjs@7.8.2)
+      pino:
+        specifier: 'catalog:'
+        version: 10.4.0
       pino-http:
         specifier: 'catalog:'
         version: 11.0.0

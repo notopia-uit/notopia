@@ -12,7 +12,12 @@
       "#/*": ["./src/*"]
     }
   },
-  "include": ["seed/**/*", "fixtures/**/*", "../../packages/lib-server/src/block-note/types.d.ts"],
+  "include": [
+    "seed/**/*",
+    "fixtures/**/*",
+    "src/otel.ts",
+    "../../packages/lib-server/src/block-note/types.d.ts"
+  ],
   "references": [
     {
       "path": "../../packages/lib-server/tsconfig.lib.json"
