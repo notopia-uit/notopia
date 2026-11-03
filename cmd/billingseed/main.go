@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	if err := logging.FirstStart("NOTOPIA_BILLINGSEED_LOG_LEVEL"); err != nil {
+	if err := logging.FirstStart("NOTOPIA_BILLING_LOG_LEVEL"); err != nil {
 		slog.Error("failed to set up logger", slog.Any("error", err))
 		os.Exit(1)
 	}

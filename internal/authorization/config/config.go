@@ -1,11 +1,6 @@
 package config
 
 import (
-	"fmt"
-	"log/slog"
-	"strings"
-
-	"github.com/creasty/defaults"
 	"github.com/go-playground/validator/v10"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/spf13/viper"
@@ -16,7 +11,7 @@ type ServerConfig struct {
 	Health commonconfig.ServerAddress `json:"health" mapstructure:"health" validate:"required" yaml:"health"`
 }
 
-type Config struct {
+type ServeConfig struct {
 	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
 	Log      commonconfig.Log     `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
 	Server   ServerConfig         `json:"server"   mapstructure:"server"   validate:"required"  yaml:"server"`
@@ -24,49 +19,29 @@ type Config struct {
 	Kafka    commonconfig.Kafka   `json:"kafka"    mapstructure:"kafka"    validate:"required"  yaml:"kafka"`
 }
 
-func NewConfig(
-	validate *validator.Validate,
-	viper *viper.Viper,
-) (*Config, error) {
-	viper.SetEnvPrefix("notopia_authorization")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+type Config = ServeConfig
 
-	viper.SetConfigName("authorization.notopia.config")
-	viper.AddConfigPath(".")
-
-	viper.AutomaticEnv()
-	if err := viper.ReadInConfig(); err == nil {
-		slog.Info("configuration loaded", slog.String("file", viper.ConfigFileUsed()))
-	}
-
-	cfg := &Config{}
-	if err := defaults.Set(cfg); err != nil {
-		return nil, fmt.Errorf("cannot set default config: %w", err)
-	}
-	if err := viper.Unmarshal(cfg); err != nil {
-		return nil, fmt.Errorf("cannot unmarshal config from env or config file: %w", err)
-	}
-
-	if cfg.Server.GRPC.Port == 0 {
-		cfg.Server.GRPC.Port = 18089
-	}
-	if cfg.Server.Health.Port == 0 {
-		cfg.Server.Health.Port = 28089
-	}
-	if cfg.Kafka.ConsumerGroup == "" {
-		cfg.Kafka.ConsumerGroup = "authorization-service"
-	}
-
-	slog.Info("configuration", slog.Any("config", cfg))
-
-	if err := validate.Struct(cfg); err != nil {
-		return nil, fmt.Errorf("Config validation failed: %w", err)
-	}
-
-	return cfg, nil
+type SeedConfig struct {
+	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
+	Log      commonconfig.Log     `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
+	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
 }
 
-var ProvideConfig = NewConfig
+func NewSeedConfig(validate *validator.Validate, v *viper.Viper) (*SeedConfig, error) {
+	return commonconfig.Load[SeedConfig](validate, v, "notopia_authorization", "authorization.notopia.config")
+}
+
+func NewConfig(validate *validator.Validate, v *viper.Viper) (*Config, error) {
+	v.SetDefault("server.grpc.port", 18089)
+	v.SetDefault("server.health.port", 28089)
+	v.SetDefault("kafka.consumer_group", "authorization-service")
+	return commonconfig.Load[ServeConfig](validate, v, "notopia_authorization", "authorization.notopia.config")
+}
+
+var (
+	ProvideConfig     = NewConfig
+	ProvideSeedConfig = NewSeedConfig
+)
 
 func NewViper() *viper.Viper {
 	return viper.NewWithOptions(

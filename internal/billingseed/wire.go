@@ -17,7 +17,7 @@ import (
 
 func NewBillingStripeConfig(stripe *Stripe) *billingconfig.Stripe {
 	return &billingconfig.Stripe{
-		SecretKey:     stripe.SecretKey,
+		StripeAPI:     billingconfig.StripeAPI{SecretKey: stripe.SecretKey},
 		WebhookSecret: "",
 	}
 }

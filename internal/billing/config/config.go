@@ -2,8 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log/slog"
-	"strings"
 	"time"
 
 	"github.com/creasty/defaults"
@@ -23,8 +21,12 @@ type Services struct {
 	Authorization commonconfig.Service `json:"authorization" mapstructure:"authorization" validate:"required" yaml:"authorization"`
 }
 
+type StripeAPI struct {
+	SecretKey commonconfig.Secret `default:"-" json:"-" mapstructure:"secret_key" validate:"required" yaml:"secret_key"`
+}
+
 type Stripe struct {
-	SecretKey     commonconfig.Secret `default:"-" json:"-" mapstructure:"secret_key"     validate:"required" yaml:"secret_key"`
+	StripeAPI     `                     mapstructure:",squash"`
 	WebhookSecret commonconfig.Secret `default:"-" json:"-" mapstructure:"webhook_secret" validate:"required" yaml:"webhook_secret"`
 }
 
@@ -44,7 +46,7 @@ type Cron struct {
 	PruneProviderEvents    commonconfig.CronJob `json:"pruneProviderEvents"    mapstructure:"prune_provider_events"   validate:"required" yaml:"prune_provider_events"`
 }
 
-type Config struct {
+type ServeConfig struct {
 	General  commonconfig.General  `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
 	Log      commonconfig.Log      `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
 	Server   Server                `json:"server"   mapstructure:"server"   validate:"required"  yaml:"server"`
@@ -82,45 +84,46 @@ func setCronDefaults(v *viper.Viper, key string, job commonconfig.CronJob) {
 	v.SetDefault(key+".enabled", job.Enabled)
 }
 
-func New(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
-	viper.SetEnvPrefix("notopia_billing")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetConfigName("billing.notopia.config")
-	viper.AddConfigPath(".")
-	viper.AutomaticEnv()
-	setCronDefaults(viper, "cron.reconcile_subscriptions", defaultReconcileSubscriptions)
-	setCronDefaults(viper, "cron.prune_provider_events", defaultPruneProviderEvents)
-	if err := viper.ReadInConfig(); err == nil {
-		slog.Info("configuration loaded", slog.String("file", viper.ConfigFileUsed()))
-	}
+type Config = ServeConfig
 
-	cfg := &Config{}
-	if err := defaults.Set(cfg); err != nil {
-		return nil, fmt.Errorf("cannot set default config: %w", err)
-	}
-	if err := viper.Unmarshal(cfg); err != nil {
-		return nil, fmt.Errorf("cannot unmarshal config from env or config file: %w", err)
-	}
-	if cfg.Server.HTTP.Port == 0 {
-		cfg.Server.HTTP.Port = 8084
-	}
-	if cfg.Server.GRPC.Port == 0 {
-		cfg.Server.GRPC.Port = 18084
-	}
-	if cfg.Server.Health.Port == 0 {
-		cfg.Server.Health.Port = 28084
-	}
-	if cfg.Kafka.ConsumerGroup == "" {
-		cfg.Kafka.ConsumerGroup = "billing-service"
-	}
-	slog.Info("configuration", slog.Any("config", cfg))
-	if err := validate.Struct(cfg); err != nil {
-		return nil, fmt.Errorf("config validation failed: %w", err)
-	}
-	return cfg, nil
+type MigrateConfig struct {
+	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
+	Log      commonconfig.Log     `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
+	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
 }
 
-var Provide = New
+type SeedConfig struct {
+	General  commonconfig.General  `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
+	Log      commonconfig.Log      `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
+	Database commonconfig.SQL      `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
+	Identity commonconfig.Identity `json:"identity" mapstructure:"identity" validate:"required"  yaml:"identity"`
+	Stripe   StripeAPI             `json:"-"        mapstructure:"stripe"   validate:"required"  yaml:"stripe"`
+	Billing  Billing               `json:"billing"  mapstructure:"billing"  validate:"required"  yaml:"billing"`
+}
+
+func NewMigrateConfig(validate *validator.Validate, v *viper.Viper) (*MigrateConfig, error) {
+	return commonconfig.Load[MigrateConfig](validate, v, "notopia_billing", "billing.notopia.config")
+}
+
+func NewSeedConfig(validate *validator.Validate, v *viper.Viper) (*SeedConfig, error) {
+	return commonconfig.Load[SeedConfig](validate, v, "notopia_billing", "billing.notopia.config")
+}
+
+func New(validate *validator.Validate, v *viper.Viper) (*Config, error) {
+	setCronDefaults(v, "cron.reconcile_subscriptions", defaultReconcileSubscriptions)
+	setCronDefaults(v, "cron.prune_provider_events", defaultPruneProviderEvents)
+	v.SetDefault("server.http.port", 8084)
+	v.SetDefault("server.grpc.port", 18084)
+	v.SetDefault("server.health.port", 28084)
+	v.SetDefault("kafka.consumer_group", "billing-service")
+	return commonconfig.Load[ServeConfig](validate, v, "notopia_billing", "billing.notopia.config")
+}
+
+var (
+	Provide              = New
+	ProvideMigrateConfig = NewMigrateConfig
+	ProvideSeedConfig    = NewSeedConfig
+)
 
 // NewDefaultDomainEvent serves binaries that write billing's outbox without loading billing's config (seed, fixtures).
 func NewDefaultDomainEvent() (*DomainEvent, error) {

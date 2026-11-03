@@ -100,8 +100,8 @@ func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) 
 	listPricesHandler := app.NewListPricesHandler(billingReadModel)
 	priceRepo := pgrepo.NewPriceRepo(queries)
 	policyRepo := pgrepo.NewPolicyRepo(queries)
-	billingseedStripe := &billingseedConfig.Stripe
-	configStripe := billingseed.NewBillingStripeConfig(billingseedStripe)
+	v := &billingseedConfig.Stripe
+	configStripe := billingseed.NewBillingStripeConfig(v)
 	catalog := &billingseedConfig.Catalog
 	billing := billingseed.NewBillingConfig(catalog)
 	stripeProvider, err := stripe.New(configStripe, billing)
