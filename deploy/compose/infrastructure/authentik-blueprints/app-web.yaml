@@ -13,6 +13,19 @@ entries:
       identifiers:
         name: Notopia - Providers Oauth2
 
+  - model: authentik_providers_oauth2.scopemapping
+    identifiers:
+      scope_name: notopia
+    attrs:
+      name: 'Notopia: gateway header claims'
+      scope_name: notopia
+      description: 'String claims mapped to X-Forwarded-* headers by the gateway'
+      expression: |
+        import json
+        return {
+            "groups_json": json.dumps([group.name for group in request.user.groups.all()]),
+        }
+
   - id: provider
     model: authentik_providers_oauth2.oauth2provider
     identifiers:
@@ -39,6 +52,7 @@ entries:
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, picture]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, notopia]]
       redirect_uris:
         - url: http://web.notopia.localhost/api/auth/callback/authentik
           matching_mode: strict
