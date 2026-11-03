@@ -1,14 +1,56 @@
 image: { repository: example/app, tag: latest, digest: '' }
+nameOverride: ''
+fullnameOverride: ''
 serviceAccount: { create: true, name: '' }
-resources: { limits: { memory: 256Mi } }
+resources:
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  limits: { memory: 256Mi }
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  requests: {}
 runtime: go
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
 env: { FOO: bar }
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
 extraEnv:
   - name: SECRET
     valueFrom:
       secretKeyRef: { name: external, key: password }
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
 envFrom:
   - secretRef: { name: external }
-otel: { enabled: true, endpoint: 'http://collector:4317', protocol: grpc, resourceAttributes: { custom: value } }
+otel:
+  enabled: true
+  endpoint: 'http://collector:4317'
+  protocol: grpc
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  resourceAttributes: { custom: value }
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+hooks: {}
+istio: { enabled: false, allowedPrincipals: [], ports: [] }
 
 notopia-common: { global: {} }

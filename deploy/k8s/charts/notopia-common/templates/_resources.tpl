@@ -1,10 +1,13 @@
 {{- define "notopia-common.hookJob" -}}
 {{- $root := .root -}}
 {{- $hookValues := default dict (get (default dict $root.Values.hooks) .name) -}}
+{{- $resources := default $root.Values.resources $hookValues.resources -}}
+{{- $hookRoot := merge (dict) $root -}}
+{{- $_ := set $hookRoot "Values" (set (deepCopy $root.Values) "resources" $resources) -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ printf "%s-%s" (include "notopia-common.fullname" $root) .name | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "%s-%s" (include "notopia-common.fullname" $root | trunc (int (sub 62 (len .name))) | trimSuffix "-") .name }}
   labels:
     {{- include "notopia-common.labels" $root | nindent 4 }}
   annotations:
@@ -33,18 +36,28 @@ spec:
           securityContext:
             {{- include "notopia-common.containerSecurityContext" $root | nindent 12 }}
           env:
-            {{- include "notopia-common.env" $root | nindent 12 }}
+            {{- include "notopia-common.env" $hookRoot | nindent 12 }}
           {{- with $root.Values.envFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           resources:
-            {{- toYaml (default $root.Values.resources $hookValues.resources) | nindent 12 }}
+            {{- toYaml $resources | nindent 12 }}
 {{- end -}}
 {{- define "notopia-common.istioWorkloadPolicy" -}}
 {{- if .Values.istio.enabled }}
 {{- if or (empty .Values.istio.allowedPrincipals) (empty .Values.istio.ports) }}
 {{- fail "istio workload policy requires non-empty allowedPrincipals and ports" }}
+{{- end }}
+{{- range .Values.istio.allowedPrincipals }}
+{{- if or (not (kindIs "string" .)) (empty (trim (toString .))) (regexMatch "\\s" (toString .)) }}
+{{- fail "istio workload policy requires non-empty principal entries" }}
+{{- end }}
+{{- end }}
+{{- range .Values.istio.ports }}
+{{- if or (not (kindIs "string" .)) (not (regexMatch "^[0-9]{1,5}$" (toString .))) (lt (int .) 1) (gt (int .) 65535) }}
+{{- fail "istio workload policy requires valid port entries from 1 to 65535" }}
+{{- end }}
 {{- end }}
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy

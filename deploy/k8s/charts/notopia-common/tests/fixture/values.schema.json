@@ -3,7 +3,8 @@
   "additionalProperties": false,
   "properties": {
     "env": {
-      "additionalProperties": false,
+      "additionalProperties": true,
+      "description": " type: object additionalProperties: true @schema",
       "properties": {
         "FOO": {
           "default": "bar",
@@ -18,97 +19,41 @@
       "type": "object"
     },
     "envFrom": {
+      "description": " type: array items:   type: object   additionalProperties: true @schema",
       "items": {
-        "anyOf": [
-          {
-            "additionalProperties": false,
-            "properties": {
-              "secretRef": {
-                "additionalProperties": false,
-                "properties": {
-                  "name": {
-                    "default": "external",
-                    "title": "name",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "name"
-                ],
-                "title": "secretRef",
-                "type": "object"
-              }
-            },
-            "required": [
-              "secretRef"
-            ],
-            "type": "object"
-          }
-        ],
-        "required": []
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
       },
       "title": "envFrom",
       "type": "array"
     },
     "extraEnv": {
+      "description": " type: array items:   type: object   additionalProperties: true @schema",
       "items": {
-        "anyOf": [
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {
-                "default": "SECRET",
-                "title": "name",
-                "type": "string"
-              },
-              "valueFrom": {
-                "additionalProperties": false,
-                "properties": {
-                  "secretKeyRef": {
-                    "additionalProperties": false,
-                    "properties": {
-                      "key": {
-                        "default": "password",
-                        "title": "key",
-                        "type": "string"
-                      },
-                      "name": {
-                        "default": "external",
-                        "title": "name",
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "name",
-                      "key"
-                    ],
-                    "title": "secretKeyRef",
-                    "type": "object"
-                  }
-                },
-                "required": [
-                  "secretKeyRef"
-                ],
-                "title": "valueFrom",
-                "type": "object"
-              }
-            },
-            "required": [
-              "name",
-              "valueFrom"
-            ],
-            "type": "object"
-          }
-        ],
-        "required": []
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
       },
       "title": "extraEnv",
       "type": "array"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "title": "fullnameOverride",
+      "type": "string"
     },
     "global": {
       "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
       "required": [],
       "title": "global",
+      "type": "object"
+    },
+    "hooks": {
+      "additionalProperties": true,
+      "description": " type: object additionalProperties: true @schema",
+      "required": [],
+      "title": "hooks",
       "type": "object"
     },
     "image": {
@@ -137,6 +82,42 @@
       ],
       "title": "image",
       "type": "object"
+    },
+    "istio": {
+      "additionalProperties": false,
+      "properties": {
+        "allowedPrincipals": {
+          "items": {
+            "required": []
+          },
+          "title": "allowedPrincipals",
+          "type": "array"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "ports": {
+          "items": {
+            "required": []
+          },
+          "title": "ports",
+          "type": "array"
+        }
+      },
+      "required": [
+        "enabled",
+        "allowedPrincipals",
+        "ports"
+      ],
+      "title": "istio",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "title": "nameOverride",
+      "type": "string"
     },
     "notopia-common": {
       "additionalProperties": false,
@@ -173,7 +154,8 @@
           "type": "string"
         },
         "resourceAttributes": {
-          "additionalProperties": false,
+          "additionalProperties": true,
+          "description": " type: object additionalProperties: true @schema",
           "properties": {
             "custom": {
               "default": "value",
@@ -191,8 +173,7 @@
       "required": [
         "enabled",
         "endpoint",
-        "protocol",
-        "resourceAttributes"
+        "protocol"
       ],
       "title": "otel",
       "type": "object"
@@ -201,7 +182,8 @@
       "additionalProperties": false,
       "properties": {
         "limits": {
-          "additionalProperties": false,
+          "additionalProperties": true,
+          "description": " type: object additionalProperties: true @schema",
           "properties": {
             "memory": {
               "default": "256Mi",
@@ -214,11 +196,16 @@
           ],
           "title": "limits",
           "type": "object"
+        },
+        "requests": {
+          "additionalProperties": true,
+          "description": " type: object additionalProperties: true @schema",
+          "required": [],
+          "title": "requests",
+          "type": "object"
         }
       },
-      "required": [
-        "limits"
-      ],
+      "required": [],
       "title": "resources",
       "type": "object"
     },
@@ -251,13 +238,13 @@
   },
   "required": [
     "image",
+    "nameOverride",
+    "fullnameOverride",
     "serviceAccount",
     "resources",
     "runtime",
-    "env",
-    "extraEnv",
-    "envFrom",
     "otel",
+    "istio",
     "notopia-common"
   ],
   "type": "object"

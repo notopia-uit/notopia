@@ -1,12 +1,12 @@
 # fixture
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../.. | notopia-common | 0.1.0 |
+| file://../.. | notopia-common | 0.1.1 |
 
 ## Values
 
@@ -17,15 +17,22 @@
 | extraEnv[0].name | string | `"SECRET"` |  |
 | extraEnv[0].valueFrom.secretKeyRef.key | string | `"password"` |  |
 | extraEnv[0].valueFrom.secretKeyRef.name | string | `"external"` |  |
+| fullnameOverride | string | `""` |  |
+| hooks | object | `{}` |  |
 | image.digest | string | `""` |  |
 | image.repository | string | `"example/app"` |  |
 | image.tag | string | `"latest"` |  |
+| istio.allowedPrincipals | list | `[]` |  |
+| istio.enabled | bool | `false` |  |
+| istio.ports | list | `[]` |  |
+| nameOverride | string | `""` |  |
 | notopia-common.global | object | `{}` |  |
 | otel.enabled | bool | `true` |  |
 | otel.endpoint | string | `"http://collector:4317"` |  |
 | otel.protocol | string | `"grpc"` |  |
 | otel.resourceAttributes.custom | string | `"value"` |  |
 | resources.limits.memory | string | `"256Mi"` |  |
+| resources.requests | object | `{}` |  |
 | runtime | string | `"go"` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |

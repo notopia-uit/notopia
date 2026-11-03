@@ -18,7 +18,7 @@
           "helm dependency build --skip-refresh deploy/k8s/charts/notopia-common/tests/fixture",
           "helm lint --strict deploy/k8s/charts/notopia-common",
           "helm lint --strict deploy/k8s/charts/notopia-common/tests/fixture",
-          "helm template fixture deploy/k8s/charts/notopia-common/tests/fixture | kubeconform -strict"
+          "bash -o pipefail -c 'helm template fixture deploy/k8s/charts/notopia-common/tests/fixture | kubeconform -strict'"
         ],
         "parallel": false
       },
@@ -30,7 +30,7 @@
         "commands": [
           "helm dependency build --skip-refresh deploy/k8s/charts/notopia-common/tests/fixture",
           "helm unittest deploy/k8s/charts/notopia-common/tests/fixture",
-          "node --test deploy/k8s/charts/notopia-common/tests/env-parity.test.ts"
+          "node --test deploy/k8s/charts/notopia-common/tests/*.test.ts"
         ],
         "parallel": false
       },
