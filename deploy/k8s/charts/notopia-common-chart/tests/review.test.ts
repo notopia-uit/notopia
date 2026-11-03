@@ -39,9 +39,11 @@ function resources(output: string): Resource[] {
 }
 
 test('lint pipeline fails when Helm rendering fails', () => {
-  const command: string = project.targets.lint.options.command;
-  assert.match(command, /bash -o pipefail -ec/);
-  const pipeline = command.split(' && ').at(-1)!.slice(0, -1);
+  const command: string = project.targets.lint.options.commands.find((item: string) =>
+    item.includes('kubeconform')
+  );
+  assert.match(command, /bash -o pipefail -c/);
+  const pipeline = command.split("bash -o pipefail -c '")[1].slice(0, -1);
   const broken = pipeline.replace(
     'helm template fixture',
     'helm template --set resources.limits.memory=1.5Gi fixture'

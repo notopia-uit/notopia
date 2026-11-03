@@ -14,7 +14,14 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "mkdir -p tmp/chart-lock && flock tmp/chart-lock/notopia-common-chart.lock bash -o pipefail -ec 'helm dependency build --skip-refresh deploy/k8s/charts/notopia-common-chart/tests/fixture && helm lint --strict deploy/k8s/charts/notopia-common-chart && helm lint --strict deploy/k8s/charts/notopia-common-chart/tests/fixture && helm template fixture deploy/k8s/charts/notopia-common-chart/tests/fixture | kubeconform -strict'"
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/notopia-common-chart.lock helm dependency build --skip-refresh deploy/k8s/charts/notopia-common-chart/tests/fixture",
+          "flock -s tmp/chart-lock/notopia-common-chart.lock helm lint --strict deploy/k8s/charts/notopia-common-chart",
+          "flock -s tmp/chart-lock/notopia-common-chart.lock helm lint --strict deploy/k8s/charts/notopia-common-chart/tests/fixture",
+          "flock -s tmp/chart-lock/notopia-common-chart.lock bash -o pipefail -c 'helm template fixture deploy/k8s/charts/notopia-common-chart/tests/fixture | kubeconform -strict'"
+        ],
+        "parallel": false
       },
       "inputs": ["chartInputs"],
       "dependsOn": []
@@ -22,7 +29,13 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "mkdir -p tmp/chart-lock && flock tmp/chart-lock/notopia-common-chart.lock bash -o pipefail -ec 'helm dependency build --skip-refresh deploy/k8s/charts/notopia-common-chart/tests/fixture && helm unittest deploy/k8s/charts/notopia-common-chart/tests/fixture && node --test deploy/k8s/charts/notopia-common-chart/tests/*.test.ts'"
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/notopia-common-chart.lock helm dependency build --skip-refresh deploy/k8s/charts/notopia-common-chart/tests/fixture",
+          "flock -s tmp/chart-lock/notopia-common-chart.lock helm unittest deploy/k8s/charts/notopia-common-chart/tests/fixture",
+          "flock -s tmp/chart-lock/notopia-common-chart.lock node --test deploy/k8s/charts/notopia-common-chart/tests/*.test.ts"
+        ],
+        "parallel": false
       },
       "inputs": ["chartInputs"],
       "dependsOn": []
