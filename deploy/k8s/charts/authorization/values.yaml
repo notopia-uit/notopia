@@ -1,141 +1,312 @@
+# @schema
+# type: string
+# @schema
 # -- Override chart name
 nameOverride: ''
+# @schema
+# type: string
+# @schema
 # -- Override release name
 fullnameOverride: ''
 image:
+  # @schema
+  # type: string
+  # @schema
   # -- Image repository
   repository: ghcr.io/notopia-uit/authorization
+  # @schema
+  # type: string
+  # @schema
   # -- Image version
   tag: latest
+  # @schema
+  # type: string
+  # @schema
   # -- Immutable image digest
   digest: ''
+  # @schema
+  # type: string
+  # @schema
   # -- Image pull policy
   pullPolicy: IfNotPresent
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
 # -- Image pull secrets
 imagePullSecrets: []
+# @schema
+# type: integer
+# minimum: 0
+# @schema
 # -- Number of replicas
 replicaCount: 1
 serviceAccount:
+  # @schema
+  # type: boolean
+  # @schema
   # -- Create service account
   create: true
+  # @schema
+  # type: string
+  # @schema
   # -- Existing or created account name
   name: ''
-  # -- Service account annotations
   # @schema
   # type: object
   # additionalProperties: true
   # @schema
+  # -- Service account annotations
   annotations: {}
 resources:
+  # @schema
+  # type: object
+  # additionalProperties:
+  #   anyOf:
+  #     - type: string
+  #     - type: number
+  # properties:
+  #   cpu:
+  #     anyOf:
+  #       - type: string
+  #       - type: number
+  #   memory:
+  #     anyOf:
+  #       - type: string
+  #       - type: number
+  # @schema
   # -- Container resource requests
   requests: { cpu: 50m, memory: 64Mi }
+  # @schema
+  # type: object
+  # additionalProperties:
+  #   anyOf:
+  #     - type: string
+  #     - type: number
+  # properties:
+  #   cpu:
+  #     anyOf:
+  #       - type: string
+  #       - type: number
+  #   memory:
+  #     anyOf:
+  #       - type: string
+  #       - type: number
+  # @schema
   # -- Container resource limits
   limits: { memory: 256Mi }
+# @schema
+# type: string
+# @schema
 # -- Application runtime
 runtime: go
-# -- Plain environment
 # @schema
 # type: object
 # additionalProperties: true
 # @schema
+# -- Plain environment
 env: {}
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
 # -- Additional environment entries
 extraEnv: []
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
 # -- External environment sources
 envFrom: []
 database:
   # -- Existing database URI secret
   urlSecret: { name: '', key: uri }
 route:
+  # @schema
+  # type: boolean
+  # @schema
   # -- Create HTTPRoute
   enabled: false
+  # @schema
+  # type: array
+  # items:
+  #   type: object
+  #   additionalProperties: true
+  # @schema
   # -- Gateway parent references
   parentRefs: []
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  # @schema
   # -- Route hostnames
   hostnames: []
+  # @schema
+  # type: boolean
+  # @schema
   # -- Expose health endpoints
   exposeHealth: true
 autoscaling:
+  # @schema
+  # type: boolean
+  # @schema
   # -- Enable horizontal scaling
   enabled: false
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
   # -- Minimum replicas
   minReplicas: 1
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
   # -- Maximum replicas
   maxReplicas: 3
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
   # -- CPU utilization target
   targetCPUUtilizationPercentage: 80
 podDisruptionBudget:
+  # @schema
+  # type: boolean
+  # @schema
   # -- Enable disruption budget
   enabled: false
+  # @schema
+  # anyOf:
+  #   - type: integer
+  #     minimum: 0
+  #   - type: string
+  #     pattern: '^([0-9]|[1-9][0-9]|100)%$'
+  # @schema
   # -- Minimum available replicas
   minAvailable: 1
 otel:
+  # @schema
+  # type: boolean
+  # @schema
   # -- Enable OpenTelemetry environment
   enabled: true
+  # @schema
+  # type: string
+  # @schema
   # -- Collector endpoint
   endpoint: ''
+  # @schema
+  # type: string
+  # @schema
   # -- Collector protocol
   protocol: grpc
-  # -- Additional resource attributes
   # @schema
   # type: object
   # additionalProperties: true
   # @schema
+  # -- Additional resource attributes
   resourceAttributes: {}
 hooks:
   migrate:
+    # @schema
+    # type: integer
+    # minimum: 1
+    # @schema
     # -- Migration deadline
     activeDeadlineSeconds: 300
-    # -- Migration resources, defaults to pod resources
     # @schema
     # type: object
     # additionalProperties: true
     # @schema
+    # -- Migration resources, defaults to pod resources
     resources: {}
   seed:
+    # @schema
+    # type: integer
+    # minimum: 1
+    # @schema
     # -- Seed deadline
     activeDeadlineSeconds: 300
-    # -- Seed resources, defaults to pod resources
     # @schema
     # type: object
     # additionalProperties: true
     # @schema
+    # -- Seed resources, defaults to pod resources
     resources: {}
 istio:
+  # @schema
+  # type: boolean
+  # @schema
   # -- Enable Istio workload policy
   enabled: true
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  # @schema
   # -- Allowed SPIFFE principals
   allowedPrincipals: []
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  # @schema
   # -- Protected workload ports
   ports: ['18089', '28089']
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
 # -- Additional pod annotations
-# @schema
-# type: object
-# additionalProperties: true
-# @schema
 podAnnotations: {}
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
 # -- Additional pod labels
-# @schema
-# type: object
-# additionalProperties: true
-# @schema
 podLabels: {}
-# -- Node selector
 # @schema
 # type: object
 # additionalProperties: true
 # @schema
+# -- Node selector
 nodeSelector: {}
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
 # -- Pod tolerations
 tolerations: []
-# -- Pod affinity
 # @schema
 # type: object
 # additionalProperties: true
 # @schema
+# -- Pod affinity
 affinity: {}
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
 # -- Additional volumes
 extraVolumes: []
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
 # -- Additional volume mounts
 extraVolumeMounts: []
 

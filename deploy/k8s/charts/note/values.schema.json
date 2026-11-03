@@ -4,7 +4,7 @@
   "properties": {
     "affinity": {
       "additionalProperties": true,
-      "description": "Pod affinity @schema type: object additionalProperties: true @schema",
+      "description": "Pod affinity",
       "required": [],
       "title": "affinity",
       "type": "object"
@@ -13,28 +13,31 @@
       "additionalProperties": false,
       "properties": {
         "enabled": {
-          "default": "false",
+          "default": false,
           "description": "Enable horizontal scaling",
-          "required": [],
-          "title": "enabled"
+          "title": "enabled",
+          "type": "boolean"
         },
         "maxReplicas": {
-          "default": "3",
+          "default": 3,
           "description": "Maximum replicas",
-          "required": [],
-          "title": "maxReplicas"
+          "minimum": 1,
+          "title": "maxReplicas",
+          "type": "integer"
         },
         "minReplicas": {
-          "default": "1",
+          "default": 1,
           "description": "Minimum replicas",
-          "required": [],
-          "title": "minReplicas"
+          "minimum": 1,
+          "title": "minReplicas",
+          "type": "integer"
         },
         "targetCPUUtilizationPercentage": {
-          "default": "80",
+          "default": 80,
           "description": "CPU utilization target",
-          "required": [],
-          "title": "targetCPUUtilizationPercentage"
+          "minimum": 1,
+          "title": "targetCPUUtilizationPercentage",
+          "type": "integer"
         }
       },
       "required": [],
@@ -72,7 +75,7 @@
     },
     "env": {
       "additionalProperties": true,
-      "description": "Plain environment @schema type: object additionalProperties: true @schema",
+      "description": "Plain environment",
       "required": [],
       "title": "env",
       "type": "object"
@@ -80,40 +83,48 @@
     "envFrom": {
       "description": "External environment sources",
       "items": {
-        "required": []
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
       },
-      "required": [],
-      "title": "envFrom"
+      "title": "envFrom",
+      "type": "array"
     },
     "extraEnv": {
       "description": "Additional environment entries",
       "items": {
-        "required": []
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
       },
-      "required": [],
-      "title": "extraEnv"
+      "title": "extraEnv",
+      "type": "array"
     },
     "extraVolumeMounts": {
       "description": "Additional volume mounts",
       "items": {
-        "required": []
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
       },
-      "required": [],
-      "title": "extraVolumeMounts"
+      "title": "extraVolumeMounts",
+      "type": "array"
     },
     "extraVolumes": {
       "description": "Additional volumes",
       "items": {
-        "required": []
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
       },
-      "required": [],
-      "title": "extraVolumes"
+      "title": "extraVolumes",
+      "type": "array"
     },
     "fullnameOverride": {
       "default": "",
       "description": "Override release name",
-      "required": [],
-      "title": "fullnameOverride"
+      "title": "fullnameOverride",
+      "type": "string"
     },
     "global": {
       "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
@@ -128,14 +139,15 @@
           "additionalProperties": false,
           "properties": {
             "activeDeadlineSeconds": {
-              "default": "300",
+              "default": 300,
               "description": "Migration deadline",
-              "required": [],
-              "title": "activeDeadlineSeconds"
+              "minimum": 1,
+              "title": "activeDeadlineSeconds",
+              "type": "integer"
             },
             "resources": {
               "additionalProperties": true,
-              "description": "Migration resources, defaults to pod resources @schema type: object additionalProperties: true @schema",
+              "description": "Migration resources, defaults to pod resources",
               "required": [],
               "title": "resources",
               "type": "object"
@@ -149,14 +161,15 @@
           "additionalProperties": false,
           "properties": {
             "activeDeadlineSeconds": {
-              "default": "300",
+              "default": 300,
               "description": "Seed deadline",
-              "required": [],
-              "title": "activeDeadlineSeconds"
+              "minimum": 1,
+              "title": "activeDeadlineSeconds",
+              "type": "integer"
             },
             "resources": {
               "additionalProperties": true,
-              "description": "Seed resources, defaults to pod resources @schema type: object additionalProperties: true @schema",
+              "description": "Seed resources, defaults to pod resources",
               "required": [],
               "title": "resources",
               "type": "object"
@@ -180,26 +193,26 @@
         "digest": {
           "default": "",
           "description": "Immutable image digest",
-          "required": [],
-          "title": "digest"
+          "title": "digest",
+          "type": "string"
         },
         "pullPolicy": {
           "default": "IfNotPresent",
           "description": "Image pull policy",
-          "required": [],
-          "title": "pullPolicy"
+          "title": "pullPolicy",
+          "type": "string"
         },
         "repository": {
           "default": "ghcr.io/notopia-uit/note",
           "description": "Image repository",
-          "required": [],
-          "title": "repository"
+          "title": "repository",
+          "type": "string"
         },
         "tag": {
           "default": "latest",
           "description": "Image version",
-          "required": [],
-          "title": "tag"
+          "title": "tag",
+          "type": "string"
         }
       },
       "required": [],
@@ -209,10 +222,12 @@
     "imagePullSecrets": {
       "description": "Image pull secrets",
       "items": {
-        "required": []
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
       },
-      "required": [],
-      "title": "imagePullSecrets"
+      "title": "imagePullSecrets",
+      "type": "array"
     },
     "istio": {
       "additionalProperties": false,
@@ -220,35 +235,24 @@
         "allowedPrincipals": {
           "description": "Allowed SPIFFE principals",
           "items": {
-            "required": []
+            "type": "string"
           },
-          "required": [],
-          "title": "allowedPrincipals"
+          "title": "allowedPrincipals",
+          "type": "array"
         },
         "enabled": {
-          "default": "true",
+          "default": true,
           "description": "Enable Istio workload policy",
-          "required": [],
-          "title": "enabled"
+          "title": "enabled",
+          "type": "boolean"
         },
         "ports": {
           "description": "Protected workload ports",
           "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "string"
-              },
-              {
-                "type": "string"
-              }
-            ],
-            "required": []
+            "type": "string"
           },
-          "required": [],
-          "title": "ports"
+          "title": "ports",
+          "type": "array"
         }
       },
       "required": [],
@@ -258,12 +262,12 @@
     "nameOverride": {
       "default": "",
       "description": "Override chart name",
-      "required": [],
-      "title": "nameOverride"
+      "title": "nameOverride",
+      "type": "string"
     },
     "nodeSelector": {
       "additionalProperties": true,
-      "description": "Node selector @schema type: object additionalProperties: true @schema",
+      "description": "Node selector",
       "required": [],
       "title": "nodeSelector",
       "type": "object"
@@ -288,26 +292,26 @@
       "additionalProperties": false,
       "properties": {
         "enabled": {
-          "default": "true",
+          "default": true,
           "description": "Enable OpenTelemetry environment",
-          "required": [],
-          "title": "enabled"
+          "title": "enabled",
+          "type": "boolean"
         },
         "endpoint": {
           "default": "",
           "description": "Collector endpoint",
-          "required": [],
-          "title": "endpoint"
+          "title": "endpoint",
+          "type": "string"
         },
         "protocol": {
           "default": "grpc",
           "description": "Collector protocol",
-          "required": [],
-          "title": "protocol"
+          "title": "protocol",
+          "type": "string"
         },
         "resourceAttributes": {
           "additionalProperties": true,
-          "description": "Additional resource attributes @schema type: object additionalProperties: true @schema",
+          "description": "Additional resource attributes",
           "required": [],
           "title": "resourceAttributes",
           "type": "object"
@@ -319,7 +323,7 @@
     },
     "podAnnotations": {
       "additionalProperties": true,
-      "description": "Additional pod annotations @schema type: object additionalProperties: true @schema",
+      "description": "Additional pod annotations",
       "required": [],
       "title": "podAnnotations",
       "type": "object"
@@ -328,12 +332,22 @@
       "additionalProperties": false,
       "properties": {
         "enabled": {
-          "default": "false",
+          "default": false,
           "description": "Enable disruption budget",
-          "required": [],
-          "title": "enabled"
+          "title": "enabled",
+          "type": "boolean"
         },
         "minAvailable": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "pattern": "^([0-9]|[1-9][0-9]|100)%$",
+              "type": "string"
+            }
+          ],
           "default": "1",
           "description": "Minimum available replicas",
           "required": [],
@@ -346,7 +360,7 @@
     },
     "podLabels": {
       "additionalProperties": true,
-      "description": "Additional pod labels @schema type: object additionalProperties: true @schema",
+      "description": "Additional pod labels",
       "required": [],
       "title": "podLabels",
       "type": "object"
@@ -357,12 +371,12 @@
         "addr": {
           "default": "",
           "description": "Redis address",
-          "required": [],
-          "title": "addr"
+          "title": "addr",
+          "type": "string"
         },
         "db": {
           "default": 0,
-          "description": "Redis database @schema type: integer minimum: 0 @schema",
+          "description": "Redis database",
           "minimum": 0,
           "title": "db",
           "type": "integer"
@@ -394,49 +408,94 @@
       "type": "object"
     },
     "replicaCount": {
-      "default": "1",
+      "default": 1,
       "description": "Number of replicas",
-      "required": [],
-      "title": "replicaCount"
+      "minimum": 0,
+      "title": "replicaCount",
+      "type": "integer"
     },
     "resources": {
       "additionalProperties": false,
       "properties": {
         "limits": {
-          "additionalProperties": false,
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
           "description": "Container resource limits",
           "properties": {
+            "cpu": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "required": []
+            },
             "memory": {
-              "default": "256Mi",
-              "title": "memory",
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "required": []
             }
           },
-          "required": [
-            "memory"
-          ],
-          "title": "limits"
+          "required": [],
+          "title": "limits",
+          "type": "object"
         },
         "requests": {
-          "additionalProperties": false,
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
           "description": "Container resource requests",
           "properties": {
             "cpu": {
-              "default": "50m",
-              "title": "cpu",
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "required": []
             },
             "memory": {
-              "default": "64Mi",
-              "title": "memory",
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "required": []
             }
           },
-          "required": [
-            "cpu",
-            "memory"
-          ],
-          "title": "requests"
+          "required": [],
+          "title": "requests",
+          "type": "object"
         }
       },
       "required": [],
@@ -447,32 +506,34 @@
       "additionalProperties": false,
       "properties": {
         "enabled": {
-          "default": "true",
+          "default": true,
           "description": "Create HTTPRoute",
-          "required": [],
-          "title": "enabled"
+          "title": "enabled",
+          "type": "boolean"
         },
         "exposeHealth": {
-          "default": "true",
+          "default": true,
           "description": "Expose health endpoints",
-          "required": [],
-          "title": "exposeHealth"
+          "title": "exposeHealth",
+          "type": "boolean"
         },
         "hostnames": {
           "description": "Route hostnames",
           "items": {
-            "required": []
+            "type": "string"
           },
-          "required": [],
-          "title": "hostnames"
+          "title": "hostnames",
+          "type": "array"
         },
         "parentRefs": {
           "description": "Gateway parent references",
           "items": {
-            "required": []
+            "additionalProperties": true,
+            "required": [],
+            "type": "object"
           },
-          "required": [],
-          "title": "parentRefs"
+          "title": "parentRefs",
+          "type": "array"
         }
       },
       "required": [],
@@ -482,30 +543,30 @@
     "runtime": {
       "default": "go",
       "description": "Application runtime",
-      "required": [],
-      "title": "runtime"
+      "title": "runtime",
+      "type": "string"
     },
     "serviceAccount": {
       "additionalProperties": false,
       "properties": {
         "annotations": {
           "additionalProperties": true,
-          "description": "Service account annotations @schema type: object additionalProperties: true @schema",
+          "description": "Service account annotations",
           "required": [],
           "title": "annotations",
           "type": "object"
         },
         "create": {
-          "default": "true",
+          "default": true,
           "description": "Create service account",
-          "required": [],
-          "title": "create"
+          "title": "create",
+          "type": "boolean"
         },
         "name": {
           "default": "",
           "description": "Existing or created account name",
-          "required": [],
-          "title": "name"
+          "title": "name",
+          "type": "string"
         }
       },
       "required": [],
@@ -515,10 +576,12 @@
     "tolerations": {
       "description": "Pod tolerations",
       "items": {
-        "required": []
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
       },
-      "required": [],
-      "title": "tolerations"
+      "title": "tolerations",
+      "type": "array"
     }
   },
   "required": [

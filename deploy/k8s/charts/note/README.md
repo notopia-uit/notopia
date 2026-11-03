@@ -1,6 +1,6 @@
 # note
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
 
 ## Requirements
 
@@ -12,22 +12,22 @@
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` | Pod affinity @schema type: object additionalProperties: true @schema |
+| affinity | object | `{}` | Pod affinity |
 | autoscaling.enabled | bool | `false` | Enable horizontal scaling |
 | autoscaling.maxReplicas | int | `3` | Maximum replicas |
 | autoscaling.minReplicas | int | `1` | Minimum replicas |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | CPU utilization target |
 | database.urlSecret | object | `{"key":"uri","name":""}` | Existing database URI secret |
-| env | object | `{}` | Plain environment @schema type: object additionalProperties: true @schema |
+| env | object | `{}` | Plain environment |
 | envFrom | list | `[]` | External environment sources |
 | extraEnv | list | `[]` | Additional environment entries |
 | extraVolumeMounts | list | `[]` | Additional volume mounts |
 | extraVolumes | list | `[]` | Additional volumes |
 | fullnameOverride | string | `""` | Override release name |
 | hooks.migrate.activeDeadlineSeconds | int | `300` | Migration deadline |
-| hooks.migrate.resources | object | `{}` | Migration resources, defaults to pod resources @schema type: object additionalProperties: true @schema |
+| hooks.migrate.resources | object | `{}` | Migration resources, defaults to pod resources |
 | hooks.seed.activeDeadlineSeconds | int | `300` | Seed deadline |
-| hooks.seed.resources | object | `{}` | Seed resources, defaults to pod resources @schema type: object additionalProperties: true @schema |
+| hooks.seed.resources | object | `{}` | Seed resources, defaults to pod resources |
 | image.digest | string | `""` | Immutable image digest |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"ghcr.io/notopia-uit/note"` | Image repository |
@@ -37,18 +37,18 @@
 | istio.enabled | bool | `true` | Enable Istio workload policy |
 | istio.ports | list | `["18081","8081","28081"]` | Protected workload ports |
 | nameOverride | string | `""` | Override chart name |
-| nodeSelector | object | `{}` | Node selector @schema type: object additionalProperties: true @schema |
+| nodeSelector | object | `{}` | Node selector |
 | notopia-common | object | `{"global":{}}` | Common library configuration |
 | otel.enabled | bool | `true` | Enable OpenTelemetry environment |
 | otel.endpoint | string | `""` | Collector endpoint |
 | otel.protocol | string | `"grpc"` | Collector protocol |
-| otel.resourceAttributes | object | `{}` | Additional resource attributes @schema type: object additionalProperties: true @schema |
-| podAnnotations | object | `{}` | Additional pod annotations @schema type: object additionalProperties: true @schema |
+| otel.resourceAttributes | object | `{}` | Additional resource attributes |
+| podAnnotations | object | `{}` | Additional pod annotations |
 | podDisruptionBudget.enabled | bool | `false` | Enable disruption budget |
 | podDisruptionBudget.minAvailable | int | `1` | Minimum available replicas |
-| podLabels | object | `{}` | Additional pod labels @schema type: object additionalProperties: true @schema |
+| podLabels | object | `{}` | Additional pod labels |
 | redis.addr | string | `""` | Redis address |
-| redis.db | int | `0` | Redis database @schema type: integer minimum: 0 @schema |
+| redis.db | int | `0` | Redis database |
 | redis.passwordSecret | object | `{"key":"password","name":""}` | Existing Redis password secret |
 | replicaCount | int | `1` | Number of replicas |
 | resources.limits | object | `{"memory":"256Mi"}` | Container resource limits |
@@ -58,7 +58,7 @@
 | route.hostnames | list | `[]` | Route hostnames |
 | route.parentRefs | list | `[]` | Gateway parent references |
 | runtime | string | `"go"` | Application runtime |
-| serviceAccount.annotations | object | `{}` | Service account annotations @schema type: object additionalProperties: true @schema |
+| serviceAccount.annotations | object | `{}` | Service account annotations |
 | serviceAccount.create | bool | `true` | Create service account |
 | serviceAccount.name | string | `""` | Existing or created account name |
 | tolerations | list | `[]` | Pod tolerations |
