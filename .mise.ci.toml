@@ -39,7 +39,3 @@ shadcn = "pnpm exec shadcn"
 
 [settings]
 legacy_version_file = false
-
-[tasks.helm-setup]
-description = "Install the pinned Helm unittest plugin"
-run = "helm plugin list | grep -qE '^unittest[[:space:]]+1\\.2\\.1([[:space:]]|$)' || { helm plugin list | grep -qE '^unittest[[:space:]]' && helm plugin uninstall unittest; helm plugin install https://github.com/helm-unittest/helm-unittest --version 1.2.1; }"
