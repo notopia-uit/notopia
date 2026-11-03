@@ -92,6 +92,10 @@ pkg/                            # Go packages
 - If a (pointer?) struct implement an interface, add e.g. `var _ Interface = (*Struct)(nil)`
 - Do not wrap small/obvious logic (error handling, simple mapping) into a function, inline it for readability
 
+### JS
+
+- Scripting, adhoc, single testing can be written in Typescript and be called with node directly
+
 ### Messaging
 
 - Redpanda (Kafka API). Go services publish through a Watermill **transactional outbox**, so
@@ -147,7 +151,7 @@ pkg/                            # Go packages
 
 ### Superpowers
 
-- Skip unnecessary, obvious cases testing for faster, saving tokens
+- Skip unnecessary, not worth, obvious cases testing for faster, resources CI savings
 - Not need to write full code, can use `…`, skip imports, mapper code, or write comments to note expand the code more while writing;
   agents later can fill in the details, but should not skip important logic
 
@@ -158,4 +162,4 @@ Before commit, make sure to:
 - Use conventional commit
 - Should run `oxfmt {pathChanged}` after writing JS code
 - Run `nx lint {projectName} --fix` to apply eslint/golangcilint fix
-- If introduce deps, should run `go mod tidy` for go, and `pnpm install` for JS/TS
+- If introduce deps, should run `go mod tidy` for go, and use pnpm workspace catalog `pnpm install` for Javascript
