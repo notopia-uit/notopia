@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { DATABASE_CONFIG, DatabaseConfig } from '#/config';
 
+import { migrations } from '../../database/migrations';
 import { createDatasourceOptions } from './database.provider';
 
 @Module({
@@ -15,7 +16,7 @@ import { createDatasourceOptions } from './database.provider';
         if (!databaseCfg) {
           throw new Error('DATABASE_CONFIG not found');
         }
-        return createDatasourceOptions({ databaseCfg });
+        return { ...createDatasourceOptions({ databaseCfg }), migrations };
       },
     }),
   ],

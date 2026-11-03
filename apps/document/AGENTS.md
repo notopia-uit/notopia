@@ -113,9 +113,8 @@ the latest one.
 ## Revisions are hard-deleted
 
 Revisions have no `deletedAt` (no soft delete); the API delete and the revision purge cron
-remove rows. There are no migration files (TypeORM `synchronize` outside production), so an
-environment with existing data must run this **before** deploying, otherwise dropping the
-column brings soft-deleted rows back:
+remove rows. For an existing schema that still has `deletedAt`, remove soft-deleted rows
+before dropping that column, otherwise those rows become visible again:
 
 ```sql
 DELETE FROM revisions WHERE "deletedAt" IS NOT NULL;
@@ -134,5 +133,8 @@ DELETE FROM revisions WHERE "deletedAt" IS NOT NULL;
 
 No sync or migrate on startup (`synchronize: false`). Schema changes go through the TypeORM
 CLI via `nx run document:db:{sync,generate,create,migrate,revert,status}` (see `package.json`).
-`db:sync` is dev only and destructive; prod uses `db:migrate`. `just fixtures-document` runs
-`db:sync` first.
+`db:sync` is dev only and destructive; production runs `dist/migrate.cjs` before starting
+the service. The initial migration targets an empty database; existing schemas need a carefully
+verified baseline before it can be recorded as applied. `just fixtures-document` runs `db:sync` first.
+Health endpoints are `/document/health/live`, `/document/health/ready`, and
+`/document/health/startup` on the main port.

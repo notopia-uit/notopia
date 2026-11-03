@@ -156,7 +156,7 @@ const lazyImports = new Set([
 const config: Configuration = {
   target: 'node',
   devtool: devTool,
-  entry: useHmr ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
+  entry: { main: './src/main.ts', migrate: './src/migrate.ts' },
   output: {
     module: isEsm,
     path: join(__dirname, './dist'),

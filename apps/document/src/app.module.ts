@@ -44,6 +44,7 @@ import {
 import { CronModule } from './cron';
 import { DatabaseModule } from './database';
 import { DocumentApi, DocumentModule } from './document';
+import { HealthModule } from './health/health.module';
 import { HocuspocusModule } from './hocuspocus';
 import { KAFKA_CLIENT, KafkaModule } from './kafka';
 import { NoteModule } from './note';
@@ -126,6 +127,7 @@ import { StorageModule } from './storage';
     BillingModule,
     NoteModule,
     DatabaseModule,
+    HealthModule,
     BlockNoteModule,
     HocuspocusModule,
     DocumentModule,
