@@ -4,6 +4,7 @@ import { ConfigMeilisearch } from '../seed/seed';
 
 describe('seed configuration', () => {
   afterEach(() => {
+    vi.restoreAllMocks();
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
   });
@@ -63,5 +64,45 @@ describe('seed configuration', () => {
     await ConfigMeilisearch();
     await ConfigMeilisearch();
     expect(created).toBe(1);
+  });
+
+  it('prints a newly created search key only outside production', async () => {
+    const output = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+    vi.stubEnv('NOTOPIA_SEARCH_WORKER_MEILI_HOST', 'http://localhost:7700');
+    vi.stubEnv('NOTOPIA_SEARCH_WORKER_MEILI_API_KEY', 'master-credential');
+    vi.stubEnv(
+      'NOTOPIA_SEARCH_WORKER_MEILI_NOTE_SEARCH_KEY_UID',
+      '00000000-0000-4000-8000-000000000001'
+    );
+    vi.stubGlobal('fetch', (input: string) => {
+      const url = String(input);
+      let status = 200;
+      let data: unknown = { uid: 'notes', primaryKey: 'id' };
+      if (url.endsWith('/settings'))
+        data = {
+          searchableAttributes: ['name', 'folderName', 'plainTextContent', 'tags'],
+          filterableAttributes: ['workspaceId', 'tags'],
+          sortableAttributes: ['name'],
+        };
+      if (url.includes('/keys/')) {
+        status = 404;
+        data = { message: 'not found', code: 'api_key_not_found' };
+      }
+      if (url.endsWith('/keys'))
+        data = { uid: '00000000-0000-4000-8000-000000000001', key: 'created-search-secret' };
+      return Promise.resolve(
+        new Response(JSON.stringify(data), {
+          status,
+          headers: { 'content-type': 'application/json' },
+        })
+      );
+    });
+    vi.stubEnv('NODE_ENV', 'production');
+    await ConfigMeilisearch();
+    expect(output.mock.calls.flat().join('')).not.toContain('created-search-secret');
+    output.mockClear();
+    vi.stubEnv('NODE_ENV', 'development');
+    await ConfigMeilisearch();
+    expect(output.mock.calls.flat().join('')).toContain('created-search-secret');
   });
 });

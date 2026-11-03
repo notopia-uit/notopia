@@ -1,8 +1,8 @@
-import '../src/otel';
+import './otel';
 import { trace } from '@opentelemetry/api';
 import pino from 'pino';
 
-import { otelSdk } from '../src/otel';
+import { otelSdk } from './otel';
 import { ConfigMeilisearch } from './seed';
 
 const logger = pino();

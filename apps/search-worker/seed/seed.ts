@@ -22,7 +22,7 @@ async function run() {
   try {
     const indexInfo = await index.getRawInfo();
     if (indexInfo.primaryKey !== 'id') {
-      logger.info(`Index primary key is '${indexInfo.primaryKey}', updating to 'id'...`);
+      logger.info('Updating index primary key to id...');
       await index.update({ primaryKey: 'id' }).waitTask();
     } else {
       logger.info('Index primary key is already set to "id", skipping update.');
@@ -77,7 +77,7 @@ async function run() {
   } catch (error) {
     if (error instanceof MeilisearchApiError && error.response.status === 404) {
       logger.info('Default search API key not found, creating it...');
-      await client.createKey({
+      const key = await client.createKey({
         uid: searchApiKey,
         actions: ['search'],
         indexes: ['notes'],
@@ -85,6 +85,9 @@ async function run() {
         name: 'Default Note Index Search Key',
       });
       logger.info('Default search API key created successfully');
+      if (process.env.NODE_ENV !== 'production') {
+        process.stdout.write(`NOTOPIA_NOTE_MEILISEARCH_API_KEY=${key.key}\n`);
+      }
     } else {
       throw error;
     }

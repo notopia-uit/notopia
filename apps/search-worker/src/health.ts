@@ -4,7 +4,19 @@ import { Meilisearch } from 'meilisearch';
 
 @Injectable()
 export class KafkaConsumerState {
-  connected = false;
+  private lastHeartbeat = 0;
+
+  get connected() {
+    return this.lastHeartbeat > 0 && Date.now() - this.lastHeartbeat < 15000;
+  }
+
+  heartbeat() {
+    this.lastHeartbeat = Date.now();
+  }
+
+  down() {
+    this.lastHeartbeat = 0;
+  }
 }
 
 @Controller('search-worker/health')
