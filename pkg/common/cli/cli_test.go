@@ -48,8 +48,10 @@ func TestExecuteFailuresExitNonzero(t *testing.T) {
 
 func TestExecuteMissingSubcommandExitsNonzero(t *testing.T) {
 	if os.Getenv("CLI_EMPTY_SUBPROCESS") == "1" {
-		root := NewRoot(metadata.ServiceName("test"), "")
-		root.SetArgs(nil)
+		root := NewRoot(metadata.ServiceName("test"), "", NewServeCommand(func(context.Context) (Runner, func(), error) {
+			return testRunner{}, func() {}, nil
+		}))
+		root.SetArgs([]string{})
 		Execute(root)
 		return
 	}
@@ -65,7 +67,16 @@ func TestExecuteMissingSubcommandExitsNonzero(t *testing.T) {
 func TestFailedInitializedCommandCleansUp(t *testing.T) {
 	if os.Getenv("CLI_CLEANUP_SUBPROCESS") == "1" {
 		root := NewRoot(metadata.ServiceName("test"), "", NewServeCommand(func(context.Context) (Runner, func(), error) {
-			return testRunner{err: context.DeadlineExceeded}, func() { os.WriteFile(os.Getenv("CLI_CLEANUP_FILE"), []byte("cleaned"), 0600) }, nil
+			return testRunner{err: context.DeadlineExceeded}, func() {
+				file, err := os.OpenFile(os.Getenv("CLI_CLEANUP_FILE"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+				if err != nil {
+					panic(err)
+				}
+				defer file.Close()
+				if _, err := file.WriteString("cleanup\n"); err != nil {
+					panic(err)
+				}
+			}, nil
 		}))
 		root.SetArgs([]string{"serve"})
 		Execute(root)
@@ -80,7 +91,25 @@ func TestFailedInitializedCommandCleansUp(t *testing.T) {
 	require.Equal(t, 1, exitErr.ExitCode())
 	content, err := os.ReadFile(file)
 	require.NoError(t, err)
-	require.Equal(t, "cleaned", string(content))
+	require.Equal(t, "cleanup\n", string(content))
+}
+
+func TestExecuteHelpExitsSuccessfully(t *testing.T) {
+	for _, args := range [][]string{{"--help"}, {"help"}} {
+		t.Run(args[0], func(t *testing.T) {
+			if os.Getenv("CLI_HELP_SUBPROCESS") == args[0] {
+				root := NewRoot(metadata.ServiceName("test"), "", NewServeCommand(func(context.Context) (Runner, func(), error) {
+					return testRunner{}, func() {}, nil
+				}))
+				root.SetArgs(args)
+				Execute(root)
+				return
+			}
+			cmd := exec.Command(os.Args[0], "-test.run=^TestExecuteHelpExitsSuccessfully/"+args[0]+"$")
+			cmd.Env = append(os.Environ(), "CLI_HELP_SUBPROCESS="+args[0])
+			require.NoError(t, cmd.Run())
+		})
+	}
 }
 
 func TestMigrateAndSeedRootSpans(t *testing.T) {

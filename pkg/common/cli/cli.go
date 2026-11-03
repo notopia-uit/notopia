@@ -93,15 +93,30 @@ func Execute(root *cobra.Command) {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	missingCommand := false
+	explicitHelp := false
 	help := root.HelpFunc()
 	root.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 		help(cmd, args)
 		if cmd == root {
-			missingCommand = true
+			missingCommand = !cmd.Flags().Changed("help")
 		}
 	})
+	root.SetHelpCommand(&cobra.Command{
+		Use: "help [command]",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			explicitHelp = true
+			target, _, err := root.Find(args)
+			if err != nil {
+				return err
+			}
+			if target == nil {
+				target = root
+			}
+			return target.Help()
+		},
+	})
 	err := root.ExecuteContext(ctx)
-	if err == nil && missingCommand {
+	if err == nil && missingCommand && !explicitHelp {
 		err = errors.New("a subcommand is required")
 	}
 	if err != nil {
