@@ -30,7 +30,7 @@
         "commands": [
           "helm dependency build --skip-refresh deploy/k8s/charts/notopia-common/tests/fixture",
           "helm unittest deploy/k8s/charts/notopia-common/tests/fixture",
-          "node --test deploy/k8s/charts/notopia-common/tests/env-parity.test.cjs"
+          "node --test deploy/k8s/charts/notopia-common/tests/env-parity.test.ts"
         ],
         "parallel": false
       },

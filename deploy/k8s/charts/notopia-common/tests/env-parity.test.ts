@@ -1,9 +1,19 @@
-const assert = require('node:assert/strict');
-const { execFileSync, spawnSync } = require('node:child_process');
-const path = require('node:path');
-const { test } = require('node:test');
+import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
+import path from 'node:path';
+import { test } from 'node:test';
 
-const fixture = path.join(__dirname, 'fixture');
+type Resource = {
+  kind: string;
+  env: Array<{
+    name: string;
+    value?: string;
+    valueFrom?: { secretKeyRef?: { name: string } };
+  }>;
+  envFrom: Array<{ secretRef?: { name: string } }>;
+};
+
+const fixture = path.join(import.meta.dirname, 'fixture');
 
 for (const runtime of ['go', 'node']) {
   test(`hook Job and Deployment render identical environment and secrets for ${runtime}`, () => {
@@ -24,7 +34,7 @@ for (const runtime of ['go', 'node']) {
       { input: manifests, encoding: 'utf8' }
     );
     assert.equal(parsed.status, 0, parsed.stderr);
-    const resources = JSON.parse(parsed.stdout);
+    const resources: Resource[] = JSON.parse(parsed.stdout);
     const deployment = resources.find((resource) => resource.kind === 'Deployment');
     const job = resources.find((resource) => resource.kind === 'Job');
     assert.ok(deployment && job, 'both the Deployment and hook Job must render');
