@@ -45,6 +45,7 @@
     "@d2t/vitest-ctrf-json-reporter": "catalog:",
     "@nestjs/testing": "catalog:",
     "@types/express": "catalog:",
+    "tsx": "catalog:",
     "unplugin-swc": "catalog:",
     "uuid": "catalog:",
     "webpack-node-externals": "catalog:"
