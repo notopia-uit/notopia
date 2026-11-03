@@ -67,7 +67,7 @@
         "runtime": "go version"
       }
     ],
-    "chartInputs": [
+    "chart": [
       "{projectRoot}/**/*",
       "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/**/*",
       "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/.helmignore",
