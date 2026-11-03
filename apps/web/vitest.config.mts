@@ -10,5 +10,6 @@ export default defineConfig({
     watch: false,
     environment: 'node',
     include: ['app/**/*.test.ts'],
+    passWithNoTests: true,
   },
 });
