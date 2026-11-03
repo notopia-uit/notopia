@@ -1,0 +1,39 @@
+{
+  "name": "billing-chart",
+  "targets": {
+    "gen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm-schema -p -c deploy/k8s/charts/billing",
+          "helm-docs -c deploy/k8s/charts/billing"
+        ],
+        "parallel": false
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm dependency build --skip-refresh deploy/k8s/charts/billing",
+          "helm lint --strict deploy/k8s/charts/billing --set istio.enabled=false --set redis.addr=redis:6379 --set redis.passwordSecret.name=redis",
+          "bash -o pipefail -c 'helm template test deploy/k8s/charts/billing --set redis.addr=redis:6379 --set redis.passwordSecret.name=redis --set route.enabled=true --set autoscaling.enabled=true --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+        ],
+        "parallel": false
+      },
+      "parallelism": false
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm dependency build --skip-refresh deploy/k8s/charts/billing",
+          "helm unittest deploy/k8s/charts/billing",
+          "node --test deploy/k8s/charts/billing/tests/*.test.ts"
+        ],
+        "parallel": false
+      },
+      "parallelism": false
+    }
+  }
+}

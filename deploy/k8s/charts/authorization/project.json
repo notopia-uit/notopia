@@ -1,0 +1,39 @@
+{
+  "name": "authorization-chart",
+  "targets": {
+    "gen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm-schema -p -c deploy/k8s/charts/authorization",
+          "helm-docs -c deploy/k8s/charts/authorization"
+        ],
+        "parallel": false
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm dependency build --skip-refresh deploy/k8s/charts/authorization",
+          "helm lint --strict deploy/k8s/charts/authorization --set istio.enabled=false",
+          "bash -o pipefail -c 'helm template test deploy/k8s/charts/authorization --set route.enabled=true --set autoscaling.enabled=true --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+        ],
+        "parallel": false
+      },
+      "parallelism": false
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm dependency build --skip-refresh deploy/k8s/charts/authorization",
+          "helm unittest deploy/k8s/charts/authorization",
+          "node --test deploy/k8s/charts/authorization/tests/*.test.ts"
+        ],
+        "parallel": false
+      },
+      "parallelism": false
+    }
+  }
+}

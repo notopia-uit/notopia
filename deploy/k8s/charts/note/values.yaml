@@ -1,0 +1,154 @@
+# -- Override chart name
+nameOverride: ''
+# -- Override release name
+fullnameOverride: ''
+image:
+  # -- Image repository
+  repository: ghcr.io/notopia-uit/note
+  # -- Image version
+  tag: latest
+  # -- Immutable image digest
+  digest: ''
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+# -- Image pull secrets
+imagePullSecrets: []
+# -- Number of replicas
+replicaCount: 1
+serviceAccount:
+  # -- Create service account
+  create: true
+  # -- Existing or created account name
+  name: ''
+  # -- Service account annotations
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  annotations: {}
+resources:
+  # -- Container resource requests
+  requests: { cpu: 50m, memory: 64Mi }
+  # -- Container resource limits
+  limits: { memory: 256Mi }
+# -- Application runtime
+runtime: go
+# -- Plain environment
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+env: {}
+# -- Additional environment entries
+extraEnv: []
+# -- External environment sources
+envFrom: []
+database:
+  # -- Existing database URI secret
+  urlSecret: { name: '', key: uri }
+redis:
+  # -- Redis address
+  addr: ''
+  # -- Redis database
+  # @schema
+  # type: integer
+  # minimum: 0
+  # @schema
+  db: 0
+  # -- Existing Redis password secret
+  passwordSecret: { name: '', key: password }
+route:
+  # -- Create HTTPRoute
+  enabled: true
+  # -- Gateway parent references
+  parentRefs: []
+  # -- Route hostnames
+  hostnames: []
+  # -- Expose health endpoints
+  exposeHealth: true
+autoscaling:
+  # -- Enable horizontal scaling
+  enabled: false
+  # -- Minimum replicas
+  minReplicas: 1
+  # -- Maximum replicas
+  maxReplicas: 3
+  # -- CPU utilization target
+  targetCPUUtilizationPercentage: 80
+podDisruptionBudget:
+  # -- Enable disruption budget
+  enabled: false
+  # -- Minimum available replicas
+  minAvailable: 1
+otel:
+  # -- Enable OpenTelemetry environment
+  enabled: true
+  # -- Collector endpoint
+  endpoint: ''
+  # -- Collector protocol
+  protocol: grpc
+  # -- Additional resource attributes
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  resourceAttributes: {}
+hooks:
+  migrate:
+    # -- Migration deadline
+    activeDeadlineSeconds: 300
+    # -- Migration resources, defaults to pod resources
+    # @schema
+    # type: object
+    # additionalProperties: true
+    # @schema
+    resources: {}
+  seed:
+    # -- Seed deadline
+    activeDeadlineSeconds: 300
+    # -- Seed resources, defaults to pod resources
+    # @schema
+    # type: object
+    # additionalProperties: true
+    # @schema
+    resources: {}
+istio:
+  # -- Enable Istio workload policy
+  enabled: true
+  # -- Allowed SPIFFE principals
+  allowedPrincipals: []
+  # -- Protected workload ports
+  ports: ['18081', '8081', '28081']
+# -- Additional pod annotations
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+podAnnotations: {}
+# -- Additional pod labels
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+podLabels: {}
+# -- Node selector
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+nodeSelector: {}
+# -- Pod tolerations
+tolerations: []
+# -- Pod affinity
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+affinity: {}
+# -- Additional volumes
+extraVolumes: []
+# -- Additional volume mounts
+extraVolumeMounts: []
+
+# -- Common library configuration
+notopia-common: { global: {} }

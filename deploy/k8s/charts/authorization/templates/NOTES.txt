@@ -1,0 +1,1 @@
+Provide the external database secret before installing.
