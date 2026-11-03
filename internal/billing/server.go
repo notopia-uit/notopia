@@ -14,6 +14,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/controller/http"
 	"github.com/notopia-uit/notopia/internal/billing/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
+	"github.com/notopia-uit/notopia/pkg/common/cli"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
 )
@@ -57,16 +58,11 @@ func NewServer(
 	}
 }
 
+var _ cli.Runner = (*Server)(nil)
+
 var ProvideServer = NewServer
 
 func (s *Server) Run(ctx context.Context) error {
-	if err := s.persistence.RunMigrations(ctx); err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
-	if err := s.app.Cmds.EnsureDefaults.Handle(ctx, &app.EnsureDefaults{}); err != nil {
-		return fmt.Errorf("failed to ensure billing defaults: %w", err)
-	}
-
 	g, ctx := errgroup.WithContext(ctx)
 
 	httpShutdownTimeout := 10 * time.Second

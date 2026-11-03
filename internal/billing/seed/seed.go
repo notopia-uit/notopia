@@ -1,4 +1,4 @@
-package billingseed
+package seed
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/app"
-	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/billing/config"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
@@ -25,28 +25,25 @@ var defaultPrices = []defaultPrice{
 }
 
 type Seeder struct {
-	pg             *persistence.Pg
 	ensureDefaults *app.EnsureDefaultsHandler
 	listPrices     *app.ListPricesHandler
 	createPrice    *app.CreatePriceHandler
 	ensurePortal   *app.EnsurePortalConfigurationHandler
-	catalog        *Catalog
+	catalog        *config.Billing
 	identity       *commonconfig.Identity
 	logger         *slog.Logger
 }
 
 func NewSeeder(
-	pg *persistence.Pg,
 	ensureDefaults *app.EnsureDefaultsHandler,
 	listPrices *app.ListPricesHandler,
 	createPrice *app.CreatePriceHandler,
 	ensurePortal *app.EnsurePortalConfigurationHandler,
-	catalog *Catalog,
+	catalog *config.Billing,
 	identity *commonconfig.Identity,
 	logger *slog.Logger,
 ) *Seeder {
 	return &Seeder{
-		pg:             pg,
 		ensureDefaults: ensureDefaults,
 		listPrices:     listPrices,
 		createPrice:    createPrice,
@@ -61,9 +58,6 @@ var ProvideSeeder = NewSeeder
 
 // Run is idempotent: a (plan, interval, currency) that already has an active price is skipped.
 func (s *Seeder) Run(ctx context.Context) error {
-	if err := s.pg.RunMigrations(ctx); err != nil {
-		return err
-	}
 	if err := s.ensureDefaults.Handle(ctx, &app.EnsureDefaults{}); err != nil {
 		return err
 	}

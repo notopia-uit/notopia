@@ -1,8 +1,9 @@
-package billingseed
+package seed
 
 import (
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/billing/app"
+	"github.com/notopia-uit/notopia/internal/billing/component"
 	billingconfig "github.com/notopia-uit/notopia/internal/billing/config"
 	"github.com/notopia-uit/notopia/internal/billing/infra/outbox"
 	stripeadapter "github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"
@@ -15,7 +16,7 @@ import (
 // Billing infra constructors take billing's config types; the small seed config is mapped onto
 // them here, so the seed config does not import billing config or app.
 
-func NewBillingStripeConfig(stripe *Stripe) *billingconfig.Stripe {
+func NewBillingStripeConfig(stripe *billingconfig.StripeAPI) *billingconfig.Stripe {
 	return &billingconfig.Stripe{
 		StripeAPI:     billingconfig.StripeAPI{SecretKey: stripe.SecretKey},
 		WebhookSecret: "",
@@ -24,16 +25,7 @@ func NewBillingStripeConfig(stripe *Stripe) *billingconfig.Stripe {
 
 var ProvideBillingStripeConfig = NewBillingStripeConfig
 
-func NewBillingConfig(catalog *Catalog) *billingconfig.Billing {
-	return &billingconfig.Billing{
-		Currency:   catalog.Currency,
-		WebBaseURL: catalog.WebBaseURL,
-	}
-}
-
-var ProvideBillingConfig = NewBillingConfig
-
-func NewAppSettings(catalog *Catalog, identity *commonconfig.Identity) *app.Settings {
+func NewAppSettings(catalog *billingconfig.Billing, identity *commonconfig.Identity) *app.Settings {
 	return &app.Settings{
 		WebBaseURL:           catalog.WebBaseURL,
 		ServiceAccountUserID: identity.ServiceAccountUserID,
@@ -45,20 +37,9 @@ var ProvideAppSettings = NewAppSettings
 var ProviderSet = wire.NewSet(
 	ProvideSeeder,
 	ProvideBillingStripeConfig,
-	ProvideBillingConfig,
 	ProvideAppSettings,
-	ProvideValidate,
-	ProvideViper,
-	ProvideConfig,
-	wire.FieldsOf(
-		new(*Config),
-		"Catalog",
-		"Database",
-		"General",
-		"Identity",
-		"Log",
-		"Stripe",
-	),
+	component.ProvideValidate,
+	billingconfig.SeedProviderSet,
 	persistence.ProviderSet,
 	outbox.PublisherProviderSet,
 	billingconfig.ProvideDefaultDomainEvent,

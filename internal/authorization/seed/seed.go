@@ -1,4 +1,4 @@
-package authorizationseed
+package seed
 
 import (
 	"context"

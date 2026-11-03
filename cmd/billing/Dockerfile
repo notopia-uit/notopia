@@ -14,3 +14,4 @@ WORKDIR /app
 COPY --from=builder /app/billing .
 EXPOSE 8084 18084 28084
 ENTRYPOINT ["./billing"]
+CMD ["serve"]
