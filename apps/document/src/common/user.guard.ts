@@ -77,11 +77,6 @@ export abstract class UserGuard implements CanActivate {
 
 @Injectable()
 export class HttpUserGuard extends UserGuard {
-  override canActivate(context: ExecutionContext): boolean {
-    if (Reflect.getMetadata('publicHealth', context.getClass())) return true;
-    return super.canActivate(context);
-  }
-
   protected throwException(message: string): void {
     throw new UnauthorizedException(message);
   }

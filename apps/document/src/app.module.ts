@@ -1,19 +1,17 @@
 import { HttpException, Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
 import { ClientKafka } from '@nestjs/microservices';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
 import { LocksSetupModule } from '@notopia-uit/lib-server/locks';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { Logger, LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
 
+import { authenticatedApiModule } from './authenticated-api.module';
 import { AuthenticationModule } from './authentication';
 import { AuthorizationModule } from './authorization';
 import { BillingModule } from './billing';
 import { BlockNoteModule } from './blocknote';
-import { HttpUserGuard } from './common';
 import {
   APP_CONFIG,
   AppConfig,
@@ -134,7 +132,7 @@ import { StorageModule } from './storage';
     RevisionModule,
     CronModule,
     Object.assign(
-      ApiModule.forRoot({
+      authenticatedApiModule({
         apiImplementations: {
           documentApi: DocumentApi,
           revisionApi: RevisionApi,
@@ -150,12 +148,6 @@ import { StorageModule } from './storage';
         ],
       }
     ),
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: HttpUserGuard,
-    },
   ],
 })
 export class AppModule implements OnModuleInit {

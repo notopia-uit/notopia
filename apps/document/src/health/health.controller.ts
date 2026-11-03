@@ -1,14 +1,12 @@
-import { Controller, Get, Inject, SetMetadata } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 import { DataSource } from 'typeorm';
 
 import { SCALING_CONFIG, type ScalingConfig } from '../config';
 
 export const HEALTH_REDIS = Symbol('HEALTH_REDIS');
-export const PUBLIC_HEALTH = 'publicHealth';
 
 @Controller('document/health')
-@SetMetadata(PUBLIC_HEALTH, true)
 export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
