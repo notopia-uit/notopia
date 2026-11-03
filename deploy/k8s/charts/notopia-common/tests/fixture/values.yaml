@@ -1,0 +1,14 @@
+image: { repository: example/app, tag: latest, digest: '' }
+serviceAccount: { create: true, name: '' }
+resources: { limits: { memory: 256Mi } }
+runtime: go
+env: { FOO: bar }
+extraEnv:
+  - name: SECRET
+    valueFrom:
+      secretKeyRef: { name: external, key: password }
+envFrom:
+  - secretRef: { name: external }
+otel: { enabled: true, endpoint: 'http://collector:4317', protocol: grpc, resourceAttributes: { custom: value } }
+
+notopia-common: { global: {} }

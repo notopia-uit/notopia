@@ -1,0 +1,264 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "env": {
+      "additionalProperties": false,
+      "properties": {
+        "FOO": {
+          "default": "bar",
+          "title": "FOO",
+          "type": "string"
+        }
+      },
+      "required": [
+        "FOO"
+      ],
+      "title": "env",
+      "type": "object"
+    },
+    "envFrom": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "secretRef": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "default": "external",
+                    "title": "name",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "title": "secretRef",
+                "type": "object"
+              }
+            },
+            "required": [
+              "secretRef"
+            ],
+            "type": "object"
+          }
+        ],
+        "required": []
+      },
+      "title": "envFrom",
+      "type": "array"
+    },
+    "extraEnv": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "default": "SECRET",
+                "title": "name",
+                "type": "string"
+              },
+              "valueFrom": {
+                "additionalProperties": false,
+                "properties": {
+                  "secretKeyRef": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "key": {
+                        "default": "password",
+                        "title": "key",
+                        "type": "string"
+                      },
+                      "name": {
+                        "default": "external",
+                        "title": "name",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "key"
+                    ],
+                    "title": "secretKeyRef",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "secretKeyRef"
+                ],
+                "title": "valueFrom",
+                "type": "object"
+              }
+            },
+            "required": [
+              "name",
+              "valueFrom"
+            ],
+            "type": "object"
+          }
+        ],
+        "required": []
+      },
+      "title": "extraEnv",
+      "type": "array"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "default": "",
+          "title": "digest",
+          "type": "string"
+        },
+        "repository": {
+          "default": "example/app",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "latest",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "tag",
+        "digest"
+      ],
+      "title": "image",
+      "type": "object"
+    },
+    "notopia-common": {
+      "additionalProperties": false,
+      "properties": {
+        "global": {
+          "additionalProperties": false,
+          "required": [],
+          "title": "global",
+          "type": "object"
+        }
+      },
+      "required": [
+        "global"
+      ],
+      "title": "notopia-common",
+      "type": "object"
+    },
+    "otel": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "endpoint": {
+          "default": "http://collector:4317",
+          "title": "endpoint",
+          "type": "string"
+        },
+        "protocol": {
+          "default": "grpc",
+          "title": "protocol",
+          "type": "string"
+        },
+        "resourceAttributes": {
+          "additionalProperties": false,
+          "properties": {
+            "custom": {
+              "default": "value",
+              "title": "custom",
+              "type": "string"
+            }
+          },
+          "required": [
+            "custom"
+          ],
+          "title": "resourceAttributes",
+          "type": "object"
+        }
+      },
+      "required": [
+        "enabled",
+        "endpoint",
+        "protocol",
+        "resourceAttributes"
+      ],
+      "title": "otel",
+      "type": "object"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": {
+          "additionalProperties": false,
+          "properties": {
+            "memory": {
+              "default": "256Mi",
+              "title": "memory",
+              "type": "string"
+            }
+          },
+          "required": [
+            "memory"
+          ],
+          "title": "limits",
+          "type": "object"
+        }
+      },
+      "required": [
+        "limits"
+      ],
+      "title": "resources",
+      "type": "object"
+    },
+    "runtime": {
+      "default": "go",
+      "title": "runtime",
+      "type": "string"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "default": true,
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "create",
+        "name"
+      ],
+      "title": "serviceAccount",
+      "type": "object"
+    }
+  },
+  "required": [
+    "image",
+    "serviceAccount",
+    "resources",
+    "runtime",
+    "env",
+    "extraEnv",
+    "envFrom",
+    "otel",
+    "notopia-common"
+  ],
+  "type": "object"
+}

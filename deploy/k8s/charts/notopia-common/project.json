@@ -1,0 +1,39 @@
+{
+  "name": "notopia-common",
+  "targets": {
+    "gen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm-schema -p -c deploy/k8s/charts/notopia-common",
+          "helm-docs -c deploy/k8s/charts/notopia-common"
+        ],
+        "parallel": false
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm dependency build --skip-refresh deploy/k8s/charts/notopia-common/tests/fixture",
+          "helm lint --strict deploy/k8s/charts/notopia-common",
+          "helm lint --strict deploy/k8s/charts/notopia-common/tests/fixture",
+          "helm template fixture deploy/k8s/charts/notopia-common/tests/fixture | kubeconform -strict"
+        ],
+        "parallel": false
+      },
+      "parallelism": false
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm dependency build --skip-refresh deploy/k8s/charts/notopia-common/tests/fixture",
+          "helm unittest deploy/k8s/charts/notopia-common/tests/fixture"
+        ],
+        "parallel": false
+      },
+      "parallelism": false
+    }
+  }
+}

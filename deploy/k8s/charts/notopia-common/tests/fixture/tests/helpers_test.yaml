@@ -1,0 +1,54 @@
+suite: common helpers
+templates:
+  - deployment.yaml
+  - job.yaml
+tests:
+  - it: derives Go memory limit
+    template: deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: { name: GOMEMLIMIT, value: '241591910' }
+  - it: derives Node memory limit
+    template: deployment.yaml
+    set: { runtime: node }
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: { name: NODE_OPTIONS, value: '--max-old-space-size=192' }
+  - it: digest overrides tag
+    template: deployment.yaml
+    set: { image.digest: 'sha256:abc' }
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: 'example/app@sha256:abc'
+  - it: restricts security and renders downward API
+    template: deployment.yaml
+    asserts:
+      - equal: { path: spec.template.spec.securityContext.runAsNonRoot, value: true }
+      - equal: { path: "spec.template.spec.containers[0].securityContext.capabilities.drop[0]", value: ALL }
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: { name: OTEL_K8S_POD_NAME, valueFrom: { fieldRef: { fieldPath: metadata.name } } }
+  - it: shares secrets and env with hook jobs
+    template: job.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: { name: SECRET, valueFrom: { secretKeyRef: { name: external, key: password } } }
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content: { secretRef: { name: external } }
+  - it: rejects duplicate env names
+    template: job.yaml
+    set: { extraEnv: [{ name: FOO, valueFrom: { secretKeyRef: { name: external, key: password } } }] }
+    asserts:
+      - failedTemplate:
+          errorMessage: duplicate environment variable FOO
+  - it: rejects unsupported memory quantities
+    template: job.yaml
+    set: { resources.limits.memory: 1.5Gi }
+    asserts:
+      - failedTemplate:
+          errorMessage: 'unsupported or missing memory limit "1.5Gi"'
