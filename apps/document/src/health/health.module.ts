@@ -29,9 +29,16 @@ import { HEALTH_REDIS, HealthController } from './health.controller';
             maxRetriesPerRequest: 1,
             retryStrategy: () => null,
           });
+          let timeout: ReturnType<typeof setTimeout> | undefined;
           try {
-            return await redis.ping();
+            return await Promise.race([
+              redis.ping(),
+              new Promise<never>((_, reject) => {
+                timeout = setTimeout(() => reject(new Error('Redis health check timed out')), 2000);
+              }),
+            ]);
           } finally {
+            clearTimeout(timeout);
             redis.disconnect();
           }
         },
