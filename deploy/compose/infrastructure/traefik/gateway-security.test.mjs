@@ -47,3 +47,17 @@ test('gateway removes forged groups when the token has no group claim', async ()
   const headers = await response.json();
   assert.equal(headers['x-forwarded-groups'], undefined);
 });
+
+test('api-web token forwards the actual nonempty groups', async () => {
+  const token = process.env.GATEWAY_TEST_API_WEB_TOKEN;
+  const groups = process.env.GATEWAY_TEST_API_WEB_GROUPS;
+  assert.ok(token && groups, 'set GATEWAY_TEST_API_WEB_TOKEN and GATEWAY_TEST_API_WEB_GROUPS');
+  const expected = JSON.parse(groups);
+  assert.ok(Array.isArray(expected) && expected.length > 0, 'expected groups must be nonempty');
+  const claims = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+  assert.ok(claims.iss?.endsWith('/application/o/api-web/'), 'token must be issued for api-web');
+  const response = await request('/billing/test-headers', token);
+  assert.equal(response.status, 200);
+  const headers = await response.json();
+  assert.deepEqual(JSON.parse(headers['x-forwarded-groups']), expected);
+});

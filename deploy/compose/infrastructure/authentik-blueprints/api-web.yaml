@@ -8,6 +8,11 @@ metadata:
       Notopia - API Web OAuth2 Provider and Application
 
 entries:
+  - model: authentik_blueprints.metaapplyblueprint
+    attrs:
+      identifiers:
+        name: Notopia - Providers Oauth2
+
   - id: provider
     model: authentik_providers_oauth2.oauth2provider
     identifiers:
@@ -37,6 +42,7 @@ entries:
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, openid]]
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, notopia]]
       redirect_uris:
         - url: ^http://api\.notopia\.localhost/.*$
           matching_mode: regex
