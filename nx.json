@@ -71,28 +71,11 @@
       "{projectRoot}/**/*",
       "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/**/*",
       "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/.helmignore",
-      "{workspaceRoot}/mise.toml",
-      "{workspaceRoot}/.mise.ci.toml",
       {
         "runtime": "helm version --short"
       },
       {
         "runtime": "helm plugin list"
-      },
-      {
-        "runtime": "kubeconform -v"
-      },
-      {
-        "runtime": "node --version"
-      },
-      {
-        "runtime": "yq --version"
-      },
-      {
-        "runtime": "flock --version"
-      },
-      {
-        "runtime": "bash --version"
       }
     ]
   },
