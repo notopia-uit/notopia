@@ -66,6 +66,29 @@
       {
         "runtime": "go version"
       }
+    ],
+    "chartInputs": [
+      "{projectRoot}/**/*",
+      "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/**/*",
+      "{workspaceRoot}/deploy/k8s/charts/chart-check.ts",
+      "{workspaceRoot}/deploy/k8s/charts/chart-commands.json",
+      "{workspaceRoot}/mise.toml",
+      "{workspaceRoot}/.mise.ci.toml",
+      {
+        "runtime": "helm version --short"
+      },
+      {
+        "runtime": "helm plugin list"
+      },
+      {
+        "runtime": "kubeconform -v"
+      },
+      {
+        "runtime": "node --version"
+      },
+      {
+        "runtime": "yq --version"
+      }
     ]
   },
   "targetDefaults": {

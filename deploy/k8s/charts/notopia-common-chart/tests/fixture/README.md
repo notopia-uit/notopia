@@ -6,7 +6,7 @@
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../.. | notopia-common | 0.1.1 |
+| file://../.. | notopia-common-chart | 0.1.2 |
 
 ## Values
 
@@ -26,7 +26,7 @@
 | istio.enabled | bool | `false` |  |
 | istio.ports | list | `[]` |  |
 | nameOverride | string | `""` |  |
-| notopia-common.global | object | `{}` |  |
+| notopia-common-chart.global | object | `{}` |  |
 | otel.enabled | bool | `true` |  |
 | otel.endpoint | string | `"http://collector:4317"` |  |
 | otel.protocol | string | `"grpc"` |  |

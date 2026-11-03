@@ -119,7 +119,7 @@
       "title": "nameOverride",
       "type": "string"
     },
-    "notopia-common": {
+    "notopia-common-chart": {
       "additionalProperties": false,
       "properties": {
         "global": {
@@ -132,7 +132,7 @@
       "required": [
         "global"
       ],
-      "title": "notopia-common",
+      "title": "notopia-common-chart",
       "type": "object"
     },
     "otel": {
@@ -245,7 +245,7 @@
     "runtime",
     "otel",
     "istio",
-    "notopia-common"
+    "notopia-common-chart"
   ],
   "type": "object"
 }

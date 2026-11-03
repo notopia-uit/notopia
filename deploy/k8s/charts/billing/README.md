@@ -1,12 +1,12 @@
 # billing
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
+![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square)
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../notopia-common | notopia-common | 0.1.1 |
+| file://../notopia-common-chart | notopia-common-chart | 0.1.2 |
 
 ## Values
 
@@ -38,7 +38,7 @@
 | istio.ports | list | `["18084","8084","28084"]` | Protected workload ports |
 | nameOverride | string | `""` | Override chart name |
 | nodeSelector | object | `{}` | Node selector |
-| notopia-common | object | `{"global":{}}` | Common library configuration |
+| notopia-common-chart | object | `{"global":{}}` | Common library configuration |
 | otel.enabled | bool | `true` | Enable OpenTelemetry environment |
 | otel.endpoint | string | `""` | Collector endpoint |
 | otel.protocol | string | `"grpc"` | Collector protocol |

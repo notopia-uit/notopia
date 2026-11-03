@@ -1,0 +1,31 @@
+{
+  "name": "notopia-common-chart",
+  "targets": {
+    "gen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm-schema -p -c deploy/k8s/charts/notopia-common-chart",
+          "helm-docs -c deploy/k8s/charts/notopia-common-chart"
+        ],
+        "parallel": false
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node deploy/k8s/charts/chart-check.ts notopia-common-chart lint"
+      },
+      "inputs": ["chartInputs"],
+      "dependsOn": []
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node deploy/k8s/charts/chart-check.ts notopia-common-chart test"
+      },
+      "inputs": ["chartInputs"],
+      "dependsOn": []
+    }
+  }
+}

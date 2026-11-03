@@ -1,7 +1,7 @@
 apiVersion: v2
 name: authorization
-version: 0.1.1
+version: 0.1.2
 dependencies:
-  - name: notopia-common
-    version: 0.1.1
-    repository: file://../notopia-common
+  - name: notopia-common-chart
+    version: 0.1.2
+    repository: file://../notopia-common-chart

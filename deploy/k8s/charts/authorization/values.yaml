@@ -311,4 +311,4 @@ extraVolumes: []
 extraVolumeMounts: []
 
 # -- Common library configuration
-notopia-common: { global: {} }
+notopia-common-chart: { global: {} }

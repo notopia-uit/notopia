@@ -1,0 +1,51 @@
+{
+  "notopia-common-chart": {
+    "lint": [
+      "helm dependency build --skip-refresh deploy/k8s/charts/notopia-common-chart/tests/fixture",
+      "helm lint --strict deploy/k8s/charts/notopia-common-chart",
+      "helm lint --strict deploy/k8s/charts/notopia-common-chart/tests/fixture",
+      "bash -o pipefail -c 'helm template fixture deploy/k8s/charts/notopia-common-chart/tests/fixture | kubeconform -strict'"
+    ],
+    "test": [
+      "helm dependency build --skip-refresh deploy/k8s/charts/notopia-common-chart/tests/fixture",
+      "helm unittest deploy/k8s/charts/notopia-common-chart/tests/fixture",
+      "node --test deploy/k8s/charts/notopia-common-chart/tests/*.test.ts"
+    ]
+  },
+  "note": {
+    "lint": [
+      "helm dependency build --skip-refresh deploy/k8s/charts/note",
+      "helm lint --strict deploy/k8s/charts/note --set istio.enabled=false --set redis.addr=redis:6379 --set redis.passwordSecret.name=redis",
+      "bash -o pipefail -c 'helm template test deploy/k8s/charts/note --set redis.addr=redis:6379 --set redis.passwordSecret.name=redis --set route.enabled=true --set autoscaling.enabled=true --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+    ],
+    "test": [
+      "helm dependency build --skip-refresh deploy/k8s/charts/note",
+      "helm unittest deploy/k8s/charts/note",
+      "node --test deploy/k8s/charts/note/tests/*.test.ts"
+    ]
+  },
+  "authorization": {
+    "lint": [
+      "helm dependency build --skip-refresh deploy/k8s/charts/authorization",
+      "helm lint --strict deploy/k8s/charts/authorization --set istio.enabled=false",
+      "bash -o pipefail -c 'helm template test deploy/k8s/charts/authorization --set route.enabled=true --set autoscaling.enabled=true --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+    ],
+    "test": [
+      "helm dependency build --skip-refresh deploy/k8s/charts/authorization",
+      "helm unittest deploy/k8s/charts/authorization",
+      "node --test deploy/k8s/charts/authorization/tests/*.test.ts"
+    ]
+  },
+  "billing": {
+    "lint": [
+      "helm dependency build --skip-refresh deploy/k8s/charts/billing",
+      "helm lint --strict deploy/k8s/charts/billing --set istio.enabled=false --set redis.addr=redis:6379 --set redis.passwordSecret.name=redis",
+      "bash -o pipefail -c 'helm template test deploy/k8s/charts/billing --set redis.addr=redis:6379 --set redis.passwordSecret.name=redis --set route.enabled=true --set autoscaling.enabled=true --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+    ],
+    "test": [
+      "helm dependency build --skip-refresh deploy/k8s/charts/billing",
+      "helm unittest deploy/k8s/charts/billing",
+      "node --test deploy/k8s/charts/billing/tests/*.test.ts"
+    ]
+  }
+}

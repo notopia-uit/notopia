@@ -66,4 +66,4 @@ vitest.config.*.timestamp*
 .claude/skills/vercel-react-best-practices/
 .claude/skills/terraform-engineer/
 /deploy/k8s/charts/*/charts/
-/deploy/k8s/charts/notopia-common/tests/fixture/charts/
+/deploy/k8s/charts/notopia-common-chart/tests/fixture/charts/

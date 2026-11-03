@@ -272,7 +272,7 @@
       "title": "nodeSelector",
       "type": "object"
     },
-    "notopia-common": {
+    "notopia-common-chart": {
       "additionalProperties": false,
       "description": "Common library configuration",
       "properties": {
@@ -286,7 +286,7 @@
       "required": [
         "global"
       ],
-      "title": "notopia-common"
+      "title": "notopia-common-chart"
     },
     "otel": {
       "additionalProperties": false,

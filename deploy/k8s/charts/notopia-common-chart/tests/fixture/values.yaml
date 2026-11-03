@@ -53,4 +53,4 @@ otel:
 hooks: {}
 istio: { enabled: false, allowedPrincipals: [], ports: [] }
 
-notopia-common: { global: {} }
+notopia-common-chart: { global: {} }

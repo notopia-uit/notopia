@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- One chart each for web, note, authorization, billing, document, search-worker and notopia-edge, plus `notopia-common` library.
+- One chart each for web, note, authorization, billing, document, search-worker and notopia-edge, plus `notopia-common-chart` library.
 - Default one replica; each chart version changes whenever it or the library changes; generated schema and README are committed.
 - Secrets precede Helm hooks; do not use a release-owned ConfigMap for hook env. Chart resources work without Istio or Flux.
 - Endpoint, header and authorization contract is overview §§58–90. Admin group protection cannot be bypassed by another ALLOW rule.
@@ -28,18 +28,18 @@
 
 ## File Structure
 
-`deploy/k8s/charts/notopia-common/` provides helpers; peer chart directories own `Chart.yaml`, values, generated artifacts, templates, tests and Nx `project.json`. Edge owns Gateway API and Istio policies. Tool versions belong in both mise configs.
+`deploy/k8s/charts/notopia-common-chart/` provides helpers; peer chart directories own `Chart.yaml`, values, generated artifacts, templates, tests and Nx `project.json`. Edge owns Gateway API and Istio policies. Tool versions belong in both mise configs.
 
 ### Task 1: Chart toolchain and library
 
-**Files:** Modify `mise.toml`, `.mise.ci.toml`, `.gitignore`; create `deploy/k8s/charts/notopia-common/{Chart.yaml,values.yaml,project.json}` and `templates/*.tpl`, plus a test fixture chart under `deploy/k8s/charts/notopia-common/tests/`.
+**Files:** Modify `mise.toml`, `.mise.ci.toml`, `.gitignore`; create `deploy/k8s/charts/notopia-common-chart/{Chart.yaml,values.yaml,project.json}` and `templates/*.tpl`, plus a test fixture chart under `deploy/k8s/charts/notopia-common-chart/tests/`.
 
 **Interfaces:** Named templates `notopia-common.{name,fullname,chart,labels,selectorLabels,serviceAccountName,image,env,otelEnv,memoryEnv,hookJob,podSecurityContext,containerSecurityContext,istioWorkloadPolicy}` as specified in §notopia-common.
 
 - [ ] Pin matching versions in both mise files: helm 3 (verify compatible available 3.x release before pinning; Helm 4 is not assumed compatible), `github:dadav/helm-schema` 0.24.0, `github:norwoodj/helm-docs` 1.14.2, `github:yannh/kubeconform` 0.8.0 and `yq` 4.54.1; pin helm-unittest plugin 1.2.1 in setup. Verify binaries install with mise before choosing the Helm 3 exact patch and record that patch in both files.
 - [ ] Write fixture tests: `256Mi` Go limit yields `GOMEMLIMIT` at 90%, Node uses 75%; digest overrides tag; env and secrets render identically in Jobs and deployment; restrictive security and downward API attrs render. Run `helm unittest` on fixture; expect failure.
 - [ ] Implement helpers and Nx gen/lint/test targets; ignore generated `charts/` dependencies, not source charts. Derive memory quantities safely or fail clearly for unsupported quantities; do not emit duplicate environment variable names.
-- [ ] Run fixture tests, `helm lint --strict` and `nx run notopia-common:gen`; expect PASS and deterministic generated files.
+- [ ] Run fixture tests, `helm lint --strict` and `nx run notopia-common-chart:gen`; expect PASS and deterministic generated files.
 - [ ] Commit with `feat(helm): add shared chart library`.
 
 ### Task 2: Go service charts and hooks

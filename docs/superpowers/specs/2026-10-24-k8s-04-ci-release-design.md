@@ -56,7 +56,7 @@ job).
 
 - for each `deploy/k8s/charts/<chart>/` changed against the base SHA (from `nx-set-shas`),
   `Chart.yaml` `version` must differ from the base and be a higher semver
-- if `notopia-common` changed, every chart depending on it must also be bumped
+- if `notopia-common-chart` changed, every chart depending on it must also be bumped
 - generated files (`README.md`, `values.schema.json`) count as changes. They only change when
   `values.yaml` does.
 

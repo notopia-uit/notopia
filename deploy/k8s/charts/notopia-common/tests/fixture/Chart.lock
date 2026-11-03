@@ -1,6 +1,0 @@
-dependencies:
-- name: notopia-common
-  repository: file://../..
-  version: 0.1.1
-digest: sha256:5dad797135b11cc402b547e1ea0b747a57dc3d54390563980daab4e333478c44
-generated: "2026-11-03T18:59:30.541687134+07:00"
