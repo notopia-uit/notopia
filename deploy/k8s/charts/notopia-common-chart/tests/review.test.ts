@@ -5,7 +5,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 
 const fixture = path.join(import.meta.dirname, 'fixture');
-const commands = JSON.parse(readFileSync('deploy/k8s/charts/chart-commands.json', 'utf8'));
+const project = JSON.parse(readFileSync(path.join(import.meta.dirname, '../project.json'), 'utf8'));
 
 type Resource = {
   kind: string;
@@ -39,14 +39,14 @@ function resources(output: string): Resource[] {
 }
 
 test('lint pipeline fails when Helm rendering fails', () => {
-  const command = commands['notopia-common-chart'].lint.find((item: string) =>
-    item.includes('kubeconform')
-  );
-  const broken = command.replace(
+  const command: string = project.targets.lint.options.command;
+  assert.match(command, /bash -o pipefail -ec/);
+  const pipeline = command.split(' && ').at(-1)!.slice(0, -1);
+  const broken = pipeline.replace(
     'helm template fixture',
     'helm template --set resources.limits.memory=1.5Gi fixture'
   );
-  const result = spawnSync('sh', ['-c', broken], { encoding: 'utf8' });
+  const result = spawnSync('bash', ['-o', 'pipefail', '-c', broken], { encoding: 'utf8' });
   assert.notEqual(result.status, 0, `render failure was hidden: ${result.stderr}`);
   assert.match(result.stderr, /unsupported or missing memory limit/);
 });

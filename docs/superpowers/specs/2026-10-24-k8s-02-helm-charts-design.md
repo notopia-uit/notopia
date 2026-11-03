@@ -13,7 +13,7 @@ work without Istio or Flux.
 
 ```
 deploy/k8s/charts/
-  notopia-common-chart/          # type: library — named templates only, no resources
+  notopia-common/          # type: library — named templates only, no resources
   web/
   note/
   authorization/
@@ -27,26 +27,26 @@ Each chart has this shape:
 
 ```
 <chart>/
-  Chart.yaml               # apiVersion v2, version (semver), appVersion unused, dependency on notopia-common-chart
+  Chart.yaml               # apiVersion v2, version (semver), appVersion unused, dependency on notopia-common
   values.yaml              # every key documented with "# --" and "# @schema"
   values.schema.json       # generated (helm-schema)
   README.md                # generated (helm-docs)
   templates/
-    _helpers.tpl           # chart-local only; shared helpers come from notopia-common-chart
+    _helpers.tpl           # chart-local only; shared helpers come from notopia-common
     NOTES.txt
     …
   tests/                   # helm-unittest
 ```
 
-- The dependency is `notopia-common-chart` with `repository: file://../notopia-common-chart`. Flux builds
+- The dependency is `notopia-common` with `repository: file://../notopia-common`. Flux builds
   charts from the `GitRepository` and resolves relative `file://` dependencies.
   `deploy/k8s/charts/*/charts/` is gitignored.
-- **Version rule**: any change to a chart (or to `notopia-common-chart`) bumps that chart's `version`.
-  A `notopia-common-chart` change bumps every dependent chart. CI enforces this (sub-project 04),
+- **Version rule**: any change to a chart (or to `notopia-common`) bumps that chart's `version`.
+  A `notopia-common` change bumps every dependent chart. CI enforces this (sub-project 04),
   because Flux only re-packages a Git chart when `version` changes (default
   `reconcileStrategy: ChartVersion`).
 
-## `notopia-common-chart` (library)
+## `notopia-common` (library)
 
 Named templates:
 

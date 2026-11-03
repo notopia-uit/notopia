@@ -14,7 +14,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node deploy/k8s/charts/chart-check.ts notopia-common-chart lint"
+        "command": "mkdir -p tmp/chart-lock && flock tmp/chart-lock/notopia-common-chart.lock bash -o pipefail -ec 'helm dependency build --skip-refresh deploy/k8s/charts/notopia-common-chart/tests/fixture && helm lint --strict deploy/k8s/charts/notopia-common-chart && helm lint --strict deploy/k8s/charts/notopia-common-chart/tests/fixture && helm template fixture deploy/k8s/charts/notopia-common-chart/tests/fixture | kubeconform -strict'"
       },
       "inputs": ["chartInputs"],
       "dependsOn": []
@@ -22,7 +22,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node deploy/k8s/charts/chart-check.ts notopia-common-chart test"
+        "command": "mkdir -p tmp/chart-lock && flock tmp/chart-lock/notopia-common-chart.lock bash -o pipefail -ec 'helm dependency build --skip-refresh deploy/k8s/charts/notopia-common-chart/tests/fixture && helm unittest deploy/k8s/charts/notopia-common-chart/tests/fixture && node --test deploy/k8s/charts/notopia-common-chart/tests/*.test.ts'"
       },
       "inputs": ["chartInputs"],
       "dependsOn": []

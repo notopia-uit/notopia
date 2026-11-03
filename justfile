@@ -40,10 +40,6 @@ helm-setup:
       helm plugin install https://github.com/helm-unittest/helm-unittest --version 1.2.1; \
     fi
 
-helm-check:
-    node --test deploy/k8s/charts/chart-config.test.ts
-    nx run-many -p notopia-common-chart,note-chart,authorization-chart,billing-chart -t lint test --parallel=8
-
 seed: seed-authorization seed-search seed-billing
 
 seed-authorization:

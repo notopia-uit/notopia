@@ -14,7 +14,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node deploy/k8s/charts/chart-check.ts authorization lint"
+        "command": "mkdir -p tmp/chart-lock && flock tmp/chart-lock/authorization.lock bash -o pipefail -ec 'helm dependency build --skip-refresh deploy/k8s/charts/authorization && helm lint --strict deploy/k8s/charts/authorization --set istio.enabled=false && helm template test deploy/k8s/charts/authorization --set route.enabled=true --set autoscaling.enabled=true --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
       },
       "inputs": ["chartInputs"],
       "dependsOn": []
@@ -22,7 +22,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node deploy/k8s/charts/chart-check.ts authorization test"
+        "command": "mkdir -p tmp/chart-lock && flock tmp/chart-lock/authorization.lock bash -o pipefail -ec 'helm dependency build --skip-refresh deploy/k8s/charts/authorization && helm unittest deploy/k8s/charts/authorization && node --test deploy/k8s/charts/authorization/tests/*.test.ts'"
       },
       "inputs": ["chartInputs"],
       "dependsOn": []

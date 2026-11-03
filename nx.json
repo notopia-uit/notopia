@@ -70,8 +70,7 @@
     "chartInputs": [
       "{projectRoot}/**/*",
       "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/**/*",
-      "{workspaceRoot}/deploy/k8s/charts/chart-check.ts",
-      "{workspaceRoot}/deploy/k8s/charts/chart-commands.json",
+      "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/.helmignore",
       "{workspaceRoot}/mise.toml",
       "{workspaceRoot}/.mise.ci.toml",
       {
@@ -88,6 +87,12 @@
       },
       {
         "runtime": "yq --version"
+      },
+      {
+        "runtime": "flock --version"
+      },
+      {
+        "runtime": "bash --version"
       }
     ]
   },

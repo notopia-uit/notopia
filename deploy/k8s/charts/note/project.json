@@ -14,7 +14,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node deploy/k8s/charts/chart-check.ts note lint"
+        "command": "mkdir -p tmp/chart-lock && flock tmp/chart-lock/note.lock bash -o pipefail -ec 'helm dependency build --skip-refresh deploy/k8s/charts/note && helm lint --strict deploy/k8s/charts/note --set istio.enabled=false --set redis.addr=redis:6379 --set redis.passwordSecret.name=redis && helm template test deploy/k8s/charts/note --set redis.addr=redis:6379 --set redis.passwordSecret.name=redis --set route.enabled=true --set autoscaling.enabled=true --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
       },
       "inputs": ["chartInputs"],
       "dependsOn": []
@@ -22,7 +22,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node deploy/k8s/charts/chart-check.ts note test"
+        "command": "mkdir -p tmp/chart-lock && flock tmp/chart-lock/note.lock bash -o pipefail -ec 'helm dependency build --skip-refresh deploy/k8s/charts/note && helm unittest deploy/k8s/charts/note && node --test deploy/k8s/charts/note/tests/*.test.ts'"
       },
       "inputs": ["chartInputs"],
       "dependsOn": []
