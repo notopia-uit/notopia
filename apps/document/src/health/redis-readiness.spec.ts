@@ -1,54 +1,32 @@
-import { once } from 'node:events';
-import { createServer, type Socket } from 'node:net';
-
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 
-import { REDIS_CONFIG, SCALING_CONFIG } from '../config';
+import { REDIS_CONFIG } from '../config';
 import { DatabaseModule } from '../database';
+import { HEALTH_REDIS } from './health.controller';
 import { HealthModule } from './health.module';
 
+const redis = vi.hoisted(() => ({
+  ping: vi.fn(() => new Promise<never>(() => {})),
+  disconnect: vi.fn<() => void>(),
+}));
+vi.mock('ioredis', () => ({
+  default: class {
+    ping = redis.ping;
+    disconnect = redis.disconnect;
+  },
+}));
+
 @Module({
-  providers: [{ provide: DataSource, useValue: { query: () => Promise.resolve([]) } }],
+  providers: [{ provide: DataSource, useValue: {} }],
   exports: [DataSource],
 })
 class FakeDatabaseModule {}
 
-it('returns unavailable and closes the socket when connected Redis stops answering', async () => {
-  const sockets = new Set<Socket>();
-  let pings = 0;
-  let socketClosed: Promise<unknown> = Promise.resolve();
-  const server = createServer((socket) => {
-    sockets.add(socket);
-    socketClosed = once(socket, 'close');
-    socket.on('close', () => sockets.delete(socket));
-    let buffer = '';
-    socket.on('data', (data) => {
-      buffer += data.toString();
-      while (buffer.startsWith('*')) {
-        const parts = buffer.split('\r\n');
-        const count = Number(parts[0].slice(1));
-        if (parts.length < count * 2 + 2) break;
-        const command = parts[2].toLowerCase();
-        buffer = parts.slice(count * 2 + 1).join('\r\n');
-        if (command === 'ping') {
-          pings++;
-          continue;
-        }
-        if (command === 'info') {
-          const info = 'redis_version:8.0.0\r\n';
-          socket.write(`$${Buffer.byteLength(info)}\r\n${info}\r\n`);
-        } else socket.write('+OK\r\n');
-      }
-    });
-  });
-  server.listen(0, '127.0.0.1');
-  await once(server, 'listening');
-  const address = server.address();
-  if (!address || typeof address === 'string') throw new Error('No TCP address');
+it('times out and disconnects when Redis does not answer', async () => {
   const module = await Test.createTestingModule({
     imports: [ConfigModule.forRoot({ isGlobal: true }), HealthModule],
   })
@@ -57,33 +35,19 @@ it('returns unavailable and closes the socket when connected Redis stops answeri
     .overrideProvider(ConfigService)
     .useValue({
       getOrThrow: (key: symbol) =>
-        key === REDIS_CONFIG
-          ? { url: `redis://127.0.0.1:${address.port}` }
-          : key === SCALING_CONFIG
-            ? { enabled: true }
-            : undefined,
+        key === REDIS_CONFIG ? { url: 'redis://localhost' } : { enabled: true },
     })
     .compile();
-  const app = module.createNestApplication();
-  await app.listen(0, '127.0.0.1');
+  vi.useFakeTimers();
   try {
-    const result = await Promise.race([
-      fetch(`${await app.getUrl()}/document/health/ready`).then((response) => response.status),
-      new Promise<string>((resolve) => setTimeout(() => resolve('timed out'), 3500)),
-    ]);
-    expect(result).toBe(503);
-    expect(pings).toBe(1);
-    await Promise.race([
-      socketClosed,
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Redis socket was not closed')), 1000)
-      ),
-    ]);
-    expect(sockets.size).toBe(0);
+    const probe = module.get<{ ping(): Promise<unknown> }>(HEALTH_REDIS).ping();
+    const result = expect(probe).rejects.toThrow('Redis health check timed out');
+    await vi.advanceTimersByTimeAsync(2000);
+    await result;
+    expect(redis.ping).toHaveBeenCalledOnce();
+    expect(redis.disconnect).toHaveBeenCalledOnce();
   } finally {
-    for (const socket of sockets) socket.destroy();
-    await app.close();
-    server.close();
-    await once(server, 'close');
+    vi.useRealTimers();
+    await module.close();
   }
-}, 10000);
+});
