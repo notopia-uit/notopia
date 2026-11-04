@@ -1,3 +1,6 @@
+Ingress is denied by NetworkPolicy until frontRoute.trustedNamespace and trustedGateway
+are set. NetworkPolicy enforcement, gateway pod labels, additive policies and the
+absence of alternate front routes must be verified in the cluster.
 {{- if not .Values.istio.enabled }}
 Istio is disabled. Supply an external JWT verification, authorization and trusted-header layer.
 It must strip all five X-Forwarded identity headers before setting verified claims, map

@@ -12,8 +12,12 @@ spec:
     - issuer: {{ .Values.istio.jwt.issuer | quote }}
       jwksUri: {{ .Values.istio.jwt.jwksUri | quote }}
       outputClaimToHeaders:
-        {{- range $header, $claim := .Values.istio.jwt.claimHeaders }}
-        - header: {{ $header | quote }}
-          claim: {{ $claim | quote }}
-        {{- end }}
+        - header: X-Forwarded-ID
+          claim: sub
+        - header: X-Forwarded-Email
+          claim: email
+        - header: X-Forwarded-Name
+          claim: name
+        - header: X-Forwarded-Groups
+          claim: groups_json
 {{- end }}

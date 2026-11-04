@@ -6,10 +6,10 @@
       "additionalProperties": false,
       "properties": {
         "enabled": {
-          "default": "true",
+          "default": true,
           "description": "Create a route from the front gateway",
-          "required": [],
-          "title": "enabled"
+          "title": "enabled",
+          "type": "boolean"
         },
         "hostnames": {
           "description": "Route hostnames",
@@ -26,6 +26,18 @@
           },
           "required": [],
           "title": "parentRefs"
+        },
+        "trustedGateway": {
+          "default": "",
+          "description": "Gateway API name of the only front gateway allowed to reach the edge",
+          "required": [],
+          "title": "trustedGateway"
+        },
+        "trustedNamespace": {
+          "default": "",
+          "description": "Namespace of the only front gateway allowed to reach the edge",
+          "required": [],
+          "title": "trustedNamespace"
         }
       },
       "required": [],
@@ -57,10 +69,10 @@
           "title": "className"
         },
         "enabled": {
-          "default": "true",
-          "description": "Create an Istio Gateway API gateway",
-          "required": [],
-          "title": "enabled"
+          "default": true,
+          "description": "Create the managed gateway; disabling is unsupported",
+          "title": "enabled",
+          "type": "boolean"
         },
         "hostname": {
           "default": "",
@@ -95,55 +107,45 @@
           "title": "adminGroup"
         },
         "enabled": {
-          "default": "true",
+          "default": true,
           "description": "Enable Istio authentication and authorization",
-          "required": [],
-          "title": "enabled"
+          "title": "enabled",
+          "type": "boolean"
         },
         "groupRules": {
           "description": "Additional group-protected paths and permitted groups",
           "items": {
-            "required": []
+            "additionalProperties": false,
+            "properties": {
+              "groups": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "paths": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "paths",
+              "groups"
+            ],
+            "type": "object"
           },
-          "required": [],
-          "title": "groupRules"
+          "title": "groupRules",
+          "type": "array"
         },
         "jwt": {
           "additionalProperties": false,
           "properties": {
-            "claimHeaders": {
-              "additionalProperties": false,
-              "description": "Scalar claims copied to trusted headers",
-              "properties": {
-                "X-Forwarded-Email": {
-                  "default": "email",
-                  "title": "X-Forwarded-Email",
-                  "type": "string"
-                },
-                "X-Forwarded-Groups": {
-                  "default": "groups_json",
-                  "title": "X-Forwarded-Groups",
-                  "type": "string"
-                },
-                "X-Forwarded-ID": {
-                  "default": "sub",
-                  "title": "X-Forwarded-ID",
-                  "type": "string"
-                },
-                "X-Forwarded-Name": {
-                  "default": "name",
-                  "title": "X-Forwarded-Name",
-                  "type": "string"
-                }
-              },
-              "required": [
-                "X-Forwarded-ID",
-                "X-Forwarded-Email",
-                "X-Forwarded-Name",
-                "X-Forwarded-Groups"
-              ],
-              "title": "claimHeaders"
-            },
             "issuer": {
               "default": "https://auth.example.invalid/",
               "description": "JWT issuer; replace the nonfunctional example before deployment",
@@ -164,10 +166,42 @@
         "publicRules": {
           "description": "Additional public rules; paths must not overlap protected group paths",
           "items": {
-            "required": []
+            "additionalProperties": false,
+            "properties": {
+              "methods": {
+                "items": {
+                  "enum": [
+                    "GET",
+                    "HEAD",
+                    "POST",
+                    "PUT",
+                    "PATCH",
+                    "DELETE",
+                    "OPTIONS",
+                    "CONNECT",
+                    "TRACE"
+                  ],
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "paths": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "paths"
+            ],
+            "type": "object"
           },
-          "required": [],
-          "title": "publicRules"
+          "title": "publicRules",
+          "type": "array"
         },
         "telemetry": {
           "additionalProperties": false,
@@ -181,10 +215,10 @@
               "title": "accessLogProviders"
             },
             "enabled": {
-              "default": "false",
+              "default": false,
               "description": "Enable Istio telemetry",
-              "required": [],
-              "title": "enabled"
+              "title": "enabled",
+              "type": "boolean"
             },
             "randomSamplingPercentage": {
               "default": "100",

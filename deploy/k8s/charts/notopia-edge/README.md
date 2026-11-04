@@ -8,9 +8,13 @@
 
 ## Security and deployment
 
-Replace the nonfunctional example JWT issuer and JWKS URI. Configure `frontRoute.parentRefs` to attach to a trusted front gateway; this route strips all five identity headers before requests reach the edge gateway. Do not allow clients to bypass that front route and reach the edge gateway directly. The billing admin group is mandatory; custom group paths are also excluded from the general JWT allow rule. Public and protected paths must not overlap, and path wildcards are supported only at the end.
+Replace the nonfunctional example JWT issuer and JWKS URI. Configure `frontRoute.parentRefs` and both `frontRoute.trustedNamespace` and `frontRoute.trustedGateway` for the gateway that strips all five identity headers. The chart creates a NetworkPolicy selecting the managed gateway's pods; by default it denies all ingress and, when configured, permits only pods labeled for that front gateway in that namespace. Existing gateways (`gateway.enabled=false`) are unsupported. `gateway.listenerPort` controls both the listener and front backend port.
 
-When Istio is disabled, Gateway API objects alone do not authenticate or authorize requests. Supply an external JWT verification and authorization layer that strips all five identity headers, sets trusted identity claims including `groups_json`, and enforces the billing admin group rule. Ensure it cannot be bypassed.
+**This is not a self-contained security guarantee.** NetworkPolicy must be enforced by the CNI for the actual gateway pods and traffic, including traffic from outside the cluster and host-network sources. Gateway pod labels must match the selector, and no other NetworkPolicy may grant broader access (policies are additive). The trusted front gateway must not expose any alternate route to the edge that bypasses header removal. Privileged cluster/network operators can bypass these controls. Verify the boundary and spoofed-header rejection in the deployment environment before use.
+
+The billing admin group is mandatory; custom group paths are also excluded from the general JWT allow rule. Public and protected paths must not overlap. Path wildcards are supported only at the end; percent escapes, dot segments and repeated slashes are rejected. Header claim mappings are fixed to the stripped identity header contract.
+
+When Istio is disabled, the NetworkPolicy remains, but Gateway API objects alone do not authenticate or authorize requests. Supply an external non-bypassable JWT verification and authorization layer that strips all five identity headers, sets trusted identity claims including `groups_json`, and enforces the billing admin group rule. The chart cannot verify that this layer exists or that a non-Istio gateway implementation uses the expected pod labels.
 
 ## Values
 
@@ -19,16 +23,17 @@ When Istio is disabled, Gateway API objects alone do not authenticate or authori
 | frontRoute.enabled | bool | `true` | Create a route from the front gateway |
 | frontRoute.hostnames | list | `[]` | Route hostnames |
 | frontRoute.parentRefs | list | `[]` | Parent gateway references |
+| frontRoute.trustedGateway | string | `""` | Gateway API name of the only front gateway allowed to reach the edge |
+| frontRoute.trustedNamespace | string | `""` | Namespace of the only front gateway allowed to reach the edge |
 | fullnameOverride | string | `""` | Override the full release name |
 | gateway.annotations | object | `{}` | Gateway annotations |
 | gateway.className | string | `"istio"` | GatewayClass name |
-| gateway.enabled | bool | `true` | Create an Istio Gateway API gateway |
+| gateway.enabled | bool | `true` | Create the managed gateway; disabling is unsupported |
 | gateway.hostname | string | `""` | Listener hostname, empty for all hosts |
 | gateway.listenerPort | int | `80` | Listener port |
 | istio.adminGroup | string | `"admin"` | Group required for billing administration |
 | istio.enabled | bool | `true` | Enable Istio authentication and authorization |
 | istio.groupRules | list | `[]` | Additional group-protected paths and permitted groups |
-| istio.jwt.claimHeaders | object | `{"X-Forwarded-Email":"email","X-Forwarded-Groups":"groups_json","X-Forwarded-ID":"sub","X-Forwarded-Name":"name"}` | Scalar claims copied to trusted headers |
 | istio.jwt.issuer | string | `"https://auth.example.invalid/"` | JWT issuer; replace the nonfunctional example before deployment |
 | istio.jwt.jwksUri | string | `"https://auth.example.invalid/jwks"` | JWKS endpoint; replace the nonfunctional example before deployment |
 | istio.publicRules | list | `[]` | Additional public rules; paths must not overlap protected group paths |
