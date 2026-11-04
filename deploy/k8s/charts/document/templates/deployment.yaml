@@ -17,6 +17,8 @@ metadata:
   labels:
     {{- include "notopia-common.labels" $root | nindent 4 }}
 spec:
+  strategy:
+    type: Recreate
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}

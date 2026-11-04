@@ -1,0 +1,11 @@
+suite: rollout safety
+templates:
+  - deployment.yaml
+tests:
+  - it: avoids overlapping replicas without Redis
+    asserts:
+      - equal: { path: spec.strategy.type, value: Recreate }
+  - it: permits a rolling update with shared Redis
+    set: { redis.urlSecret.name: redis }
+    asserts:
+      - equal: { path: spec.strategy.type, value: RollingUpdate }

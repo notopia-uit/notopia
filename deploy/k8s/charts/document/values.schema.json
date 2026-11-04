@@ -488,7 +488,7 @@
         },
         "exposeHealth": {
           "default": true,
-          "description": "Expose health endpoints",
+          "description": "Add an explicit health rule; false does not block health through the /document prefix",
           "title": "exposeHealth",
           "type": "boolean"
         },

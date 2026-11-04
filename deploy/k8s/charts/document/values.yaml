@@ -155,7 +155,7 @@ route:
   # @schema
   # type: boolean
   # @schema
-  # -- Expose health endpoints
+  # -- Add an explicit health rule; false does not block health through the /document prefix
   exposeHealth: true
 autoscaling:
   # @schema

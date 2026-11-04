@@ -1,2 +1,3 @@
 Redis configuration alone does not make document scale-out safe: deletion and permission events do not reach every replica. Keep homelab at one replica until a separately approved fix and multi-replica integration test exist.
+route.exposeHealth=false does not block health endpoints: the /document prefix still routes them. Use separate gateway authorization to restrict them.
 The retained migration hook ServiceAccount must be removed manually after uninstall.

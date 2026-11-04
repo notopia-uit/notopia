@@ -11,6 +11,10 @@
 
 Redis configuration alone does not establish safe document scale-out: deletion and permission event delivery to every replica remains unresolved. Keep homelab at one replica until a separately approved fix and multi-replica integration test exist.
 
+## Health route exposure
+
+`route.exposeHealth: false` removes only the explicit health rule. The `/document` prefix still routes `/document/health` and its descendants to the service, so this setting does **not** block health endpoints. Do not rely on it as a security boundary. Use a separately configured gateway authorization policy when health endpoints must be private.
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -53,7 +57,7 @@ Redis configuration alone does not establish safe document scale-out: deletion a
 | resources.limits | object | `{"memory":"256Mi"}` | Container resource limits; memory must be an integer quantity (e.g. 256Mi or 2Gi), not fractional |
 | resources.requests | object | `{"cpu":"50m","memory":"64Mi"}` | Container resource requests |
 | route.enabled | bool | `true` | Create HTTPRoute |
-| route.exposeHealth | bool | `true` | Expose health endpoints |
+| route.exposeHealth | bool | `true` | Add an explicit health rule; false does not block health through the /document prefix |
 | route.hostnames | list | `[]` | Route hostnames |
 | route.parentRefs | list | `[]` | Gateway parent references |
 | runtime | string | `"node"` | Application runtime |
