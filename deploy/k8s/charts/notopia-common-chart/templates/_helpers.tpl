@@ -28,10 +28,11 @@ app.kubernetes.io/version: {{ . | quote }}
 {{- if .Values.image.digest -}}{{ printf "%s@%s" .Values.image.repository .Values.image.digest }}{{- else -}}{{ printf "%s:%s" .Values.image.repository (default .Chart.AppVersion .Values.image.tag) }}{{- end -}}
 {{- end -}}
 {{- define "notopia-common.podSecurityContext" -}}
+{{- $context := .Values.podSecurityContext | default dict -}}
 runAsNonRoot: true
-runAsUser: {{ .Values.podSecurityContext.runAsUser }}
-runAsGroup: {{ .Values.podSecurityContext.runAsGroup }}
-fsGroup: {{ .Values.podSecurityContext.fsGroup }}
+runAsUser: {{ required "podSecurityContext.runAsUser is required" $context.runAsUser }}
+runAsGroup: {{ required "podSecurityContext.runAsGroup is required" $context.runAsGroup }}
+fsGroup: {{ required "podSecurityContext.fsGroup is required" $context.fsGroup }}
 seccompProfile:
   type: RuntimeDefault
 {{- end -}}

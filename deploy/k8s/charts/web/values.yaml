@@ -339,7 +339,7 @@ affinity: {}
 #   type: object
 #   additionalProperties: true
 # @schema
-# -- Additional volumes
+# -- Additional volumes; the name next-cache is reserved for the built-in cache volume
 extraVolumes: []
 # @schema
 # type: array
@@ -347,7 +347,7 @@ extraVolumes: []
 #   type: object
 #   additionalProperties: true
 # @schema
-# -- Additional volume mounts
+# -- Additional volume mounts; /app/apps/web/.next/cache is reserved for the built-in cache mount
 extraVolumeMounts: []
 
 # -- Common library configuration

@@ -72,7 +72,7 @@
       "type": "array"
     },
     "extraVolumeMounts": {
-      "description": "Additional volume mounts",
+      "description": "Additional volume mounts; /app/apps/web/.next/cache is reserved for the built-in cache mount",
       "items": {
         "additionalProperties": true,
         "required": [],
@@ -82,7 +82,7 @@
       "type": "array"
     },
     "extraVolumes": {
-      "description": "Additional volumes",
+      "description": "Additional volumes; the name next-cache is reserved for the built-in cache volume",
       "items": {
         "additionalProperties": true,
         "required": [],

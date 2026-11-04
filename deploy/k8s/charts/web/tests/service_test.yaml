@@ -18,3 +18,13 @@ tests:
       - contains: { path: spec.template.spec.volumes, content: { name: custom, emptyDir: {} } }
       - contains: { path: 'spec.template.spec.containers[0].volumeMounts', content: { name: next-cache, mountPath: /app/apps/web/.next/cache } }
       - contains: { path: 'spec.template.spec.containers[0].volumeMounts', content: { name: custom, mountPath: /custom } }
+  - it: rejects a duplicate built-in cache volume
+    set:
+      extraVolumes: [{ name: next-cache, emptyDir: {} }]
+    asserts:
+      - failedTemplate: { errorMessage: 'extraVolumes cannot use reserved name next-cache' }
+  - it: rejects a duplicate built-in cache mount path
+    set:
+      extraVolumeMounts: [{ name: custom, mountPath: /app/apps/web/.next/cache }]
+    asserts:
+      - failedTemplate: { errorMessage: 'extraVolumeMounts cannot use reserved mountPath /app/apps/web/.next/cache' }

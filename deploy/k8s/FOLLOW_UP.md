@@ -25,7 +25,10 @@ that deployment, upgrades, or the identity boundary are safe.
   migration/seed hook with the configured IDs and a read-only root, exercising real requests and
   startup dependencies. Override the IDs where image or volume ownership requires it. Web mounts
   an ephemeral writable `/app/apps/web/.next/cache`, which hides any image contents at that path;
-  validate Next.js caching and any writes outside that path (including ISR). If other workloads need
+  current web source has no explicit revalidation or ISR configuration, but Next.js may write ISR
+  output under `.next/server`, outside that mount. Runtime behavior and writable paths remain pending
+  user review and verification against the built image; do not assume this chart is runtime-ready.
+  If other workloads need
   writable paths such as `/tmp`, mount appropriate volumes and verify their ownership; hook jobs do
   not currently expose extra volume mounts, so such a hook requires a chart change. No claim is made
   that read-only root or arbitrary IDs work with every image.

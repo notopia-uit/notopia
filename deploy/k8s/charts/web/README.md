@@ -20,8 +20,8 @@
 | env | object | `{}` | Plain environment |
 | envFrom | list | `[]` | External environment sources |
 | extraEnv | list | `[]` | Additional environment entries |
-| extraVolumeMounts | list | `[]` | Additional volume mounts |
-| extraVolumes | list | `[]` | Additional volumes |
+| extraVolumeMounts | list | `[]` | Additional volume mounts; /app/apps/web/.next/cache is reserved for the built-in cache mount |
+| extraVolumes | list | `[]` | Additional volumes; the name next-cache is reserved for the built-in cache volume |
 | fullnameOverride | string | `""` | Override release name |
 | hooks.migrate.activeDeadlineSeconds | int | `300` | Migration deadline |
 | hooks.migrate.resources | object | `{}` | Migration resources, defaults to pod resources; memory limit must be an integer quantity |

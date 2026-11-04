@@ -3,6 +3,16 @@
 {{- $extra := default list $values.extraEnv -}}
 {{- $_ := set $values "extraEnv" $extra -}}
 {{- $_ := set $root "Values" $values -}}
+{{- range .Values.extraVolumes -}}
+{{- if eq .name "next-cache" -}}
+{{- fail "extraVolumes cannot use reserved name next-cache" -}}
+{{- end -}}
+{{- end -}}
+{{- range .Values.extraVolumeMounts -}}
+{{- if eq .mountPath "/app/apps/web/.next/cache" -}}
+{{- fail "extraVolumeMounts cannot use reserved mountPath /app/apps/web/.next/cache" -}}
+{{- end -}}
+{{- end -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
