@@ -27,6 +27,9 @@ tests:
     template: deployment.yaml
     asserts:
       - equal: { path: spec.template.spec.securityContext.runAsNonRoot, value: true }
+      - equal: { path: spec.template.spec.securityContext.runAsUser, value: 1000 }
+      - equal: { path: spec.template.spec.securityContext.runAsGroup, value: 1000 }
+      - equal: { path: spec.template.spec.securityContext.fsGroup, value: 1000 }
       - equal: { path: "spec.template.spec.containers[0].securityContext.capabilities.drop[0]", value: ALL }
       - contains:
           path: spec.template.spec.containers[0].env
@@ -34,12 +37,21 @@ tests:
   - it: shares secrets and env with hook jobs
     template: job.yaml
     asserts:
+      - equal: { path: spec.template.spec.securityContext.runAsUser, value: 1000 }
+      - equal: { path: spec.template.spec.securityContext.fsGroup, value: 1000 }
       - contains:
           path: spec.template.spec.containers[0].env
           content: { name: SECRET, valueFrom: { secretKeyRef: { name: external, key: password } } }
       - contains:
           path: spec.template.spec.containers[0].envFrom
           content: { secretRef: { name: external } }
+  - it: applies identity overrides to hook jobs
+    template: job.yaml
+    set: { podSecurityContext: { runAsUser: 1234, runAsGroup: 2345, fsGroup: 3456 } }
+    asserts:
+      - equal: { path: spec.template.spec.securityContext.runAsUser, value: 1234 }
+      - equal: { path: spec.template.spec.securityContext.runAsGroup, value: 2345 }
+      - equal: { path: spec.template.spec.securityContext.fsGroup, value: 3456 }
   - it: rejects duplicate env names
     template: job.yaml
     set: { extraEnv: [{ name: FOO, valueFrom: { secretKeyRef: { name: external, key: password } } }] }

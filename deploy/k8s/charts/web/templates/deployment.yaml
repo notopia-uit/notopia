@@ -51,12 +51,14 @@ spec:
           envFrom: {{- toYaml . | nindent 12 }}
           {{- end }}
           resources: {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.extraVolumeMounts }}
-          volumeMounts: {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.extraVolumes }}
-      volumes: {{- toYaml . | nindent 8 }}
-      {{- end }}
+          volumeMounts:
+            - name: next-cache
+              mountPath: /app/apps/web/.next/cache
+            {{- with .Values.extraVolumeMounts }}{{- toYaml . | nindent 12 }}{{- end }}
+      volumes:
+        - name: next-cache
+          emptyDir: {}
+        {{- with .Values.extraVolumes }}{{- toYaml . | nindent 8 }}{{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector: {{- toYaml . | nindent 8 }}
       {{- end }}

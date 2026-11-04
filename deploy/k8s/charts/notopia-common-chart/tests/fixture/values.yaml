@@ -1,3 +1,22 @@
+podSecurityContext:
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Numeric non-root user ID; image files must be readable and executable by this user
+  runAsUser: 1000
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Numeric primary group ID
+  runAsGroup: 1000
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Group owning supported writable volumes
+  fsGroup: 1000
 image: { repository: example/app, tag: latest, digest: '' }
 nameOverride: ''
 fullnameOverride: ''

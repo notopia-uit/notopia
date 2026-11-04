@@ -29,6 +29,9 @@ app.kubernetes.io/version: {{ . | quote }}
 {{- end -}}
 {{- define "notopia-common.podSecurityContext" -}}
 runAsNonRoot: true
+runAsUser: {{ .Values.podSecurityContext.runAsUser }}
+runAsGroup: {{ .Values.podSecurityContext.runAsGroup }}
+fsGroup: {{ .Values.podSecurityContext.fsGroup }}
 seccompProfile:
   type: RuntimeDefault
 {{- end -}}

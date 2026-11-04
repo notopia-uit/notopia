@@ -47,6 +47,9 @@
 | podDisruptionBudget.enabled | bool | `false` | Enable disruption budget |
 | podDisruptionBudget.minAvailable | int | `1` | Minimum available replicas |
 | podLabels | object | `{}` | Additional pod labels |
+| podSecurityContext.fsGroup | int | `1000` | Group owning supported writable volumes |
+| podSecurityContext.runAsGroup | int | `1000` | Numeric primary group ID |
+| podSecurityContext.runAsUser | int | `1000` | Numeric non-root user ID; image files must be readable and executable by this user |
 | redis.addr | string | `""` | Redis address |
 | redis.db | int | `0` | Redis database |
 | redis.passwordSecret | object | `{"key":"password","name":""}` | Existing Redis password secret |

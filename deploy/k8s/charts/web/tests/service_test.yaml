@@ -6,3 +6,15 @@ tests:
     asserts:
       - equal: { path: 'spec.template.spec.containers[0].command', value: [node, apps/web/server.js] }
       - equal: { path: 'spec.template.spec.containers[0].readinessProbe.tcpSocket.port', value: 3000 }
+  - it: provides a writable cache while retaining extra mounts and identity overrides
+    set:
+      podSecurityContext: { runAsUser: 1234, runAsGroup: 2345, fsGroup: 3456 }
+      extraVolumes: [{ name: custom, emptyDir: {} }]
+      extraVolumeMounts: [{ name: custom, mountPath: /custom }]
+    asserts:
+      - equal: { path: spec.template.spec.securityContext.runAsUser, value: 1234 }
+      - equal: { path: spec.template.spec.securityContext.fsGroup, value: 3456 }
+      - contains: { path: spec.template.spec.volumes, content: { name: next-cache, emptyDir: {} } }
+      - contains: { path: spec.template.spec.volumes, content: { name: custom, emptyDir: {} } }
+      - contains: { path: 'spec.template.spec.containers[0].volumeMounts', content: { name: next-cache, mountPath: /app/apps/web/.next/cache } }
+      - contains: { path: 'spec.template.spec.containers[0].volumeMounts', content: { name: custom, mountPath: /custom } }

@@ -380,6 +380,35 @@
       "title": "podLabels",
       "type": "object"
     },
+    "podSecurityContext": {
+      "additionalProperties": false,
+      "properties": {
+        "fsGroup": {
+          "default": 1000,
+          "description": "Group owning supported writable volumes",
+          "minimum": 1,
+          "title": "fsGroup",
+          "type": "integer"
+        },
+        "runAsGroup": {
+          "default": 1000,
+          "description": "Numeric primary group ID",
+          "minimum": 1,
+          "title": "runAsGroup",
+          "type": "integer"
+        },
+        "runAsUser": {
+          "default": 1000,
+          "description": "Numeric non-root user ID; image files must be readable and executable by this user",
+          "minimum": 1,
+          "title": "runAsUser",
+          "type": "integer"
+        }
+      },
+      "required": [],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
     "redis": {
       "additionalProperties": false,
       "properties": {
@@ -589,6 +618,7 @@
     }
   },
   "required": [
+    "podSecurityContext",
     "image",
     "serviceAccount",
     "resources",

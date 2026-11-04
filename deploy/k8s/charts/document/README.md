@@ -53,6 +53,9 @@ Redis configuration alone does not establish safe document scale-out: deletion a
 | podDisruptionBudget.enabled | bool | `false` | Enable disruption budget |
 | podDisruptionBudget.minAvailable | int | `1` | Minimum available replicas |
 | podLabels | object | `{}` | Additional pod labels |
+| podSecurityContext.fsGroup | int | `1000` | Group owning supported writable volumes |
+| podSecurityContext.runAsGroup | int | `1000` | Numeric primary group ID |
+| podSecurityContext.runAsUser | int | `1000` | Numeric non-root user ID; image files must be readable and executable by this user |
 | replicaCount | int | `1` | Number of replicas |
 | resources.limits | object | `{"memory":"256Mi"}` | Container resource limits; memory must be an integer quantity (e.g. 256Mi or 2Gi), not fractional |
 | resources.requests | object | `{"cpu":"50m","memory":"64Mi"}` | Container resource requests |

@@ -18,6 +18,17 @@ that deployment, upgrades, or the identity boundary are safe.
 - **Node live upgrade and gateway tests:** validate document and search-worker upgrades against
   running workloads, including hooks and rollout behavior, and exercise gateway routing and health
   exposure on the intended implementation. Rendered manifests and Node tests are not substitutes.
+- **Non-root image and filesystem validation:** all six service Dockerfiles default to root; charts
+  supply numeric UID/GID 1000 and fsGroup 1000, with configurable IDs and read-only root filesystems.
+  Image contents, dependency permissions, hook commands, and framework runtime writes have not been
+  verified against the actual built images or a cluster. Before deployment, run each image and every
+  migration/seed hook with the configured IDs and a read-only root, exercising real requests and
+  startup dependencies. Override the IDs where image or volume ownership requires it. Web mounts
+  an ephemeral writable `/app/apps/web/.next/cache`, which hides any image contents at that path;
+  validate Next.js caching and any writes outside that path (including ISR). If other workloads need
+  writable paths such as `/tmp`, mount appropriate volumes and verify their ownership; hook jobs do
+  not currently expose extra volume mounts, so such a hook requires a chart change. No claim is made
+  that read-only root or arbitrary IDs work with every image.
 - **Document replicas:** deletion and permission events may not reach every replica; Redis alone
   is insufficient. Keep homelab at one replica until a separately approved fix and multi-replica
   integration test exist.
