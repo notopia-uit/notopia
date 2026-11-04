@@ -25,9 +25,9 @@
 | extraVolumes | list | `[]` | Additional volumes |
 | fullnameOverride | string | `""` | Override release name |
 | hooks.migrate.activeDeadlineSeconds | int | `300` | Migration deadline |
-| hooks.migrate.resources | object | `{}` | Migration resources, defaults to pod resources |
+| hooks.migrate.resources | object | `{}` | Migration resources, defaults to pod resources; memory limit must be an integer quantity |
 | hooks.seed.activeDeadlineSeconds | int | `300` | Seed deadline |
-| hooks.seed.resources | object | `{}` | Seed resources, defaults to pod resources |
+| hooks.seed.resources | object | `{}` | Seed resources, defaults to pod resources; memory limit must be an integer quantity |
 | image.digest | string | `""` | Immutable image digest |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"ghcr.io/notopia-uit/billing"` | Image repository |
@@ -51,7 +51,7 @@
 | redis.db | int | `0` | Redis database |
 | redis.passwordSecret | object | `{"key":"password","name":""}` | Existing Redis password secret |
 | replicaCount | int | `1` | Number of replicas |
-| resources.limits | object | `{"memory":"256Mi"}` | Container resource limits |
+| resources.limits | object | `{"memory":"256Mi"}` | Container resource limits; memory must be an integer quantity (e.g. 256Mi or 2Gi), not fractional |
 | resources.requests | object | `{"cpu":"50m","memory":"64Mi"}` | Container resource requests |
 | route.enabled | bool | `true` | Create HTTPRoute |
 | route.exposeHealth | bool | `true` | Expose health endpoints |

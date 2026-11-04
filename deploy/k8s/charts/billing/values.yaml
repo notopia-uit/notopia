@@ -93,9 +93,11 @@ resources:
   #   memory:
   #     anyOf:
   #       - type: string
-  #       - type: number
+  #         pattern: '^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$'
+  #       - type: integer
+  #         minimum: 0
   # @schema
-  # -- Container resource limits
+  # -- Container resource limits; memory must be an integer quantity (e.g. 256Mi or 2Gi), not fractional
   limits: { memory: 256Mi }
 # @schema
 # type: string
@@ -239,8 +241,19 @@ hooks:
     # @schema
     # type: object
     # additionalProperties: true
+    # properties:
+    #   limits:
+    #     type: object
+    #     additionalProperties: true
+    #     properties:
+    #       memory:
+    #         anyOf:
+    #           - type: string
+    #             pattern: '^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$'
+    #           - type: integer
+    #             minimum: 0
     # @schema
-    # -- Migration resources, defaults to pod resources
+    # -- Migration resources, defaults to pod resources; memory limit must be an integer quantity
     resources: {}
   seed:
     # @schema
@@ -252,8 +265,19 @@ hooks:
     # @schema
     # type: object
     # additionalProperties: true
+    # properties:
+    #   limits:
+    #     type: object
+    #     additionalProperties: true
+    #     properties:
+    #       memory:
+    #         anyOf:
+    #           - type: string
+    #             pattern: '^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$'
+    #           - type: integer
+    #             minimum: 0
     # @schema
-    # -- Seed resources, defaults to pod resources
+    # -- Seed resources, defaults to pod resources; memory limit must be an integer quantity
     resources: {}
 istio:
   # @schema

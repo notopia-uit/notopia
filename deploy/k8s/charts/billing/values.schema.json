@@ -147,7 +147,29 @@
             },
             "resources": {
               "additionalProperties": true,
-              "description": "Migration resources, defaults to pod resources",
+              "description": "Migration resources, defaults to pod resources; memory limit must be an integer quantity",
+              "properties": {
+                "limits": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "memory": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$",
+                          "type": "string"
+                        },
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      ],
+                      "required": []
+                    }
+                  },
+                  "required": [],
+                  "type": "object"
+                }
+              },
               "required": [],
               "title": "resources",
               "type": "object"
@@ -169,7 +191,29 @@
             },
             "resources": {
               "additionalProperties": true,
-              "description": "Seed resources, defaults to pod resources",
+              "description": "Seed resources, defaults to pod resources; memory limit must be an integer quantity",
+              "properties": {
+                "limits": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "memory": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$",
+                          "type": "string"
+                        },
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      ],
+                      "required": []
+                    }
+                  },
+                  "required": [],
+                  "type": "object"
+                }
+              },
               "required": [],
               "title": "resources",
               "type": "object"
@@ -428,7 +472,7 @@
               }
             ]
           },
-          "description": "Container resource limits",
+          "description": "Container resource limits; memory must be an integer quantity (e.g. 256Mi or 2Gi), not fractional",
           "properties": {
             "cpu": {
               "anyOf": [
@@ -444,10 +488,12 @@
             "memory": {
               "anyOf": [
                 {
+                  "pattern": "^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$",
                   "type": "string"
                 },
                 {
-                  "type": "number"
+                  "minimum": 0,
+                  "type": "integer"
                 }
               ],
               "required": []

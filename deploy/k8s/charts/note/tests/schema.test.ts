@@ -57,3 +57,22 @@ test('accepts percentage disruption budgets', () => {
   );
   assert.equal(result.status, 0, result.stderr);
 });
+
+test('rejects fractional workload memory via the schema', () => {
+  const result = spawnSync('helm', [...base, '--set', 'resources.limits.memory=1.5Gi'], {
+    encoding: 'utf8',
+  });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /values don't meet the specifications/);
+});
+
+test('rejects fractional hook memory via the schema', () => {
+  const hook = name === 'authorization' ? 'seed' : 'migrate';
+  const result = spawnSync(
+    'helm',
+    [...base, '--set', `hooks.${hook}.resources.limits.memory=1.5Gi`],
+    { encoding: 'utf8' }
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /values don't meet the specifications/);
+});

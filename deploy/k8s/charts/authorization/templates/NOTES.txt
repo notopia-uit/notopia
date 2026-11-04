@@ -2,4 +2,5 @@ Provide the external database secret before installing.
 The post-install seed hook runs after Helm --wait checks readiness. The database
 policy must already match this image's policy before starting or upgrading pods;
 the service does not reload policy seeded after startup. Upgrade ordering is
-not yet automated safely by this chart.
+not yet automated safely by this chart. Follow the external policy seeding and
+maintenance prerequisites in the chart README before every install or upgrade.
