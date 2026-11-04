@@ -8,13 +8,19 @@
 
 ## Security and deployment
 
+**Security blocker:** the chart does not establish a portable, non-bypassable identity-header boundary. Do not deploy or expose it until the operator has independently implemented and verified that boundary. Helm rendering/install/upgrade fails by default. After verification, set `security.externalBoundaryAcknowledged=true`; this is an operator assertion, not a control or evidence of security. A failed upgrade does not remove or secure an already-running release.
+
 Replace the nonfunctional example JWT issuer and JWKS URI. Configure `frontRoute.parentRefs` and both `frontRoute.trustedNamespace` and `frontRoute.trustedGateway` for the gateway that strips all five identity headers. The chart creates a NetworkPolicy selecting the managed gateway's pods; by default it denies all ingress and, when configured, permits only pods labeled for that front gateway in that namespace. Existing gateways (`gateway.enabled=false`) are unsupported. `gateway.listenerPort` controls both the listener and front backend port.
 
-**This is not a self-contained security guarantee.** NetworkPolicy must be enforced by the CNI for the actual gateway pods and traffic, including traffic from outside the cluster and host-network sources. Gateway pod labels must match the selector, and no other NetworkPolicy may grant broader access (policies are additive). The trusted front gateway must not expose any alternate route to the edge that bypasses header removal. Privileged cluster/network operators can bypass these controls. Verify the boundary and spoofed-header rejection in the deployment environment before use.
+**Required external controls:** all traffic reaching the edge, including public paths and requests with absent JWT claims, must have the five client-supplied identity headers removed before trusted claims are set; no alternate front route may reach the edge without that removal. Prevent direct access to the edge service, pod IPs, host ports, load balancer and all other entry points. Restrict who can create or modify routes, pods, labels, gateways and network policies, including in the trusted namespace; a matching pod label is not authenticated identity. Ensure downstream services cannot be reached directly with spoofed identity headers. Use enforceable platform controls, such as a verified authenticated proxy-to-proxy boundary and centrally controlled routing; the precise mechanism is deployment-specific.
+
+**NetworkPolicy is defense in depth, not a security proof.** Enforcement depends on the CNI, selected pod labels, traffic path, host-network and node behavior. Policies are additive and another policy can widen access. A different route on the same front gateway or another pod with the same label may bypass the intended filter. Cluster and network administrators must verify these controls and their continuing operation; privileged operators can bypass them.
 
 The billing admin group is mandatory; custom group paths are also excluded from the general JWT allow rule. Public and protected paths must not overlap. Path wildcards are supported only at the end; percent escapes, dot segments and repeated slashes are rejected. Header claim mappings are fixed to the stripped identity header contract.
 
-When Istio is disabled, the NetworkPolicy remains, but Gateway API objects alone do not authenticate or authorize requests. Supply an external non-bypassable JWT verification and authorization layer that strips all five identity headers, sets trusted identity claims including `groups_json`, and enforces the billing admin group rule. The chart cannot verify that this layer exists or that a non-Istio gateway implementation uses the expected pod labels.
+When Istio is disabled, the NetworkPolicy remains, but Gateway API objects alone do not authenticate or authorize requests. Supply an external non-bypassable JWT verification and authorization layer that strips all five identity headers, sets trusted identity claims including `groups_json`, and enforces the public, authenticated and billing admin group rules. After independently verifying that layer, also set `security.externalIdentityLayerAcknowledged=true`. The chart cannot verify that this layer exists or that a non-Istio gateway implementation uses the expected pod labels.
+
+Before exposure and after configuration or infrastructure changes, test direct edge access, an alternate front route, a spoofed-label pod, and all five forged headers with anonymous requests and tokens with missing claims. Test ordinary and admin users against admin paths, and repeat with Istio disabled when applicable. These checks require a representative cluster and do not follow from successful Helm rendering or acknowledgement.
 
 ## Values
 
@@ -43,6 +49,8 @@ When Istio is disabled, the NetworkPolicy remains, but Gateway API objects alone
 | istio.telemetry.tracingProviders | list | `[]` | Tracing provider names |
 | nameOverride | string | `""` | Override the chart name |
 | notopia-common-chart | object | `{"global":{}}` | Common library configuration |
+| security.externalBoundaryAcknowledged | bool | `false` | Operator acknowledges an externally enforced non-bypassable identity-header boundary |
+| security.externalIdentityLayerAcknowledged | bool | `false` | Operator acknowledges an external JWT, header, and authorization layer when Istio is disabled |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

@@ -2,6 +2,17 @@
 nameOverride: ''
 # -- Override the full release name
 fullnameOverride: ''
+security:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Operator acknowledges an externally enforced non-bypassable identity-header boundary
+  externalBoundaryAcknowledged: false
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Operator acknowledges an external JWT, header, and authorization layer when Istio is disabled
+  externalIdentityLayerAcknowledged: false
 gateway:
   # @schema
   # type: boolean

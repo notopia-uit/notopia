@@ -268,9 +268,30 @@
         "global"
       ],
       "title": "notopia-common-chart"
+    },
+    "security": {
+      "additionalProperties": false,
+      "properties": {
+        "externalBoundaryAcknowledged": {
+          "default": false,
+          "description": "Operator acknowledges an externally enforced non-bypassable identity-header boundary",
+          "title": "externalBoundaryAcknowledged",
+          "type": "boolean"
+        },
+        "externalIdentityLayerAcknowledged": {
+          "default": false,
+          "description": "Operator acknowledges an external JWT, header, and authorization layer when Istio is disabled",
+          "title": "externalIdentityLayerAcknowledged",
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "title": "security",
+      "type": "object"
     }
   },
   "required": [
+    "security",
     "gateway",
     "frontRoute",
     "istio"

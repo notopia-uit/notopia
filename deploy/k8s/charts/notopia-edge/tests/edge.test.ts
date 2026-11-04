@@ -3,10 +3,22 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { test } from 'node:test';
 
 const chart = 'deploy/k8s/charts/notopia-edge';
+const acknowledgements = [
+  '--set',
+  'security.externalBoundaryAcknowledged=true,security.externalIdentityLayerAcknowledged=true',
+];
 function render(template: string, ...values: string[]) {
   const yaml = execFileSync(
     'helm',
-    ['template', 'test', chart, '--show-only', `templates/${template}`, ...values],
+    [
+      'template',
+      'test',
+      chart,
+      ...acknowledgements,
+      '--show-only',
+      `templates/${template}`,
+      ...values,
+    ],
     { encoding: 'utf8' }
   );
   return JSON.parse(execFileSync('yq', ['-o=json'], { input: yaml, encoding: 'utf8' }));
@@ -49,9 +61,13 @@ test('public and protected policies and authenticated fallback are disjoint', ()
 });
 
 test('Istio disabled emits no Istio objects', () => {
-  const yaml = execFileSync('helm', ['template', 'test', chart, '--set', 'istio.enabled=false'], {
-    encoding: 'utf8',
-  });
+  const yaml = execFileSync(
+    'helm',
+    ['template', 'test', chart, ...acknowledgements, '--set', 'istio.enabled=false'],
+    {
+      encoding: 'utf8',
+    }
+  );
   assert.doesNotMatch(yaml, /(?:security|telemetry)\.istio\.io/);
 });
 
@@ -62,9 +78,13 @@ test('conflicting paths and unsupported wildcards are rejected', () => {
     'istio.groupRules[0].paths[0]=/billing/admin/*,istio.groupRules[0].groups[0]=other',
     'istio.adminGroup=*',
   ]) {
-    const result = spawnSync('helm', ['template', 'test', chart, '--set', setting], {
-      encoding: 'utf8',
-    });
+    const result = spawnSync(
+      'helm',
+      ['template', 'test', chart, ...acknowledgements, '--set', setting],
+      {
+        encoding: 'utf8',
+      }
+    );
     assert.notEqual(result.status, 0, setting);
   }
 });
@@ -122,7 +142,9 @@ test('rejects unsafe configuration', () => {
     ['--set', 'istio.jwt.claimHeaders.X-Forwarded-Groups=groups'],
   ];
   for (const args of invalid) {
-    const result = spawnSync('helm', ['template', 'test', chart, ...args], { encoding: 'utf8' });
+    const result = spawnSync('helm', ['template', 'test', chart, ...acknowledgements, ...args], {
+      encoding: 'utf8',
+    });
     assert.notEqual(result.status, 0, args.join(' '));
   }
 });

@@ -1,6 +1,8 @@
 suite: edge security
 templates:
   - templates/istio/authorizationpolicy.yaml
+set:
+  security.externalBoundaryAcknowledged: true
 tests:
   - it: excludes the admin root and subtree from the ordinary authenticated rule
     asserts:

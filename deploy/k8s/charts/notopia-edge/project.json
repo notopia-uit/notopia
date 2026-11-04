@@ -17,8 +17,8 @@
         "commands": [
           "mkdir -p tmp/chart-lock",
           "flock tmp/chart-lock/notopia-edge.lock helm dependency build --skip-refresh deploy/k8s/charts/notopia-edge",
-          "flock -s tmp/chart-lock/notopia-edge.lock helm lint --strict deploy/k8s/charts/notopia-edge",
-          "flock -s tmp/chart-lock/notopia-edge.lock bash -o pipefail -c 'helm template test deploy/k8s/charts/notopia-edge --set istio.telemetry.enabled=true --set istio.telemetry.tracingProviders[0]=otel | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+          "flock -s tmp/chart-lock/notopia-edge.lock helm lint --strict deploy/k8s/charts/notopia-edge --set security.externalBoundaryAcknowledged=true",
+          "flock -s tmp/chart-lock/notopia-edge.lock bash -o pipefail -c 'helm template test deploy/k8s/charts/notopia-edge --set security.externalBoundaryAcknowledged=true --set istio.telemetry.enabled=true --set istio.telemetry.tracingProviders[0]=otel | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
         ],
         "parallel": false
       },
