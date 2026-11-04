@@ -9,6 +9,7 @@ MISE_EXPERIMENTAL = 1
 
 [tools]
 helm = "3.22.1"
+just = "1.59.0"
 "github:dadav/helm-schema" = "0.24.0"
 "github:norwoodj/helm-docs" = "1.14.2"
 "github:yannh/kubeconform" = "0.8.0"

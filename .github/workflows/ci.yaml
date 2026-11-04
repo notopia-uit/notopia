@@ -223,6 +223,9 @@ jobs:
           experimental: true
           cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
 
+      - name: Setup Helm plugins
+        run: just helm-setup
+
       - name: Cache Buf dependencies
         uses: actions/cache@v6
         with:
