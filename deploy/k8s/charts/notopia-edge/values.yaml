@@ -1,0 +1,59 @@
+# -- Override the chart name
+nameOverride: ''
+# -- Override the full release name
+fullnameOverride: ''
+gateway:
+  # -- Create an Istio Gateway API gateway
+  enabled: true
+  # -- GatewayClass name
+  className: istio
+  # @schema
+  # type: object
+  # additionalProperties:
+  #   type: string
+  # @schema
+  # -- Gateway annotations
+  annotations: {}
+  # -- Listener hostname, empty for all hosts
+  hostname: ''
+  # -- Listener port
+  listenerPort: 80
+frontRoute:
+  # -- Create a route from the front gateway
+  enabled: true
+  # -- Parent gateway references
+  parentRefs: []
+  # -- Route hostnames
+  hostnames: []
+istio:
+  # -- Enable Istio authentication and authorization
+  enabled: true
+  jwt:
+    # -- JWT issuer; replace the nonfunctional example before deployment
+    issuer: 'https://auth.example.invalid/'
+    # -- JWKS endpoint; replace the nonfunctional example before deployment
+    jwksUri: 'https://auth.example.invalid/jwks'
+    # -- Scalar claims copied to trusted headers
+    claimHeaders:
+      X-Forwarded-ID: sub
+      X-Forwarded-Email: email
+      X-Forwarded-Name: name
+      X-Forwarded-Groups: groups_json
+  # -- Additional public rules; paths must not overlap protected group paths
+  publicRules: []
+  # -- Additional group-protected paths and permitted groups
+  groupRules: []
+  # -- Group required for billing administration
+  adminGroup: admin
+  telemetry:
+    # -- Enable Istio telemetry
+    enabled: false
+    # -- Tracing provider names
+    tracingProviders: []
+    # -- Access logging provider names
+    accessLogProviders: []
+    # -- Trace sampling percentage
+    randomSamplingPercentage: 100
+
+# -- Common library configuration
+notopia-common-chart: { global: {} }

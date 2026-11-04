@@ -1,0 +1,245 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "frontRoute": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": "true",
+          "description": "Create a route from the front gateway",
+          "required": [],
+          "title": "enabled"
+        },
+        "hostnames": {
+          "description": "Route hostnames",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "hostnames"
+        },
+        "parentRefs": {
+          "description": "Parent gateway references",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "parentRefs"
+        }
+      },
+      "required": [],
+      "title": "frontRoute",
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "Override the full release name",
+      "required": [],
+      "title": "fullnameOverride"
+    },
+    "gateway": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Gateway annotations",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "className": {
+          "default": "istio",
+          "description": "GatewayClass name",
+          "required": [],
+          "title": "className"
+        },
+        "enabled": {
+          "default": "true",
+          "description": "Create an Istio Gateway API gateway",
+          "required": [],
+          "title": "enabled"
+        },
+        "hostname": {
+          "default": "",
+          "description": "Listener hostname, empty for all hosts",
+          "required": [],
+          "title": "hostname"
+        },
+        "listenerPort": {
+          "default": "80",
+          "description": "Listener port",
+          "required": [],
+          "title": "listenerPort"
+        }
+      },
+      "required": [],
+      "title": "gateway",
+      "type": "object"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "istio": {
+      "additionalProperties": false,
+      "properties": {
+        "adminGroup": {
+          "default": "admin",
+          "description": "Group required for billing administration",
+          "required": [],
+          "title": "adminGroup"
+        },
+        "enabled": {
+          "default": "true",
+          "description": "Enable Istio authentication and authorization",
+          "required": [],
+          "title": "enabled"
+        },
+        "groupRules": {
+          "description": "Additional group-protected paths and permitted groups",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "groupRules"
+        },
+        "jwt": {
+          "additionalProperties": false,
+          "properties": {
+            "claimHeaders": {
+              "additionalProperties": false,
+              "description": "Scalar claims copied to trusted headers",
+              "properties": {
+                "X-Forwarded-Email": {
+                  "default": "email",
+                  "title": "X-Forwarded-Email",
+                  "type": "string"
+                },
+                "X-Forwarded-Groups": {
+                  "default": "groups_json",
+                  "title": "X-Forwarded-Groups",
+                  "type": "string"
+                },
+                "X-Forwarded-ID": {
+                  "default": "sub",
+                  "title": "X-Forwarded-ID",
+                  "type": "string"
+                },
+                "X-Forwarded-Name": {
+                  "default": "name",
+                  "title": "X-Forwarded-Name",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "X-Forwarded-ID",
+                "X-Forwarded-Email",
+                "X-Forwarded-Name",
+                "X-Forwarded-Groups"
+              ],
+              "title": "claimHeaders"
+            },
+            "issuer": {
+              "default": "https://auth.example.invalid/",
+              "description": "JWT issuer; replace the nonfunctional example before deployment",
+              "required": [],
+              "title": "issuer"
+            },
+            "jwksUri": {
+              "default": "https://auth.example.invalid/jwks",
+              "description": "JWKS endpoint; replace the nonfunctional example before deployment",
+              "required": [],
+              "title": "jwksUri"
+            }
+          },
+          "required": [],
+          "title": "jwt",
+          "type": "object"
+        },
+        "publicRules": {
+          "description": "Additional public rules; paths must not overlap protected group paths",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "publicRules"
+        },
+        "telemetry": {
+          "additionalProperties": false,
+          "properties": {
+            "accessLogProviders": {
+              "description": "Access logging provider names",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "accessLogProviders"
+            },
+            "enabled": {
+              "default": "false",
+              "description": "Enable Istio telemetry",
+              "required": [],
+              "title": "enabled"
+            },
+            "randomSamplingPercentage": {
+              "default": "100",
+              "description": "Trace sampling percentage",
+              "required": [],
+              "title": "randomSamplingPercentage"
+            },
+            "tracingProviders": {
+              "description": "Tracing provider names",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "tracingProviders"
+            }
+          },
+          "required": [],
+          "title": "telemetry",
+          "type": "object"
+        }
+      },
+      "required": [
+        "jwt",
+        "telemetry"
+      ],
+      "title": "istio",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "Override the chart name",
+      "required": [],
+      "title": "nameOverride"
+    },
+    "notopia-common-chart": {
+      "additionalProperties": false,
+      "description": "Common library configuration",
+      "properties": {
+        "global": {
+          "additionalProperties": false,
+          "required": [],
+          "title": "global",
+          "type": "object"
+        }
+      },
+      "required": [
+        "global"
+      ],
+      "title": "notopia-common-chart"
+    }
+  },
+  "required": [
+    "gateway",
+    "frontRoute",
+    "istio"
+  ],
+  "type": "object"
+}

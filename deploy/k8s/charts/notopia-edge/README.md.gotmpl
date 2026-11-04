@@ -1,0 +1,11 @@
+{{ template "chart.header" . }}
+{{ template "chart.requirementsSection" . }}
+
+## Security and deployment
+
+Replace the nonfunctional example JWT issuer and JWKS URI. Configure `frontRoute.parentRefs` to attach to a trusted front gateway; this route strips all five identity headers before requests reach the edge gateway. Do not allow clients to bypass that front route and reach the edge gateway directly. The billing admin group is mandatory; custom group paths are also excluded from the general JWT allow rule. Public and protected paths must not overlap, and path wildcards are supported only at the end.
+
+When Istio is disabled, Gateway API objects alone do not authenticate or authorize requests. Supply an external JWT verification and authorization layer that strips all five identity headers, sets trusted identity claims including `groups_json`, and enforces the billing admin group rule. Ensure it cannot be bypassed.
+
+{{ template "chart.valuesSection" . }}
+{{ template "helm-docs.versionFooter" . }}

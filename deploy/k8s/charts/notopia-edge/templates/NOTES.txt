@@ -1,0 +1,5 @@
+{{- if not .Values.istio.enabled }}
+Istio is disabled. Supply an external JWT verification, authorization and trusted-header layer.
+It must strip all five X-Forwarded identity headers before setting verified claims, map
+groups_json to X-Forwarded-Groups, and enforce the billing admin group restriction.
+{{- end }}

@@ -1,0 +1,12 @@
+suite: edge security
+templates:
+  - templates/istio/authorizationpolicy.yaml
+tests:
+  - it: excludes the admin root and subtree from the ordinary authenticated rule
+    asserts:
+      - contains:
+          path: spec.rules[-1].to[0].operation.notPaths
+          content: /billing/admin
+      - contains:
+          path: spec.rules[-1].to[0].operation.notPaths
+          content: /billing/admin/*
