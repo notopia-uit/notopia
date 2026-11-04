@@ -11,12 +11,12 @@ spec:
   hostnames: {{- toYaml . | nindent 4 }}
   {{- end }}
   rules:
-    {{- if .Values.route.exposeHealth }}
     - matches:
         - path: { type: PathPrefix, value: /document/health }
+      {{- if .Values.route.exposeHealth }}
       backendRefs:
         - { name: {{ include "notopia-common.fullname" . }}, port: 8082 }
-    {{- end }}
+      {{- end }}
     - matches:
         - path: { type: PathPrefix, value: /document }
       backendRefs:

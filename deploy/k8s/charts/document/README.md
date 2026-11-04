@@ -13,7 +13,7 @@ Redis configuration alone does not establish safe document scale-out: deletion a
 
 ## Health route exposure
 
-`route.exposeHealth: false` removes only the explicit health rule. The `/document` prefix still routes `/document/health` and its descendants to the service, so this setting does **not** block health endpoints. Do not rely on it as a security boundary. Use a separately configured gateway authorization policy when health endpoints must be private.
+`route.exposeHealth: false` creates a more-specific health rule without a backend, preventing this route from forwarding `/document/health` and its descendants. Gateway API documentation specifies a gateway error response (404 or 500 depending on version), not an authorization response. Other routes, listeners, direct service access, URL normalization, and gateway implementation behavior remain outside this chart's control; use a gateway authorization policy when a security boundary is required.
 
 ## Values
 
@@ -57,7 +57,7 @@ Redis configuration alone does not establish safe document scale-out: deletion a
 | resources.limits | object | `{"memory":"256Mi"}` | Container resource limits; memory must be an integer quantity (e.g. 256Mi or 2Gi), not fractional |
 | resources.requests | object | `{"cpu":"50m","memory":"64Mi"}` | Container resource requests |
 | route.enabled | bool | `true` | Create HTTPRoute |
-| route.exposeHealth | bool | `true` | Add an explicit health rule; false does not block health through the /document prefix |
+| route.exposeHealth | bool | `true` | Forward health endpoints; false matches health without a backend, returning a gateway error |
 | route.hostnames | list | `[]` | Route hostnames |
 | route.parentRefs | list | `[]` | Gateway parent references |
 | runtime | string | `"node"` | Application runtime |

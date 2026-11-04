@@ -488,7 +488,7 @@
         },
         "exposeHealth": {
           "default": true,
-          "description": "Add an explicit health rule; false does not block health through the /document prefix",
+          "description": "Forward health endpoints; false matches health without a backend, returning a gateway error",
           "title": "exposeHealth",
           "type": "boolean"
         },

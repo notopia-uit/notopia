@@ -43,12 +43,18 @@ function backendForPath(route: Route, path: string) {
   return matches.sort((a, b) => b.prefix.length - a.prefix.length)[0]?.backend;
 }
 
-test('the document prefix still routes health when the explicit health route is disabled', () => {
+test('a more specific backendless health rule blocks forwarding when disabled', () => {
   const rendered = route(false);
+  const healthRule = rendered.spec.rules.find((rule) =>
+    rule.matches.some(({ path }) => path.value === '/document/health')
+  );
+  assert.ok(healthRule);
+  assert.equal(healthRule.backendRefs, undefined);
   assert.equal(backendForPath(rendered, '/document/documents/123')?.port, 8082);
   assert.equal(backendForPath(rendered, '/document/ws/document')?.port, 8082);
-  assert.equal(backendForPath(rendered, '/document/health/ready')?.port, 8082);
-  assert.equal(backendForPath(rendered, '/document/health')?.port, 8082);
+  assert.equal(backendForPath(rendered, '/document/health/ready'), undefined);
+  assert.equal(backendForPath(rendered, '/document/health'), undefined);
+  assert.equal(backendForPath(rendered, '/document/healthcheck')?.port, 8082);
   assert.equal(backendForPath(rendered, '/documentary/health'), undefined);
 });
 

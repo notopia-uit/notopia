@@ -5,7 +5,7 @@ tests:
   - it: avoids overlapping replicas without Redis
     asserts:
       - equal: { path: spec.strategy.type, value: Recreate }
-  - it: permits a rolling update with shared Redis
+  - it: avoids overlap when enabling Redis
     set: { redis.urlSecret.name: redis }
     asserts:
-      - equal: { path: spec.strategy.type, value: RollingUpdate }
+      - equal: { path: spec.strategy.type, value: Recreate }

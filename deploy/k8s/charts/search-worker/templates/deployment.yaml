@@ -16,7 +16,8 @@ metadata:
     {{- include "notopia-common.labels" $root | nindent 4 }}
 spec:
   strategy:
-    type: {{ if .Values.redis.urlSecret.name }}RollingUpdate{{ else }}Recreate{{ end }}
+    type: Recreate
+    rollingUpdate: null
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}

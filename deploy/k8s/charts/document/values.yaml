@@ -155,7 +155,7 @@ route:
   # @schema
   # type: boolean
   # @schema
-  # -- Add an explicit health rule; false does not block health through the /document prefix
+  # -- Forward health endpoints; false matches health without a backend, returning a gateway error
   exposeHealth: true
 autoscaling:
   # @schema
