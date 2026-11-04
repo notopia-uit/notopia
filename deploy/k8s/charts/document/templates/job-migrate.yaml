@@ -1,0 +1,14 @@
+{{- $root := merge (dict) . -}}
+{{- $values := deepCopy .Values -}}
+{{- $extra := default list $values.extraEnv -}}
+{{- if and (or (gt (int $values.replicaCount) 1) $values.autoscaling.enabled) (not $values.scaling.enabled) -}}{{ fail "document scaling requires scaling.enabled and a Redis secret" }}{{- end -}}
+{{- if and $values.scaling.enabled (or (not $values.scaling.redisUrlSecret.name) (not $values.scaling.redisUrlSecret.key)) -}}{{ fail "scaling.redisUrlSecret.name and key are required" }}{{- end -}}
+{{- if $values.scaling.redisUrlSecret.name -}}
+{{- if not $values.scaling.redisUrlSecret.key -}}{{ fail "scaling.redisUrlSecret.key is required" }}{{- end -}}
+{{- $extra = append $extra (dict "name" "NOTOPIA_DOCUMENT_REDIS_URL" "valueFrom" (dict "secretKeyRef" $values.scaling.redisUrlSecret)) -}}
+{{- end -}}
+{{- if $values.scaling.enabled -}}{{- $extra = append $extra (dict "name" "NOTOPIA_DOCUMENT_SCALING_ENABLED" "value" "true") -}}{{- end -}}
+{{- $_ := set $values "extraEnv" $extra -}}
+{{- $_ := set $values "serviceAccount" (dict "create" false "name" (printf "%s-hook" (include "notopia-common.fullname" . | trunc 58 | trimSuffix "-"))) -}}
+{{- $_ := set $root "Values" $values -}}
+{{ include "notopia-common.hookJob" (dict "root" $root "name" "migrate" "hook" "pre-install,pre-upgrade" "weight" -5 "command" (list "node" "migrate.cjs")) }}

@@ -1,0 +1,2 @@
+Redis configuration alone does not make document scale-out safe: deletion and permission events do not reach every replica. Keep homelab at one replica until a separately approved fix and multi-replica integration test exist.
+The retained migration hook ServiceAccount must be removed manually after uninstall.

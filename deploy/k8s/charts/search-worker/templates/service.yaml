@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "notopia-common.fullname" . }}
+  labels:
+    {{- include "notopia-common.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "notopia-common.selectorLabels" . | nindent 4 }}
+  ports:
+    - { name: health, port: 28083, targetPort: health, appProtocol: http }

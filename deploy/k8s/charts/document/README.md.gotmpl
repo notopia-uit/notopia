@@ -1,0 +1,10 @@
+{{ template "chart.header" . }}
+{{ template "chart.badgesSection" . }}
+{{ template "chart.requirementsSection" . }}
+
+## Scaling safety
+
+Redis configuration alone does not establish safe document scale-out: deletion and permission event delivery to every replica remains unresolved. Keep homelab at one replica until a separately approved fix and multi-replica integration test exist.
+
+{{ template "chart.valuesSection" . }}
+{{ template "helm-docs.versionFooter" . }}
