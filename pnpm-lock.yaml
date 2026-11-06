@@ -1437,7 +1437,7 @@ importers:
         version: 10.0.2(@types/react@19.2.18)(react@19.2.9)
       react-resizable-panels:
         specifier: ^4.12.4
-        version: 4.12.4(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+        version: 4.19.1(@types/react@19.2.18)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       recharts:
         specifier: 3.8.1
         version: 3.8.1(@types/react@19.2.18)(react-dom@19.2.9(react@19.2.9))(react-is@18.3.1)(react@19.2.9)(redux@5.0.1)
@@ -12056,6 +12056,7 @@ packages:
   image-size@0.5.5:
     resolution: {integrity: sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==}
     engines: {node: '>=0.10.0'}
+    deprecated: Please migrate to image-size@2.x
     hasBin: true
 
   immer@10.2.0:
@@ -14759,11 +14760,15 @@ packages:
       '@types/react':
         optional: true
 
-  react-resizable-panels@4.12.4:
-    resolution: {integrity: sha512-SOsSj4e9U7vxL15MbgTfl35IO4vxSW4Xb0b1gtJVbRPWv7FOezcgOA00Mi0jP8XqC3y7jOQxpsGs/9zLKHPitA==}
+  react-resizable-panels@4.19.1:
+    resolution: {integrity: sha512-nXhB03Lt0fKzVy4wJyv83cWt1sx05/oWkfIXaZQ6FBka5FsnYGqX32hTLo8BIANNojLGXnadzJTspTa1Um5P2w==}
     peerDependencies:
+      '@types/react': ^18.2.6 || ^19.0.0
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   react-style-singleton@2.2.3:
     resolution: {integrity: sha512-b6jSvxvVnyptAiLjbkWLE/lOnR4lfTtDAl+eUC7RZy+QQWc6wRzIV2CE6xBuMmDxc2qIihtDCZD5NPOFl7fRBQ==}
@@ -34017,10 +34022,12 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.18
 
-  react-resizable-panels@4.12.4(react-dom@19.2.9(react@19.2.9))(react@19.2.9):
+  react-resizable-panels@4.19.1(@types/react@19.2.18)(react-dom@19.2.9(react@19.2.9))(react@19.2.9):
     dependencies:
       react: 19.2.9
       react-dom: 19.2.9(react@19.2.9)
+    optionalDependencies:
+      '@types/react': 19.2.18
 
   react-style-singleton@2.2.3(@types/react@19.2.18)(react@19.2.9):
     dependencies:
