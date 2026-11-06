@@ -494,7 +494,7 @@ catalogs:
       version: 4.21.5
     tailwind-merge:
       specifier: ^3.5.0
-      version: 3.5.0
+      version: 3.7.0
     tailwindcss:
       specifier: ^4.2.4
       version: 4.2.4
@@ -1185,7 +1185,7 @@ importers:
         version: 10.4.27(postcss@8.5.32)
       tailwind-merge:
         specifier: 'catalog:'
-        version: 3.5.0
+        version: 3.7.0
       tw-animate-css:
         specifier: 'catalog:'
         version: 1.4.0
@@ -1471,7 +1471,7 @@ importers:
         version: 19.2.9
       tailwind-merge:
         specifier: 'catalog:'
-        version: 3.5.0
+        version: 3.7.0
       tw-animate-css:
         specifier: 'catalog:'
         version: 1.4.0
