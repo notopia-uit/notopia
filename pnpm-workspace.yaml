@@ -40,7 +40,7 @@ catalog:
   "@nestjs/schedule": "12.0.2"
   "@nestjs/schematics": "^11.1.0"
   "@nestjs/testing": "^11.2.7"
-  "@nestjs/typeorm": "^11.0.3"
+  "@nestjs/typeorm": "^12.0.0"
   "@nestjs/websockets": "^11.2.7"
   "@openapitools/openapi-generator-cli": "2.31.1"
   "@opentelemetry/api": "^1.9.1"
