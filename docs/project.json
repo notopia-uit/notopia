@@ -6,8 +6,18 @@
   "namedInputs": {
     "default": [
       "{projectRoot}/.vitepress/config.{mts,ts}",
+      "{projectRoot}/.vitepress/**/*.spec.ts",
+      "{projectRoot}/vitest.config.mts",
+      "{projectRoot}/tsconfig*.json",
       "{projectRoot}/.vitepress/theme/**/*.{vue,ts,mts}",
       "{projectRoot}/src/**/*.md",
+      "{workspaceRoot}/deploy/k8s/charts/authorization/README.md",
+      "{workspaceRoot}/deploy/k8s/charts/billing/README.md",
+      "{workspaceRoot}/deploy/k8s/charts/document/README.md",
+      "{workspaceRoot}/deploy/k8s/charts/note/README.md",
+      "{workspaceRoot}/deploy/k8s/charts/notopia-edge/README.md",
+      "{workspaceRoot}/deploy/k8s/charts/search-worker/README.md",
+      "{workspaceRoot}/deploy/k8s/charts/web/README.md",
       "{projectRoot}/src/public/**",
       "!{projectRoot}/src/public/diagrams/**"
     ]
