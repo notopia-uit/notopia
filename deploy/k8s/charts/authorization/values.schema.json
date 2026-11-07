@@ -44,6 +44,20 @@
       "title": "autoscaling",
       "type": "object"
     },
+    "containerSecurityContext": {
+      "additionalProperties": false,
+      "properties": {
+        "readOnlyRootFilesystem": {
+          "default": "true",
+          "description": "Mount the container root filesystem read-only",
+          "required": [],
+          "title": "readOnlyRootFilesystem"
+        }
+      },
+      "required": [],
+      "title": "containerSecurityContext",
+      "type": "object"
+    },
     "database": {
       "additionalProperties": false,
       "properties": {
@@ -422,14 +436,20 @@
         "runAsGroup": {
           "default": 1000,
           "description": "Numeric primary group ID",
-          "minimum": 1,
+          "minimum": 0,
           "title": "runAsGroup",
           "type": "integer"
         },
+        "runAsNonRoot": {
+          "default": "true",
+          "description": "Require the container to run as a non-root user",
+          "required": [],
+          "title": "runAsNonRoot"
+        },
         "runAsUser": {
           "default": 1000,
-          "description": "Numeric non-root user ID; image files must be readable and executable by this user",
-          "minimum": 1,
+          "description": "Numeric user ID; image files must be readable and executable by this user",
+          "minimum": 0,
           "title": "runAsUser",
           "type": "integer"
         }
@@ -619,6 +639,7 @@
   },
   "required": [
     "podSecurityContext",
+    "containerSecurityContext",
     "image",
     "serviceAccount",
     "resources",

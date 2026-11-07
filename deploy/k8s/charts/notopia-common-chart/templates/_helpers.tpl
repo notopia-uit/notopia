@@ -29,16 +29,18 @@ app.kubernetes.io/version: {{ . | quote }}
 {{- end -}}
 {{- define "notopia-common.podSecurityContext" -}}
 {{- $context := .Values.podSecurityContext | default dict -}}
-runAsNonRoot: true
-runAsUser: {{ required "podSecurityContext.runAsUser is required" $context.runAsUser }}
-runAsGroup: {{ required "podSecurityContext.runAsGroup is required" $context.runAsGroup }}
+{{- if not (hasKey $context "runAsUser") -}}{{ fail "podSecurityContext.runAsUser is required" }}{{- end -}}
+{{- if not (hasKey $context "runAsGroup") -}}{{ fail "podSecurityContext.runAsGroup is required" }}{{- end -}}
+runAsNonRoot: {{ $context.runAsNonRoot }}
+runAsUser: {{ $context.runAsUser }}
+runAsGroup: {{ $context.runAsGroup }}
 fsGroup: {{ required "podSecurityContext.fsGroup is required" $context.fsGroup }}
 seccompProfile:
   type: RuntimeDefault
 {{- end -}}
 {{- define "notopia-common.containerSecurityContext" -}}
 allowPrivilegeEscalation: false
-readOnlyRootFilesystem: true
+readOnlyRootFilesystem: {{ .Values.containerSecurityContext.readOnlyRootFilesystem }}
 capabilities:
   drop: [ALL]
 {{- end -}}

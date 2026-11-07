@@ -17,6 +17,7 @@
 | autoscaling.maxReplicas | int | `3` | Maximum replicas |
 | autoscaling.minReplicas | int | `1` | Minimum replicas |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | CPU utilization target |
+| containerSecurityContext.readOnlyRootFilesystem | bool | `true` | Mount the container root filesystem read-only |
 | env | object | `{}` | Plain environment |
 | envFrom | list | `[]` | External environment sources |
 | extraEnv | list | `[]` | Additional environment entries |
@@ -48,7 +49,8 @@
 | podLabels | object | `{}` | Additional pod labels |
 | podSecurityContext.fsGroup | int | `1000` | Group owning supported writable volumes |
 | podSecurityContext.runAsGroup | int | `1000` | Numeric primary group ID |
-| podSecurityContext.runAsUser | int | `1000` | Numeric non-root user ID; image files must be readable and executable by this user |
+| podSecurityContext.runAsNonRoot | bool | `true` | Require the container to run as a non-root user |
+| podSecurityContext.runAsUser | int | `1000` | Numeric user ID; image files must be readable and executable by this user |
 | replicaCount | int | `1` | Number of replicas |
 | resources.limits | object | `{"memory":"256Mi"}` | Container resource limits; memory must be an integer quantity (e.g. 256Mi or 2Gi), not fractional |
 | resources.requests | object | `{"cpu":"50m","memory":"64Mi"}` | Container resource requests |

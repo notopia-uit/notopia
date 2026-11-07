@@ -17,6 +17,7 @@
 | autoscaling.maxReplicas | int | `3` | Maximum replicas |
 | autoscaling.minReplicas | int | `1` | Minimum replicas |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | CPU utilization target |
+| containerSecurityContext.readOnlyRootFilesystem | bool | `true` | Mount the container root filesystem read-only |
 | database.urlSecret | object | `{"key":"uri","name":""}` | Existing database URI secret |
 | env | object | `{}` | Plain environment |
 | envFrom | list | `[]` | External environment sources |
@@ -49,7 +50,8 @@
 | podLabels | object | `{}` | Additional pod labels |
 | podSecurityContext.fsGroup | int | `1000` | Group owning supported writable volumes |
 | podSecurityContext.runAsGroup | int | `1000` | Numeric primary group ID |
-| podSecurityContext.runAsUser | int | `1000` | Numeric non-root user ID; image files must be readable and executable by this user |
+| podSecurityContext.runAsNonRoot | bool | `true` | Require the container to run as a non-root user |
+| podSecurityContext.runAsUser | int | `1000` | Numeric user ID; image files must be readable and executable by this user |
 | redis.addr | string | `""` | Redis address |
 | redis.db | int | `0` | Redis database |
 | redis.passwordSecret | object | `{"key":"password","name":""}` | Existing Redis password secret |

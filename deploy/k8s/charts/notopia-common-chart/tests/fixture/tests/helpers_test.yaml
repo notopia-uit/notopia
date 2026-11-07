@@ -52,6 +52,24 @@ tests:
       - equal: { path: spec.template.spec.securityContext.runAsUser, value: 1234 }
       - equal: { path: spec.template.spec.securityContext.runAsGroup, value: 2345 }
       - equal: { path: spec.template.spec.securityContext.fsGroup, value: 3456 }
+  - it: permits root and writable root filesystem in deployments
+    template: deployment.yaml
+    set:
+      podSecurityContext: { runAsNonRoot: false, runAsUser: 0, runAsGroup: 0 }
+      containerSecurityContext: { readOnlyRootFilesystem: false }
+    asserts:
+      - equal: { path: spec.template.spec.securityContext.runAsNonRoot, value: false }
+      - equal: { path: spec.template.spec.securityContext.runAsUser, value: 0 }
+      - equal: { path: spec.template.spec.securityContext.runAsGroup, value: 0 }
+      - equal: { path: 'spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem', value: false }
+  - it: applies root and writable root filesystem to hook jobs
+    template: job.yaml
+    set:
+      podSecurityContext: { runAsNonRoot: false, runAsUser: 0, runAsGroup: 0 }
+      containerSecurityContext: { readOnlyRootFilesystem: false }
+    asserts:
+      - equal: { path: spec.template.spec.securityContext.runAsUser, value: 0 }
+      - equal: { path: 'spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem', value: false }
   - it: rejects duplicate env names
     template: job.yaml
     set: { extraEnv: [{ name: FOO, valueFrom: { secretKeyRef: { name: external, key: password } } }] }
