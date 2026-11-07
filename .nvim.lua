@@ -411,6 +411,7 @@ lsp.enable({
 	"gh_actions_ls",
 	"golangci_lint_ls",
 	"gopls",
+	"helm_ls",
 	"jsonls",
 	"jsonls",
 	"lua_ls",
