@@ -389,7 +389,7 @@ catalogs:
       version: 5.0.5
     autoprefixer:
       specifier: ^10.4.27
-      version: 10.4.27
+      version: 10.6.2
     better-auth:
       specifier: ~1.7.6
       version: 1.7.18
@@ -1203,7 +1203,7 @@ importers:
     devDependencies:
       autoprefixer:
         specifier: 'catalog:'
-        version: 10.4.27(postcss@8.5.32)
+        version: 10.6.2(postcss@8.5.32)
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.7.0
@@ -1489,7 +1489,7 @@ importers:
         version: 7.4.3
       autoprefixer:
         specifier: 'catalog:'
-        version: 10.4.27(postcss@8.5.32)
+        version: 10.6.2(postcss@8.5.32)
       react:
         specifier: 'catalog:'
         version: 19.2.9
@@ -9455,8 +9455,8 @@ packages:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
     engines: {node: '>=8.0.0'}
 
-  autoprefixer@10.4.27:
-    resolution: {integrity: sha512-NP9APE+tO+LuJGn7/9+cohklunJsXWiaWEfV3si4Gi/XHDwVNgkwr1J3RQYFIvPy76GmJ9/bW8vyoU1LcxwKHA==}
+  autoprefixer@10.6.2:
+    resolution: {integrity: sha512-VOw9/yGTGwPPgzFcODtcv6zhEPIeIWkRSe10L2ri2f5vZ7ID7lCt6jZzRF5/ubgOZ+szYydmEF5AYsA5jxX1tA==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
@@ -20847,7 +20847,7 @@ snapshots:
       '@nx/js': 24.0.3(@babel/traverse@7.29.8(supports-color@7.2.0))(@swc-node/register@1.12.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@swc/core@1.16.22(@swc/helpers@0.5.24))(@swc/types@0.1.28)(@typescript/typescript6@6.0.2)(supports-color@7.2.0))(@swc/cli@0.8.2(@swc/core@1.16.22(@swc/helpers@0.5.24))(supports-color@7.2.0))(@swc/core@1.16.22(@swc/helpers@0.5.24))(nx@24.0.3(@swc-node/register@1.12.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@swc/core@1.16.22(@swc/helpers@0.5.24))(@swc/types@0.1.28)(@typescript/typescript6@6.0.2)(supports-color@7.2.0))(@swc/core@1.16.22(@swc/helpers@0.5.24)))(supports-color@7.2.0)(verdaccio@6.3.1(encoding@0.1.13)(supports-color@7.2.0)(typanion@3.14.0))
       '@nx/web': 24.0.3(063918a705f276a465f24698ce79e006)
       '@phenomnomnominal/tsquery': 6.2.0(@typescript/typescript6@6.0.2)
-      autoprefixer: 10.4.27(postcss@8.5.32)
+      autoprefixer: 10.6.2(postcss@8.5.32)
       browserslist: 4.29.4
       css-loader: 7.1.5(@rspack/core@2.3.1(@module-federation/runtime-tools@2.3.3(node-fetch@3.3.2))(@swc/helpers@0.5.24))(webpack@5.111.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(clean-css@5.3.3)(esbuild@0.28.1)(html-minifier-terser@7.2.0)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.34.5)(uglify-js@3.19.3))
       less-loader: 12.3.2(@rspack/core@2.3.1(@module-federation/runtime-tools@2.3.3(node-fetch@3.3.2))(@swc/helpers@0.5.24))(less@4.5.1)(webpack@5.111.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(clean-css@5.3.3)(esbuild@0.28.1)(html-minifier-terser@7.2.0)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.34.5)(uglify-js@3.19.3))
@@ -27008,7 +27008,7 @@ snapshots:
 
   atomic-sleep@1.0.0: {}
 
-  autoprefixer@10.4.27(postcss@8.5.32):
+  autoprefixer@10.6.2(postcss@8.5.32):
     dependencies:
       browserslist: 4.29.4
       caniuse-lite: 1.0.30001817
