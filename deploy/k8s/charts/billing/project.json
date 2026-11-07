@@ -2,13 +2,22 @@
   "name": "billing-chart",
   "targets": {
     "gen": {
+      "dependsOn": ["gen:schema", "gen:readme"]
+    },
+    "gen:schema": {
+      "inputs": ["chartSchema"],
+      "outputs": ["{projectRoot}/values.schema.json"],
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "helm-schema -p -c deploy/k8s/charts/billing",
-          "helm-docs -c deploy/k8s/charts/billing"
-        ],
-        "parallel": false
+        "command": "helm-schema -p -c deploy/k8s/charts/billing"
+      }
+    },
+    "gen:readme": {
+      "inputs": ["chartReadme"],
+      "outputs": ["{projectRoot}/README.md"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "helm-docs -c deploy/k8s/charts/billing"
       }
     },
     "lint": {

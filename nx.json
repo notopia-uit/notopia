@@ -77,6 +77,17 @@
       {
         "runtime": "helm plugin list"
       }
+    ],
+    "chartSchema": [
+      "{projectRoot}/Chart.yaml",
+      "{projectRoot}/values.yaml",
+      "{workspaceRoot}/mise.toml"
+    ],
+    "chartReadme": [
+      "{projectRoot}/Chart.yaml",
+      "{projectRoot}/values.yaml",
+      "{projectRoot}/README.md.gotmpl",
+      "{workspaceRoot}/mise.toml"
     ]
   },
   "targetDefaults": {
