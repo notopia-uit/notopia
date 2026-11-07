@@ -23,4 +23,6 @@ for the pinned helm-unittest plugin. See each chart's `project.json` for its exa
   implemented and verified; acknowledgement values are assertions, not security controls.
   Read `charts/notopia-edge/README.md` for required controls and adversarial checks.
 - Keep document at one replica; Redis alone does not make event delivery safe across replicas.
-- See [FOLLOW_UP.md](./FOLLOW_UP.md) for unresolved issues deferred for user review.
+- See [deployment limitations](../../docs/src/limitation/kubernetes-deployment.md) for remaining
+  validation requirements and [document replicas](../../docs/src/limitation/document-replica-events.md)
+  for the event-delivery limitation.
