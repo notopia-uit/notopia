@@ -35,7 +35,8 @@ Docs: `docs/src/services/billing/` (domain and data diagrams are inline; update 
 
 ## Local development
 
-- Keys: `cmd/billing/.env.local` (`NOTOPIA_BILLING_STRIPE_SECRET_KEY`, `NOTOPIA_BILLING_STRIPE_WEBHOOK_SECRET`), `cmd/billingseed/.env.local` (`NOTOPIA_BILLINGSEED_STRIPE_SECRET_KEY`).
+- Keys: `cmd/billing/.env.local` (`NOTOPIA_BILLING_STRIPE_SECRET_KEY`, `NOTOPIA_BILLING_STRIPE_WEBHOOK_SECRET`).
+- Seed implementation: `internal/billing/seed`; run `nx run billing:migrate` before `nx run billing:seed`.
 - `just seed-billing`: Stripe products/prices + portal configuration, idempotent (needed in every environment).
 - `just fixtures-billing`: dev-only workspace with fake Stripe ids (no Stripe calls).
 - `just stripe-listen`: forwards sandbox events to `http://api.notopia.localhost/billing/webhooks/stripe`; put the printed `whsec_` in `.env.local`.

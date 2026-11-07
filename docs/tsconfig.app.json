@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "outDir": "out-tsc/app"
+  },
+  "include": [".vitepress/config.mts", ".vitepress/theme/authorship.ts"],
+  "exclude": [".vitepress/**/*.spec.ts"]
+}

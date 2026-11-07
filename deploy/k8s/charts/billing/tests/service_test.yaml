@@ -1,0 +1,15 @@
+suite: service contract
+set: { redis.addr: 'redis:6379', redis.passwordSecret.name: redis }
+templates:
+  - deployment.yaml
+tests:
+  - it: serves with the configured health endpoints
+    asserts:
+      - equal: { path: 'spec.template.spec.containers[0].command', value: ['./billing', serve] }
+      - equal: { path: 'spec.template.spec.containers[0].startupProbe.httpGet.path', value: /billing/health/startup }
+      - equal: { path: 'spec.template.spec.containers[0].readinessProbe.httpGet.path', value: /billing/health/ready }
+      - equal: { path: 'spec.template.spec.containers[0].livenessProbe.httpGet.path', value: /billing/health/live }
+      - equal: { path: 'spec.template.spec.containers[0].startupProbe.httpGet.port', value: 28084 }
+      - contains: { path: 'spec.template.spec.containers[0].ports', content: { name: http, containerPort: 8084, protocol: TCP } }
+      - contains: { path: 'spec.template.spec.containers[0].ports', content: { name: grpc, containerPort: 18084, protocol: TCP } }
+      - contains: { path: 'spec.template.spec.containers[0].ports', content: { name: health, containerPort: 28084, protocol: TCP } }

@@ -1,0 +1,13 @@
+suite: health route
+templates:
+  - httproute.yaml
+tests:
+  - it: exposes health when enabled
+    set: { route.enabled: true, route.exposeHealth: true }
+    asserts:
+      - equal: { path: 'spec.rules[0].matches[0].path.value', value: /document/health }
+  - it: matches health without a backend when disabled
+    set: { route.enabled: true, route.exposeHealth: false }
+    asserts:
+      - equal: { path: 'spec.rules[0].matches[0].path.value', value: /document/health }
+      - notExists: { path: 'spec.rules[0].backendRefs' }

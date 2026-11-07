@@ -9,13 +9,17 @@
     "emitDecoratorMetadata": true,
     "noImplicitOverride": true,
     "target": "esnext",
-    "rootDir": "src",
+    "rootDir": ".",
     "outDir": "out-tsc/app",
     "paths": {
       "#/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "../../packages/lib-server/src/block-note/types.d.ts"],
+  "include": [
+    "src/**/*",
+    "database/migrations/**/*",
+    "../../packages/lib-server/src/block-note/types.d.ts"
+  ],
   "references": [
     {
       "path": "../../packages/pb/tsconfig.lib.json"

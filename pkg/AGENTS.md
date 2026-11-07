@@ -34,8 +34,10 @@ handlers themselves contain no logging or tracing boilerplate.
 ## `GatewayUserAuth`
 
 Reads `X-Forwarded-ID` / `X-Forwarded-Email` / `X-Forwarded-Name`, plus `X-Forwarded-Groups`
-and `X-Forwarded-Roles` (JSON arrays) — headers **injected by Traefik's
-jwt-middleware after it validates the Authentik JWT**. It does not verify anything itself,
+and `X-Forwarded-Roles` (JSON arrays). Locally Traefik maps Authentik's `groups_json`
+claim to `X-Forwarded-Groups` after validating the JWT; Istio supplies the gateway headers
+in the cluster. Traefik strips client-supplied roles and does not map a roles claim;
+other gateways must also strip or set that header. This middleware does not verify anything itself,
 so it is only safe behind the gateway; never expose a service port directly. Retrieve with
 `commonhttp.UserFromContext(ctx)` (requires gin's `ContextWithFallback`, already set in
 `NewGin`). `RequireGroup(group)` aborts with 403 `{code: "forbidden"}` when the user lacks the group.

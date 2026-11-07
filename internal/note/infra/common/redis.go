@@ -17,9 +17,7 @@ func NewRedisClient(
 	cfg *commonconfig.Redis,
 	logger *slog.Logger,
 ) (*RedisClient, func()) {
-	client := redis.NewClient(&redis.Options{
-		Addr: cfg.Addr,
-	})
+	client := redis.NewClient(cfg.Options())
 	cleanup := func() {
 		if err := client.Close(); err != nil {
 			logger.ErrorContext(ctx, "failed to shutdown Redis client", slog.Any("error", err))

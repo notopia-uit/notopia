@@ -1,0 +1,26 @@
+{{- if .Values.frontRoute.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "notopia-common.fullname" . }}-front
+  labels:
+    {{- include "notopia-common.labels" . | nindent 4 }}
+spec:
+  parentRefs: {{ .Values.frontRoute.parentRefs | toYaml | nindent 4 }}
+  {{- with .Values.frontRoute.hostnames }}
+  hostnames: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    - filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            remove:
+              - X-Forwarded-ID
+              - X-Forwarded-Email
+              - X-Forwarded-Name
+              - X-Forwarded-Groups
+              - X-Forwarded-Roles
+      backendRefs:
+        - name: {{ include "notopia-common.fullname" . }}-istio
+          port: {{ .Values.gateway.listenerPort }}
+{{- end }}

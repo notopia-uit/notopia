@@ -28,3 +28,5 @@ var ProviderSet = wire.NewSet(
 		"WorkspaceEvent",
 	),
 )
+
+var MigrateProviderSet = wire.NewSet(ProvideViper, ProvideMigrateConfig, wire.FieldsOf(new(*MigrateConfig), "General", "Log", "Database"))

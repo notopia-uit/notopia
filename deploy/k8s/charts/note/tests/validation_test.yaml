@@ -1,0 +1,20 @@
+suite: required Redis
+templates:
+  - deployment.yaml
+tests:
+  - it: rejects missing Redis address
+    set: { redis.passwordSecret.name: redis }
+    asserts:
+      - failedTemplate: { errorMessage: redis.addr is required }
+  - it: rejects missing Redis password secret
+    set: { redis.addr: 'redis:6379' }
+    asserts:
+      - failedTemplate: { errorMessage: redis.passwordSecret.name is required }
+  - it: rejects missing Redis password secret key
+    set: { redis.addr: 'redis:6379', redis.passwordSecret.name: redis, redis.passwordSecret.key: '' }
+    asserts:
+      - failedTemplate: { errorMessage: redis.passwordSecret.key is required }
+  - it: rejects a missing Redis database
+    set: { redis.addr: 'redis:6379', redis.passwordSecret.name: redis, redis.db: null }
+    asserts:
+      - failedTemplate: { errorMessage: redis.db is required }

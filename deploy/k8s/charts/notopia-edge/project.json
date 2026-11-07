@@ -1,0 +1,43 @@
+{
+  "name": "notopia-edge-chart",
+  "targets": {
+    "gen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "helm-schema -p -c deploy/k8s/charts/notopia-edge",
+          "helm-docs -c deploy/k8s/charts/notopia-edge"
+        ],
+        "parallel": false
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/notopia-edge.lock helm dependency build --skip-refresh deploy/k8s/charts/notopia-edge",
+          "flock -s tmp/chart-lock/notopia-edge.lock helm lint --strict deploy/k8s/charts/notopia-edge --set security.externalBoundaryAcknowledged=true",
+          "flock -s tmp/chart-lock/notopia-edge.lock bash -o pipefail -c 'helm template test deploy/k8s/charts/notopia-edge --set security.externalBoundaryAcknowledged=true --set istio.telemetry.enabled=true --set istio.telemetry.tracingProviders[0]=otel | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+        ],
+        "parallel": false
+      },
+      "inputs": ["chart"],
+      "dependsOn": []
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/notopia-edge.lock helm dependency build --skip-refresh deploy/k8s/charts/notopia-edge",
+          "flock -s tmp/chart-lock/notopia-edge.lock helm unittest deploy/k8s/charts/notopia-edge",
+          "flock -s tmp/chart-lock/notopia-edge.lock node --test deploy/k8s/charts/notopia-edge/tests/*.test.ts"
+        ],
+        "parallel": false
+      },
+      "inputs": ["chart"],
+      "dependsOn": []
+    }
+  }
+}

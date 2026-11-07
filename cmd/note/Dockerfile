@@ -14,3 +14,4 @@ WORKDIR /app
 COPY --from=builder /app/note .
 EXPOSE 8081 18081 28081
 ENTRYPOINT ["./note"]
+CMD ["serve"]

@@ -1,6 +1,6 @@
 # Search Worker (nx: `search-worker`)
 
-Pure Kafka consumer → Meilisearch. No HTTP API. Small enough that `src/` is flat:
+Kafka consumer → Meilisearch, with an HTTP health listener. Small enough that `src/` is flat:
 `app.controller.ts` (event handlers), `app.service.ts` (indexing), config, otel, errors.
 
 ## Topics consumed (`app.controller.ts`)
@@ -27,7 +27,8 @@ to search. See `apps/document/AGENTS.md`.
   must line up with the filters those tokens embed.
 - `kafka-max-retry.exception-filter.ts` bounds retries — a handler that throws is retried,
   then dropped. Don't rely on a throw to reprocess later.
-- `seed/` (`nx run search-worker:seed`) ensures the Meilisearch index and settings exist; idempotent, needed in every environment.
+- `seed/` (`nx run search-worker:seed`, or `node dist/seed.cjs`) ensures the Meilisearch index and settings exist; idempotent, needed in every environment. Host, master key and note search key UID are required. The UID must match `NOTOPIA_NOTE_MEILISEARCH_NOTE_SEARCH_KEY_UID`; newly created key values are printed only outside production. Seed emits a root span without auto-instrumentation so credentials are not captured.
+- `/search-worker/health/live` and `/search-worker/health/ready` listen on `NOTOPIA_SEARCH_WORKER_HEALTH_CHECK_PORT` (default 28083), independently of Kafka startup. Readiness checks Meilisearch and consumer group join/heartbeat; it goes down after 15 seconds without a heartbeat or on consumer failures, and recovers on group join or heartbeat.
 - `fixtures/` (`nx run search-worker:fixtures`, after `fixtures:transform`) loads dev-only fake documents into the index.
 - Deletion tombstones (`tombstone.ts`): topics are separate, so a late `note.updated` /
   `document.committed` can arrive after `note.deleted` and upsert the note back.

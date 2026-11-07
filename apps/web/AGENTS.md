@@ -2,6 +2,14 @@
 
 Next.js 16 App Router. The main user-facing application.
 
+## Next.js cache and Kubernetes
+
+There is no explicit ISR or revalidation configuration. Workspace pages render dynamically;
+React Query caching is separate from Next.js ISR. The web chart mounts an ephemeral writable
+`.next/cache`, not `.next/server`. When adding ISR, revalidation, image optimization, or other
+runtime cache writes, review and test writable paths and multi-replica cache behavior with the
+web Helm chart and the built image. A successful chart render does not verify runtime writes.
+
 ## Error Handling
 
 ### Route Segments

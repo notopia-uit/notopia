@@ -38,9 +38,8 @@ adds missing rows and prunes stale `p` rows from the DB. `policy_fixtures.csv` h
 and are never pruned. Sync parses CSV into a standalone model and applies rules to the real enforcer;
 never build a second enforcer on the shared model, it replaces the role manager and drops loaded `g` links.
 
-The service itself never seeds or loads fixtures. Seeding is done by separate binaries sharing the
-authorization infra (DB, Casbin adapter): `cmd/authorizationseed` (`internal/authorizationseed`, runs
-`policy.Seed`, `just seed-authorization`) and `cmd/authorizationfixtures`
+The service itself never seeds or loads fixtures. Seeding uses `cmd/authorization seed` (`internal/authorization/seed`, runs
+`policy.Seed`, `just seed-authorization`). Dev fixtures use `cmd/authorizationfixtures`
 (`internal/authorizationfixtures`, runs `policy.LoadFixtures`, `just fixtures-authorization`). Nothing
 is auto-loaded in development.
 

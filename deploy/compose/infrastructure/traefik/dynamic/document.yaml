@@ -10,6 +10,15 @@ http:
         - cors
         - jwt
 
+    document-health:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && (Path(`/document/health/live`) || Path(`/document/health/ready`) || Path(`/document/health/startup`))
+      priority: 100
+      service: document
+      middlewares:
+        - cors
+
     document-public:
       entryPoints:
         - web

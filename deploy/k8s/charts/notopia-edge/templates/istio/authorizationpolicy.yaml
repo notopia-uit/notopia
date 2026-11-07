@@ -1,0 +1,61 @@
+{{- if .Values.istio.enabled }}
+{{- $public := list (dict "paths" (list "/note/health/*" "/authorization/health/*" "/billing/health/*" "/document/health/*" "/search-worker/health/*" "/billing/webhooks/stripe" "/document/ws/document")) (dict "paths" (list "/billing/plans") "methods" (list "GET")) | concat .Values.istio.publicRules }}
+{{- $groups := list (dict "paths" (list "/billing/admin" "/billing/admin/*") "groups" (list .Values.istio.adminGroup)) | concat .Values.istio.groupRules }}
+{{- $protected := list }}
+{{- range $rule := $groups }}
+  {{- if or (not $rule.paths) (not $rule.groups) }}{{ fail "group rules require nonempty paths and groups" }}{{ end }}
+  {{- range $group := $rule.groups }}{{ if or (not $group) (contains "*" $group) }}{{ fail "group names must be nonempty and must not contain wildcards" }}{{ end }}{{ end }}
+  {{- range $path := $rule.paths }}
+    {{- if or (not (regexMatch `^/[a-zA-Z0-9._~/-]*(\*)?$` $path)) (contains "//" $path) (regexMatch `(^|/)\.{1,2}(/|\*|$)` $path) }}{{ fail (printf "invalid or noncanonical protected path %q" $path) }}{{ end }}
+    {{- range $old := $protected }}
+      {{- if or (eq $path $old) (and (hasSuffix "*" $path) (hasPrefix (trimSuffix "*" $path) $old)) (and (hasSuffix "*" $old) (hasPrefix (trimSuffix "*" $old) $path)) }}{{ fail (printf "overlapping protected paths %q and %q" $path $old) }}{{ end }}
+    {{- end }}
+    {{- $protected = append $protected $path }}
+  {{- end }}
+{{- end }}
+{{- range $rule := $public }}
+  {{- if not $rule.paths }}{{ fail "public rules require nonempty paths" }}{{ end }}
+  {{- range $path := $rule.paths }}
+    {{- if or (not (regexMatch `^/[a-zA-Z0-9._~/-]*(\*)?$` $path)) (contains "//" $path) (regexMatch `(^|/)\.{1,2}(/|\*|$)` $path) }}{{ fail (printf "invalid or noncanonical public path %q" $path) }}{{ end }}
+    {{- range $old := $protected }}
+      {{- if or (eq $path $old) (and (hasSuffix "*" $path) (hasPrefix (trimSuffix "*" $path) $old)) (and (hasSuffix "*" $old) (hasPrefix (trimSuffix "*" $old) $path)) }}{{ fail (printf "public path %q overlaps protected path %q" $path $old) }}{{ end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ include "notopia-common.fullname" . }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: {{ include "notopia-common.fullname" . }}
+  action: ALLOW
+  rules:
+    {{- range $rule := $public }}
+    - to:
+        - operation:
+            paths: {{ toYaml $rule.paths | nindent 14 }}
+            {{- with $rule.methods }}
+            methods: {{ toYaml . | nindent 14 }}
+            {{- end }}
+    {{- end }}
+    {{- range $rule := $groups }}
+    - from:
+        - source:
+            requestPrincipals: ["*"]
+      to:
+        - operation:
+            paths: {{ toYaml $rule.paths | nindent 14 }}
+      when:
+        - key: request.auth.claims[groups]
+          values: {{ toYaml $rule.groups | nindent 12 }}
+    {{- end }}
+    - from:
+        - source:
+            requestPrincipals: ["*"]
+      to:
+        - operation:
+            notPaths: {{ toYaml $protected | nindent 14 }}
+{{- end }}

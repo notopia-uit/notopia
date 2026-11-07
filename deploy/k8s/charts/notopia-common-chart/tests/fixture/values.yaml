@@ -1,0 +1,80 @@
+podSecurityContext:
+  # -- Require the container to run as a non-root user
+  runAsNonRoot: true
+  # @schema
+  # type: integer
+  # minimum: 0
+  # @schema
+  # -- Numeric user ID; image files must be readable and executable by this user
+  runAsUser: 1000
+  # @schema
+  # type: integer
+  # minimum: 0
+  # @schema
+  # -- Numeric primary group ID
+  runAsGroup: 1000
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Group owning supported writable volumes
+  fsGroup: 1000
+containerSecurityContext:
+  # -- Mount the container root filesystem read-only
+  readOnlyRootFilesystem: true
+image: { repository: example/app, tag: latest, digest: '' }
+nameOverride: ''
+fullnameOverride: ''
+serviceAccount: { create: true, name: '' }
+resources:
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  limits: { memory: 256Mi }
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  requests: {}
+runtime: go
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+env: { FOO: bar }
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
+extraEnv:
+  - name: SECRET
+    valueFrom:
+      secretKeyRef: { name: external, key: password }
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
+envFrom:
+  - secretRef: { name: external }
+otel:
+  enabled: true
+  endpoint: 'http://collector:4317'
+  protocol: grpc
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  resourceAttributes: { custom: value }
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+hooks: {}
+istio: { enabled: false, allowedPrincipals: [], ports: [] }
+
+notopia-common-chart: { global: {} }

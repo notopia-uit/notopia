@@ -1,0 +1,76 @@
+{{- $root := merge (dict) . -}}
+{{- $values := deepCopy .Values -}}
+{{- $extra := default list $values.extraEnv -}}
+{{- if and (or (gt (int $values.replicaCount) 1) $values.autoscaling.enabled) (or (not $values.redis.urlSecret.name) (not $values.redis.urlSecret.key)) -}}{{ fail "search-worker scaling requires redis.urlSecret.name and key" }}{{- end -}}
+{{- if $values.redis.urlSecret.name -}}
+{{- if not $values.redis.urlSecret.key -}}{{ fail "redis.urlSecret.key is required" }}{{- end -}}
+{{- $extra = append $extra (dict "name" "NOTOPIA_SEARCH_WORKER_REDIS_URL" "valueFrom" (dict "secretKeyRef" $values.redis.urlSecret)) -}}
+{{- end -}}
+{{- $_ := set $values "extraEnv" $extra -}}
+{{- $_ := set $root "Values" $values -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "notopia-common.fullname" $root }}
+  labels:
+    {{- include "notopia-common.labels" $root | nindent 4 }}
+spec:
+  strategy:
+    type: Recreate
+    rollingUpdate: null
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "notopia-common.selectorLabels" $root | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "notopia-common.selectorLabels" $root | nindent 8 }}
+        {{- with .Values.podLabels }}{{- toYaml . | nindent 8 }}{{- end }}
+      annotations:
+        checksum/env: {{ printf "%s%s" (include "notopia-common.env" $root) (toYaml .Values.envFrom) | sha256sum }}
+        {{- with .Values.podAnnotations }}{{- toYaml . | nindent 8 }}{{- end }}
+    spec:
+      serviceAccountName: {{ include "notopia-common.serviceAccountName" $root }}
+      automountServiceAccountToken: false
+      securityContext:
+        {{- include "notopia-common.podSecurityContext" $root | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: search-worker
+          image: {{ include "notopia-common.image" $root | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["node", "main.cjs"]
+          securityContext:
+            {{- include "notopia-common.containerSecurityContext" $root | nindent 12 }}
+          ports:
+            - { name: health, containerPort: 28083, protocol: TCP }
+          readinessProbe:
+            httpGet: { path: /search-worker/health/ready, port: 28083 }
+          livenessProbe:
+            httpGet: { path: /search-worker/health/live, port: 28083 }
+          env:
+            {{- include "notopia-common.env" $root | nindent 12 }}
+          {{- with .Values.envFrom }}
+          envFrom: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.extraVolumeMounts }}
+          volumeMounts: {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.extraVolumes }}
+      volumes: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}

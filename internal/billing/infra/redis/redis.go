@@ -9,7 +9,7 @@ import (
 )
 
 func NewClient(ctx context.Context, cfg *commonconfig.Redis) (*goredis.Client, func(), error) {
-	client := goredis.NewClient(&goredis.Options{Addr: cfg.Addr})
+	client := goredis.NewClient(cfg.Options())
 	if err := client.Ping(ctx).Err(); err != nil {
 		return nil, nil, fmt.Errorf("failed to ping redis: %w", err)
 	}

@@ -8,15 +8,17 @@ import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { AppConfig } from './config';
 import { APP_CONFIG } from './config.factory';
+import { KafkaConsumerState } from './health';
 import { getKafkaConfig } from './kafka.config';
+import { TrackedKafkaServer } from './kafka.server';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.connectMicroservice({
-    useFactory: getKafkaConfig,
-    inject: [ConfigService],
-  });
   const configService = app.get(ConfigService);
+  const state = app.get(KafkaConsumerState);
+  app.connectMicroservice({
+    strategy: new TrackedKafkaServer(getKafkaConfig(configService).options!, state),
+  });
   const appConfig = configService.get<AppConfig>(APP_CONFIG);
   if (!appConfig) {
     throw new Error('APP_CONFIG not found');
@@ -25,8 +27,10 @@ async function bootstrap() {
   const logger = app.get(Logger);
   app.useLogger(logger);
   app.enableShutdownHooks();
-  await app.startAllMicroservices();
   await app.listen(port);
+  void app.startAllMicroservices().catch((error: unknown) => {
+    logger.error(error, 'Failed to start Kafka microservice');
+  });
 
   if (module.hot) {
     module.hot.accept();

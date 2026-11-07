@@ -1,0 +1,54 @@
+package seed
+
+import (
+	"github.com/goforj/wire"
+	"github.com/notopia-uit/notopia/internal/billing/app"
+	"github.com/notopia-uit/notopia/internal/billing/component"
+	billingconfig "github.com/notopia-uit/notopia/internal/billing/config"
+	"github.com/notopia-uit/notopia/internal/billing/infra/outbox"
+	stripeadapter "github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"github.com/notopia-uit/notopia/pkg/logging"
+	"github.com/notopia-uit/notopia/pkg/otel"
+)
+
+// Billing infra constructors take billing's config types; the small seed config is mapped onto
+// them here, so the seed config does not import billing config or app.
+
+func NewBillingStripeConfig(stripe *billingconfig.StripeAPI) *billingconfig.Stripe {
+	return &billingconfig.Stripe{
+		StripeAPI:     billingconfig.StripeAPI{SecretKey: stripe.SecretKey},
+		WebhookSecret: "",
+	}
+}
+
+var ProvideBillingStripeConfig = NewBillingStripeConfig
+
+func NewAppSettings(catalog *billingconfig.Billing, identity *commonconfig.Identity) *app.Settings {
+	return &app.Settings{
+		WebBaseURL:           catalog.WebBaseURL,
+		ServiceAccountUserID: identity.ServiceAccountUserID,
+	}
+}
+
+var ProvideAppSettings = NewAppSettings
+
+var ProviderSet = wire.NewSet(
+	ProvideSeeder,
+	ProvideBillingStripeConfig,
+	ProvideAppSettings,
+	component.ProvideValidate,
+	billingconfig.SeedProviderSet,
+	persistence.ProviderSet,
+	outbox.PublisherProviderSet,
+	billingconfig.ProvideDefaultDomainEvent,
+	stripeadapter.Provide,
+	wire.Bind(new(app.PaymentProvider), new(*stripeadapter.Provider)),
+	app.ProvideEnsureDefaultsHandler,
+	app.ProvideListPricesHandler,
+	app.ProvideCreatePriceHandler,
+	app.ProvideEnsurePortalConfigurationHandler,
+	logging.ProviderSet,
+	otel.ProviderSet,
+)

@@ -1,0 +1,8 @@
+suite: service contract
+templates:
+  - deployment.yaml
+tests:
+  - it: serves with the correct command and readiness probe
+    asserts:
+      - equal: { path: 'spec.template.spec.containers[0].command', value: [node, main.cjs] }
+      - equal: { path: 'spec.template.spec.containers[0].readinessProbe.httpGet.path', value: /search-worker/health/ready }

@@ -4,30 +4,31 @@ on:
   push:
     branches:
       - "**"
-    paths-ignore: &pushPathsIgnore
-      - .agents/**/*
-      - .dockerignore
-      - .editorconfig
-      - .eslintignore
-      - .gitattributes
-      - .gitignore
-      - .harper-dictionary.txt
-      - .husky/**/*
-      - .lazy.lua
-      - .nvim.lua
-      - .renovaterc.json
-      - .vscode/**/*
-      - .wakatime-project
-      - README.md
-      - deploy/**/*
-      - justfile
-      - mise.toml
-      - "**/*/AGENTS.md"
-      - "**/*/CLAUDE.md"
+    paths: &pushPaths
+      - "**"
+      - "!.agents/**/*"
+      - "!.dockerignore"
+      - "!.editorconfig"
+      - "!.eslintignore"
+      - "!.gitattributes"
+      - "!.gitignore"
+      - "!.harper-dictionary.txt"
+      - "!.husky/**/*"
+      - "!.lazy.lua"
+      - "!.nvim.lua"
+      - "!.renovaterc.json"
+      - "!.vscode/**/*"
+      - "!.wakatime-project"
+      - "!README.md"
+      - "!deploy/**/*"
+      - "deploy/k8s/charts/**"
+      - "!mise.toml"
+      - "!**/*/AGENTS.md"
+      - "!**/*/CLAUDE.md"
   pull_request:
     branches:
       - "**"
-    paths-ignore: *pushPathsIgnore
+    paths: *pushPaths
     types:
       - opened
       - synchronize
@@ -222,6 +223,9 @@ jobs:
         with:
           experimental: true
           cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
+
+      - name: Setup Helm plugins
+        run: just helm-setup
 
       - name: Cache Buf dependencies
         uses: actions/cache@v6

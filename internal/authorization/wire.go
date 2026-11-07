@@ -7,6 +7,8 @@ import (
 	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/authorization/controller/health"
 	"github.com/notopia-uit/notopia/internal/authorization/infra"
+	"github.com/notopia-uit/notopia/internal/authorization/seed"
+	"github.com/notopia-uit/notopia/pkg/common/cli"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -30,3 +32,7 @@ var ProviderSet = wire.NewSet(
 	logging.ProviderSet,
 	otel.ProviderSet,
 )
+
+var SeedProviderSet = wire.NewSet(seed.ProviderSet, wire.Bind(new(cli.Seeder), new(*seed.Seeder)))
+
+var ServeProviderSet = ProviderSet

@@ -1,0 +1,33 @@
+suite: shared state guards
+templates:
+  - deployment.yaml
+tests:
+  - it: rejects multiple replicas without shared state
+    set: { replicaCount: 2 }
+    asserts:
+      - failedTemplate: {}
+  - it: rejects autoscaling without shared state
+    set: { autoscaling.enabled: true }
+    asserts:
+      - failedTemplate: {}
+  - it: accepts replicas with shared state
+    set:
+      replicaCount: 2
+      redis.urlSecret.name: redis
+      redis.urlSecret.key: url
+    asserts:
+      - isKind: { of: Deployment }
+  - it: accepts autoscaling with shared state
+    set:
+      autoscaling.enabled: true
+      redis.urlSecret.name: redis
+      redis.urlSecret.key: url
+    asserts:
+      - isKind: { of: Deployment }
+  - it: rejects an incomplete Redis secret
+    set:
+      replicaCount: 2
+      redis.urlSecret.name: redis
+      redis.urlSecret.key: ''
+    asserts:
+      - failedTemplate: {}

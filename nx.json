@@ -66,6 +66,17 @@
       {
         "runtime": "go version"
       }
+    ],
+    "chart": [
+      "{projectRoot}/**/*",
+      "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/**/*",
+      "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/.helmignore",
+      {
+        "runtime": "helm version --short"
+      },
+      {
+        "runtime": "helm plugin list"
+      }
     ]
   },
   "targetDefaults": {

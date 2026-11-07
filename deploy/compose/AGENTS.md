@@ -21,8 +21,17 @@ Layout:
 
 - Config in `./deploy/compose/infrastructure/traefik/`: static (`traefik.yaml`) and
   dynamic (`dynamic/*.yaml`, one file per service)
-- Dynamic config includes `agilezebra/jwt-middleware` for authentication; it authorizes
-  using roles mapped from the OIDC `roles` claim, and injects user headers downstream
+- Dynamic config includes `agilezebra/jwt-middleware` for authentication. The `notopia`
+  OAuth scope emits `groups_json`, mapped to `X-Forwarded-Groups`; missing mapped claims
+  remove client-supplied headers. Both JWT chains strip `X-Forwarded-Roles`.
+  `jwt-admin` requires the `notopia-admins` group.
+- `node --test deploy/compose/infrastructure/traefik/gateway-security.test.mjs` tests a
+  disposable gateway with a header-echo backend on `/billing/test-headers` and
+  `/billing/admin/test-headers`. Set `GATEWAY_TEST_URL`, `GATEWAY_TEST_USER_TOKEN`,
+  `GATEWAY_TEST_ADMIN_TOKEN`, `GATEWAY_TEST_NO_GROUPS_TOKEN`, and
+  `GATEWAY_TEST_USER_GROUPS` (JSON array), plus `GATEWAY_TEST_API_WEB_TOKEN` and
+  `GATEWAY_TEST_API_WEB_GROUPS` (a nonempty JSON array of its actual groups). Never
+  direct the echo backend at production.
 - Traefik mounts the host network, so it can reach services at `localhost:{port}`
 - Backend services are routed by **path prefix on a single API host**, and each service
   excludes its own health path from the JWT middleware. For example:

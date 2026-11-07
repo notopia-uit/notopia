@@ -1,0 +1,2 @@
+Use shared Redis for multiple replicas or autoscaling.
+Deployments use Recreate even with Redis to prevent overlap during the transition from in-memory tombstones. Rollouts incur downtime.

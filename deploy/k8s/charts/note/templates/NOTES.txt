@@ -1,0 +1,3 @@
+Provide external database and Redis secrets before installing.
+The migration hook ServiceAccount is retained after a run and replaced before the next hook.
+Helm does not delete retained hook resources on uninstall; remove it manually when no longer needed.

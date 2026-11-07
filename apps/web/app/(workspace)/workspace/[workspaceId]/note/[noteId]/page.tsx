@@ -12,9 +12,7 @@ export default async function NotePage({
   const token = await fetchAccessTokenServerSide();
   return (
     <div className="p-4">
-      <HocuspocusProviderWebsocketComponent
-        url={`ws://${process.env.API_URL}/document/ws/document`}
-      >
+      <HocuspocusProviderWebsocketComponent url={process.env.DOCUMENT_WS_URL}>
         <HocuspocusRoom name={noteId} token={token}>
           <EditorBoundary noteId={noteId} workspaceId={workspaceId} />
         </HocuspocusRoom>

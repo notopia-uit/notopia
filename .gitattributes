@@ -22,3 +22,5 @@ pkg/pb/**/*.go linguist-generated
 docs/src/** linguist-detectable
 
 internal/notefixturegen/fixtures.gen.sql linguist-generated
+
+deploy/k8s/charts/**/values.schema.json linguist-generated

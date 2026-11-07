@@ -1,12 +1,7 @@
 package config
 
 import (
-	"fmt"
-	"log/slog"
-	"strings"
 	"time"
-
-	"github.com/creasty/defaults"
 
 	"github.com/go-playground/validator/v10"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
@@ -55,7 +50,7 @@ type Cron struct {
 	PurgeExpiredTrash commonconfig.CronJob `json:"purgeExpiredTrash" mapstructure:"purge_expired_trash" validate:"required" yaml:"purge_expired_trash"`
 }
 
-type Config struct {
+type ServeConfig struct {
 	General     commonconfig.General   `json:"general"     mapstructure:"general"     validate:"omitempty" yaml:"general"`
 	Log         commonconfig.Log       `json:"log"         mapstructure:"log"         validate:"omitempty" yaml:"log"`
 	Server      Server                 `json:"server"      mapstructure:"server"      validate:"required"  yaml:"server"`
@@ -84,52 +79,28 @@ func setCronDefaults(v *viper.Viper, key string, job commonconfig.CronJob) {
 	v.SetDefault(key+".enabled", job.Enabled)
 }
 
-func New(
-	validate *validator.Validate,
-	viper *viper.Viper,
-) (*Config, error) {
-	viper.SetEnvPrefix("notopia_note")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+type Config = ServeConfig
 
-	viper.SetConfigName("note.notopia.config")
-	viper.AddConfigPath(".")
-
-	viper.AutomaticEnv()
-	setCronDefaults(viper, "cron.purge_expired_trash", defaultPurgeExpiredTrash)
-	if err := viper.ReadInConfig(); err == nil {
-		slog.Info("configuration loaded", slog.String("file", viper.ConfigFileUsed()))
-	}
-
-	cfg := &Config{}
-	if err := defaults.Set(cfg); err != nil {
-		return nil, fmt.Errorf("cannot set default config: %w", err)
-	}
-
-	if err := viper.Unmarshal(cfg); err != nil {
-		return nil, fmt.Errorf("cannot unmarshal config from env or config file: %w", err)
-	}
-
-	if cfg.Server.HTTP.Port == 0 {
-		cfg.Server.HTTP.Port = 8081
-	}
-	if cfg.Server.GRPC.Port == 0 {
-		cfg.Server.GRPC.Port = 18081
-	}
-	if cfg.Server.Health.Port == 0 {
-		cfg.Server.Health.Port = 28081
-	}
-
-	if cfg.Kafka.ConsumerGroup == "" {
-		cfg.Kafka.ConsumerGroup = "note-service"
-	}
-
-	slog.Info("configuration", slog.Any("config", cfg))
-
-	if err := validate.Struct(cfg); err != nil {
-		return nil, fmt.Errorf("Config validation failed: %w", err)
-	}
-
-	return cfg, nil
+type MigrateConfig struct {
+	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
+	Log      commonconfig.Log     `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
+	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
 }
 
-var Provide = New
+func NewMigrateConfig(validate *validator.Validate, v *viper.Viper) (*MigrateConfig, error) {
+	return commonconfig.Load[MigrateConfig](validate, v, "notopia_note", "note.notopia.config")
+}
+
+func New(validate *validator.Validate, v *viper.Viper) (*Config, error) {
+	setCronDefaults(v, "cron.purge_expired_trash", defaultPurgeExpiredTrash)
+	v.SetDefault("server.http.port", 8081)
+	v.SetDefault("server.grpc.port", 18081)
+	v.SetDefault("server.health.port", 28081)
+	v.SetDefault("kafka.consumer_group", "note-service")
+	return commonconfig.Load[ServeConfig](validate, v, "notopia_note", "note.notopia.config")
+}
+
+var (
+	Provide              = New
+	ProvideMigrateConfig = NewMigrateConfig
+)

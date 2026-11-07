@@ -14,3 +14,4 @@ WORKDIR /app
 COPY --from=builder /app/authorization .
 EXPOSE 8089 18089 28089
 ENTRYPOINT ["./authorization"]
+CMD ["serve"]

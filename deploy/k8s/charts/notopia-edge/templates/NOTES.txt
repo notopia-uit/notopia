@@ -1,0 +1,9 @@
+SECURITY BLOCKER: the chart does not guarantee a non-bypassable identity-header boundary.
+The operator acknowledgement is not enforcement. Verify external controls and spoofed
+headers, alternate routes, direct access and forged pod labels before exposure; see README.
+NetworkPolicy is defense in depth only; other policies and traffic paths can bypass it.
+{{- if not .Values.istio.enabled }}
+Istio is disabled. Supply an external JWT verification, authorization and trusted-header layer.
+It must strip all five X-Forwarded identity headers before setting verified claims, map
+groups_json to X-Forwarded-Groups, and enforce the billing admin group restriction.
+{{- end }}

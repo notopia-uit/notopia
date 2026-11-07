@@ -1,0 +1,1 @@
+{{ include "notopia-common.hookJob" (dict "root" . "name" "seed" "command" (list "seed") "hook" "post-install,post-upgrade" "weight" 5) }}

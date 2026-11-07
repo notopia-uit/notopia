@@ -1,0 +1,13 @@
+suite: service contract
+templates:
+  - deployment.yaml
+tests:
+  - it: serves with the configured health endpoints
+    asserts:
+      - equal: { path: 'spec.template.spec.containers[0].command', value: ['./authorization', serve] }
+      - equal: { path: 'spec.template.spec.containers[0].startupProbe.httpGet.path', value: /authorization/health/startup }
+      - equal: { path: 'spec.template.spec.containers[0].readinessProbe.httpGet.path', value: /authorization/health/ready }
+      - equal: { path: 'spec.template.spec.containers[0].livenessProbe.httpGet.path', value: /authorization/health/live }
+      - equal: { path: 'spec.template.spec.containers[0].startupProbe.httpGet.port', value: 28089 }
+      - contains: { path: 'spec.template.spec.containers[0].ports', content: { name: grpc, containerPort: 18089, protocol: TCP } }
+      - contains: { path: 'spec.template.spec.containers[0].ports', content: { name: health, containerPort: 28089, protocol: TCP } }

@@ -1,0 +1,14 @@
+{{- $root := merge (dict) . -}}
+{{- $values := deepCopy .Values -}}
+{{- $extra := default list $values.extraEnv -}}
+{{- if $values.database.urlSecret.name -}}
+{{- $extra = append $extra (dict "name" "NOTOPIA_BILLING_DATABASE_URL" "valueFrom" (dict "secretKeyRef" $values.database.urlSecret)) -}}
+{{- end -}}
+{{- if not (hasKey $values.redis "db") -}}{{ fail "redis.db is required" }}{{- end -}}
+{{- if not $values.redis.addr -}}{{ fail "redis.addr is required" }}{{- end -}}
+{{- if not $values.redis.passwordSecret.name -}}{{ fail "redis.passwordSecret.name is required" }}{{- end -}}
+{{- if not $values.redis.passwordSecret.key -}}{{ fail "redis.passwordSecret.key is required" }}{{- end -}}
+{{- $extra = concat $extra (list (dict "name" "NOTOPIA_BILLING_REDIS_ADDR" "value" $values.redis.addr) (dict "name" "NOTOPIA_BILLING_REDIS_DB" "value" (toString $values.redis.db)) (dict "name" "NOTOPIA_BILLING_REDIS_PASSWORD" "valueFrom" (dict "secretKeyRef" $values.redis.passwordSecret))) -}}
+{{- $_ := set $values "extraEnv" $extra -}}
+{{- $_ := set $root "Values" $values -}}
+{{ include "notopia-common.hookJob" (dict "root" $root "name" "seed" "hook" "post-install,post-upgrade" "weight" 5 "command" (list "./billing" "seed")) }}

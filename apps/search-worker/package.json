@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "seed": "tsx ./seed/seed.ts",
+    "seed": "tsx ./seed/main.ts",
     "fixtures": "tsx ./fixtures/fixtures.ts",
     "fixtures:transform": "tsx ./fixtures/transform.ts"
   },
@@ -16,6 +16,7 @@
     "@nestjs/core": "catalog:",
     "@nestjs/microservices": "catalog:",
     "@nestjs/platform-express": "catalog:",
+    "@nestjs/terminus": "catalog:",
     "@notopia-uit/api-share-gen": "workspace:",
     "@notopia-uit/lib-server": "workspace:",
     "@opentelemetry/api": "catalog:",
@@ -32,6 +33,7 @@
     "meilisearch": "catalog:",
     "nestjs-otel": "catalog:",
     "nestjs-pino": "catalog:",
+    "pino": "catalog:",
     "pino-http": "catalog:",
     "pino-pretty": "catalog:",
     "reflect-metadata": "catalog:",
@@ -43,6 +45,7 @@
     "@d2t/vitest-ctrf-json-reporter": "catalog:",
     "@nestjs/testing": "catalog:",
     "@types/express": "catalog:",
+    "tsx": "catalog:",
     "unplugin-swc": "catalog:",
     "uuid": "catalog:",
     "webpack-node-externals": "catalog:"

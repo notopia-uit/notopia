@@ -8,14 +8,16 @@ metadata:
       Notopia - Providers Oauth2 Settings
 
 entries:
-  - identifiers:
-      scope_name: picture
-    model: authentik_providers_oauth2.scopemapping
+  - model: authentik_providers_oauth2.scopemapping
+    identifiers:
+      scope_name: notopia
     attrs:
-      name: "Egolia - OAuth Mapping: Picture 'picture'"
-      scope_name: picture
-      description: "Picture URL"
+      name: "Notopia - OAuth Mapping: gateway header claims"
+      scope_name: notopia
+      description: "String claims mapped to X-Forwarded-* headers by the gateway"
       expression: | # language: python
+        import json
         return {
-          "picture": request.user.attributes.get("avatar_url") or None,
+            "groups_json": json.dumps([group.name for group in request.user.groups.all()]),
+            "picture": request.user.attributes.get("avatar_url") or None,
         }

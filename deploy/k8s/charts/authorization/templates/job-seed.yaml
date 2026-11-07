@@ -1,0 +1,9 @@
+{{- $root := merge (dict) . -}}
+{{- $values := deepCopy .Values -}}
+{{- $extra := default list $values.extraEnv -}}
+{{- if $values.database.urlSecret.name -}}
+{{- $extra = append $extra (dict "name" "NOTOPIA_AUTHORIZATION_DATABASE_URL" "valueFrom" (dict "secretKeyRef" $values.database.urlSecret)) -}}
+{{- end -}}
+{{- $_ := set $values "extraEnv" $extra -}}
+{{- $_ := set $root "Values" $values -}}
+{{ include "notopia-common.hookJob" (dict "root" $root "name" "seed" "hook" "post-install,post-upgrade" "weight" 5 "command" (list "./authorization" "seed")) }}
