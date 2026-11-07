@@ -15,6 +15,8 @@ import { withSidebar } from 'vitepress-sidebar';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 import waitOn from 'wait-on';
 
+import { validateAuthorship } from './theme/authorship';
+
 const COMPOSE_KROKI_URL = 'http://localhost:8002';
 const PUBLIC_KROKI_URL = 'https://kroki.io';
 const KROKI_PROBE_TIMEOUT = 3_000;
@@ -191,6 +193,9 @@ const vitePressOptions = {
   lang: 'en-GB',
   base: '/notopia/',
   srcDir: 'src',
+  transformPageData(pageData) {
+    validateAuthorship(pageData.frontmatter.authorship, pageData.relativePath);
+  },
   markdown: {
     theme: {
       light: 'catppuccin-latte',

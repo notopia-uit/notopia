@@ -6,6 +6,6 @@
     "types": ["node"],
     "outDir": "out-tsc/app"
   },
-  "include": [".vitepress/config.mts"],
+  "include": [".vitepress/config.mts", ".vitepress/theme/authorship.ts"],
   "exclude": [".vitepress/**/*.spec.ts"]
 }
