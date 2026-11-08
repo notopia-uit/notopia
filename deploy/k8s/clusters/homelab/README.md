@@ -20,6 +20,8 @@ The empty `image.tag` values are intentionally not deployable image selections:
 the chart falls back to its default app version, which has not been verified.
 Publish or independently verify an immutable image for each service and set its
 tag before resuming that release. Verify image access and migration compatibility.
+Before releasing each service, validate its image and migration or seed hooks with
+the configured UID, GID, filesystem mode, writable paths, and startup dependencies.
 No chart-compatible application images or credentials have been verified.
 
 Anonymous GHCR inspection found `2603.07.1311` for web, note, and document,
@@ -45,6 +47,11 @@ and bucket, and other production settings from the provisioned systems. Include
 the note Authentik token in its Secret. Use the exact environment names from the
 services, not local development credentials. Document's database fields are
 provided from the CNPG Secret, and document must remain at one replica.
+
+Before enabling the edge, check the `app-web` provider's OpenID discovery
+document and confirm that its `issuer` exactly matches `istio.jwt.issuer` in
+`edge/values.yaml`. Authentik's issuer mode determines the value; update the
+configuration if needed and verify authenticated requests at runtime.
 
 Authorization requires external policy seeding from the same image before every
 install, upgrade, and rollback; follow `charts/authorization/README.md`.
@@ -114,15 +121,15 @@ above do not apply to that repository. Add the resulting encrypted file to that
 repository's webhook kustomization, not this one. Do not assume this repository's
 SOPS rule or recipient applies to the other repository.
 
-| Secret | Required contents / source |
-| --- | --- |
-| `valkey-note`, `valkey-billing`, `valkey-document` | Each has its own `password` key for the default Valkey user. |
-| `meilisearch` | `MEILI_MASTER_KEY`, a production master key. |
-| `search-worker` | `NOTOPIA_SEARCH_WORKER_MEILI_API_KEY`: the same Meilisearch master key. |
-| `note` | `NOTOPIA_NOTE_MEILISEARCH_API_KEY`: worker-seeded search key; `NOTOPIA_NOTE_AUTHENTIK_TOKEN`: least-privilege Authentik API token. |
-| `billing` | `NOTOPIA_BILLING_STRIPE_SECRET_KEY`: Stripe API secret; `NOTOPIA_BILLING_STRIPE_WEBHOOK_SECRET`: signing secret for the configured endpoint. |
-| `document` | `NOTOPIA_DOCUMENT_S3_ACCESS_KEY_ID` and `NOTOPIA_DOCUMENT_S3_SECRET_ACCESS_KEY`: RustFS credentials scoped to the document bucket. |
-| `web` | `BETTER_AUTH_SECRET`: independently generated secret; `AUTHENTIK_CLIENT_SECRET`: confidential provider secret. |
+| Secret                                             | Required contents / source                                                                                                                   |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `valkey-note`, `valkey-billing`, `valkey-document` | Each has its own `password` key for the default Valkey user.                                                                                 |
+| `meilisearch`                                      | `MEILI_MASTER_KEY`, a production master key.                                                                                                 |
+| `search-worker`                                    | `NOTOPIA_SEARCH_WORKER_MEILI_API_KEY`: the same Meilisearch master key.                                                                      |
+| `note`                                             | `NOTOPIA_NOTE_MEILISEARCH_API_KEY`: worker-seeded search key; `NOTOPIA_NOTE_AUTHENTIK_TOKEN`: least-privilege Authentik API token.           |
+| `billing`                                          | `NOTOPIA_BILLING_STRIPE_SECRET_KEY`: Stripe API secret; `NOTOPIA_BILLING_STRIPE_WEBHOOK_SECRET`: signing secret for the configured endpoint. |
+| `document`                                         | `NOTOPIA_DOCUMENT_S3_ACCESS_KEY_ID` and `NOTOPIA_DOCUMENT_S3_SECRET_ACCESS_KEY`: RustFS credentials scoped to the document bucket.           |
+| `web`                                              | `BETTER_AUTH_SECRET`: independently generated secret; `AUTHENTIK_CLIENT_SECRET`: confidential provider secret.                               |
 
 The Secret keys above are passed through `envFrom`, except the explicit Valkey
 and Meilisearch chart references. CNPG supplies database credentials separately.
@@ -186,23 +193,15 @@ not just its Kubernetes Secret.
    persistent data recovery; do not assume an updated Secret changes a running
    server's ACL. For Meilisearch, verify master-key and derived-key behavior with
    the deployed version and preserve an index backup.
-2. Update provider and encrypted Secrets in the coordinated order supported by each
+2. For Meilisearch credential changes, stop the search-worker and prevent its
+   controller from restarting it; verify that no worker remains consuming events.
+   Keep it stopped throughout the server rotation. Suspending a HelmRelease does
+   not stop existing pods; prevent unrelated Helm actions and verify none is in flight.
+3. Update provider and encrypted Secrets in the coordinated order supported by each
    provider, reconcile only the Secret resources, and verify the intended Secret
-   versions reached the cluster without printing values. Suspending a HelmRelease
-   does not stop existing pods; keep controllers from initiating unrelated Helm
-   actions and verify none is in flight. Do not revoke old credentials yet.
-3. Restart every affected server and client after its new credentials are available.
-   The checked-in application charts render Deployments named `web`, `note`,
-   `billing`, `document`, `search-worker`, and `authorization` in `notopia`:
-   for each affected deployment, after confirming the live name and intended
-   operation, run `kubectl -n notopia rollout restart deployment/<name>` and
-   `kubectl -n notopia rollout status deployment/<name> --timeout=10m`.
-   These commands restart pods, not Helm hooks; for authorization confirm no Helm
-   action or seeding is in progress and preserve its existing image and policy.
-   Restart only after database credentials are valid. Do not scale document above
-   one replica. Completed Jobs retain old environments; ensure future Jobs are
-   newly created with the current Secret, without rerunning migrations as a test.
-4. For `meilisearch` and `valkey-note`, `valkey-billing`, `valkey-document`, inspect
+   versions reached the cluster without printing values. Do not revoke old credentials.
+4. Restart affected servers before their clients. For `meilisearch` and
+   `valkey-note`, `valkey-billing`, `valkey-document`, inspect
    each installed release's `helm get manifest <release> -n notopia` and live
    workload to identify its exact Deployment or StatefulSet name, controller,
    replica count and Secret mounts; chart versions can differ. After confirming
@@ -212,10 +211,25 @@ not just its Kubernetes Secret.
    Do not guess selectors or restart all workloads. Coordinate Valkey server and
    its note or billing client; document currently has no Valkey URL configured,
    so inventory any separately configured consumers. For Meilisearch coordinate
-   the server and search-worker master key, retrieve the new worker-seeded search
-   key securely, update note's Secret and restart note; verify tenant tokens and
-   browser search. Determine whether seeding is needed from the deployed version;
+   the server and search-worker master key as described above. Confirm Meilisearch
+   accepts the new worker credential with an authenticated request before restoring
+   the worker's previous replica count; health alone does not verify the key. If
+   authentication fails, keep the worker stopped and recover before resuming.
+   Retrieve the search key securely, update note's Secret and verify tenant tokens
+   and browser search. Determine whether seeding is needed from the deployed version;
    do not blindly rerun a Helm release or its hooks.
+
+   Once their servers and credentials are ready, restart the affected application
+   Deployments: `web`, `note`, `billing`, `document`, `search-worker`, or
+   `authorization` in `notopia`. Confirm the live name and operation, then run
+   `kubectl -n notopia rollout restart deployment/<name>` and `kubectl -n notopia
+   rollout status deployment/<name> --timeout=10m`. These commands restart pods,
+   not Helm hooks; for authorization confirm no Helm action or seeding is in
+   progress and preserve its existing image and policy. Restart only after database
+   credentials are valid. Do not scale document above one replica. Completed Jobs
+   retain old environments; ensure future Jobs use the current Secret without
+   rerunning migrations as a test.
+
 5. Verify replacement pods, readiness, authenticated functionality and provider
    logs without revealing credentials; confirm every consumer and newly created
    Job has switched. Only then revoke old credentials. If any restart, health or
@@ -285,11 +299,14 @@ Stop at any failed gate; do not expose an incomplete deployment.
    `spec.suspend: false`, commit and reconcile apps. The worker's seed hook must
    complete independently of note. Both worker and note currently use UID
    `00000000-0000-4000-8000-000000000001`; confirm they still match. The seed
-   creates or reuses a `notes`-only search key and configures index settings; it
+   creates a `notes`-only search key when absent and configures index settings;
+   an existing key is reused without checking its permissions or expiry. The seed
    does not backfill existing data. Plan and verify a separate reindex if needed.
 6. **Transfer the search key securely.** After the seed Job succeeds, use an
    authenticated, verified TLS connection to Meilisearch's `/keys/<uid>` API
-   with the master key and securely transfer the returned `key` into the note
+   with the master key. Verify the key permits `search` on `notes` and has a
+   suitable expiry; if not, provision a compatible key with the configured UID
+   before continuing. Securely transfer the returned `key` into the note
    Secret's `NOTOPIA_NOTE_MEILISEARCH_API_KEY`. Use a secret manager or protected
    interactive tooling that does not expose credentials in command arguments,
    history, logs, terminal recording, or temporary files; do not print the

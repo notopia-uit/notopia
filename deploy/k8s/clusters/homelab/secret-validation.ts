@@ -93,7 +93,7 @@ export function* findSecrets(paths: Iterable<string>): Generator<[string, Object
     try {
       documents = parseDocuments(text);
     } catch (error) {
-      if (/\bkind\s*:\s*['"]?Secret\b/.test(text))
+      if (/\bkind['"]?\s*:\s*['"]?(?:Secret|SecretList)\b/.test(text))
         throw new Error(`${path}: cannot parse Secret document`, { cause: error });
       continue;
     }

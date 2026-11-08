@@ -54,18 +54,47 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 		vim.api.nvim_create_autocmd("BufWriteCmd", {
 			group = sops_group,
 			buffer = buffer,
-			callback = function()
+			callback = function(write_event)
+				if vim.fs.normalize(vim.fn.fnamemodify(write_event.match, ":p")) ~= filename then
+					error("Saving a SOPS buffer to another file is not supported")
+				end
 				if not decrypted then
+					if not vim.bo[buffer].modified then
+						return
+					end
 					error("Decrypt the SOPS buffer before editing or saving")
 				end
 				local ciphertext = run_sops({
 					"sops", "--config", project_root .. "/.sops.yaml", "encrypt",
 					"--filename-override", filename, "--input-type", "yaml", "--output-type", "yaml",
 				}, contents())
-				local file = assert(io.open(filename, "wb"))
-				assert(file:write(ciphertext))
-				assert(file:close())
+				local uv = vim.uv
+				local file, temporary = assert(uv.fs_mkstemp(filename .. ".XXXXXX"))
+				local ok, err = pcall(function()
+					local existing = uv.fs_stat(filename)
+					if existing then
+						assert(uv.fs_fchmod(file, existing.mode % 512))
+					end
+					local written = assert(uv.fs_write(file, ciphertext, 0))
+					assert(written == #ciphertext, "Incomplete SOPS file write")
+					assert(uv.fs_close(file))
+					file = nil
+					assert(uv.fs_rename(temporary, filename))
+				end)
+				if file then uv.fs_close(file) end
+				if not ok then
+					uv.fs_unlink(temporary)
+					error(err)
+				end
 				vim.bo[buffer].modified = false
+			end,
+		})
+
+		vim.api.nvim_create_autocmd({ "FileWriteCmd", "FileAppendCmd" }, {
+			group = sops_group,
+			buffer = buffer,
+			callback = function()
+				error("Writing a SOPS buffer to another file is not supported")
 			end,
 		})
 

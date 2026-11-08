@@ -23,6 +23,7 @@ route:
   - notopia.${LOCAL_DOMAIN}
 env:
   API_URL: https://notopia-api.${PUBLIC_DOMAIN}
+  BETTER_AUTH_URL: https://notopia.${PUBLIC_DOMAIN}
   DOCUMENT_WS_URL: wss://notopia-api.${PUBLIC_DOMAIN}/document/ws/document
   AUTHENTIK_CLIENT_DISCOVERY_URL: https://authentik.${PUBLIC_DOMAIN}/application/o/app-web/.well-known/openid-configuration
   AUTHENTIK_REDIRECT_URI: https://notopia.${PUBLIC_DOMAIN}/api/auth/callback/authentik
