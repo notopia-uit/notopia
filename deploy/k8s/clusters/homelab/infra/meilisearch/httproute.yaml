@@ -16,6 +16,7 @@ spec:
           cors:
             allowOrigins:
               - https://notopia.${PUBLIC_DOMAIN}
+              - https://notopia.${LOCAL_DOMAIN}
             allowMethods: [GET, POST, OPTIONS]
             allowHeaders: [Authorization, Content-Type]
       backendRefs:

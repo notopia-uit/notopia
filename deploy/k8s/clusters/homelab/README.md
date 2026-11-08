@@ -114,9 +114,74 @@ Go charts' `database.urlSecret`. For document, map `host`, `port`, `username`,
 single-instance clusters have no backup configured; provision backups before
 relying on their data.
 
-The route uses the homelab's Gateway API CORS filter. Confirm the installed
-Gateway API CRDs and Istio implementation support this filter and enforce the
-specified origin before exposing search. CORS only controls browsers.
+The route uses the homelab's Gateway API CORS filter for the deployed web origin
+and the local gateway origin `https://notopia.${LOCAL_DOMAIN}`. Confirm the
+installed Gateway API CRDs and Istio implementation support this filter and
+enforce both origins before exposing search. CORS only controls browsers.
+
+## Coordinated secret rotation
+
+Updating a stable Secret reference does not restart pods or refresh environment
+variables. Use a supervised maintenance window, inventory actual Secret consumers
+(including Jobs and any external clients), and confirm the deployed chart versions,
+workload names, replicas, health, backups, provider rotation and rollback behavior.
+Keep releases suspended unless explicitly authorized otherwise. Never trigger an
+unattended Helm upgrade or migration to refresh a Secret: changing values or resuming
+Flux can invoke hooks. Authorization's database Secret is no exception; follow
+[Authorization upgrade and recovery](#authorization-upgrade-and-recovery) for any
+install, upgrade or rollback, and do not run migration or policy seeding merely to
+restart pods. Coordinate CNPG database password changes with the database itself,
+not just its Kubernetes Secret.
+
+1. Where supported, create overlapping credentials and retain the previous usable
+   credential securely. If overlap is impossible, plan downtime, block affected
+   traffic and pause producers/consumers as needed; do not assume a rolling restart
+   can keep mismatched credentials working. Prepare and verify an encrypted Git
+   rollback and provider-side recovery without disclosing values. Account for
+   Better Auth session invalidation, Stripe webhook delivery/retries, and pending
+   work. For Valkey, verify the pinned chart's ACL Secret reload behavior and
+   persistent data recovery; do not assume an updated Secret changes a running
+   server's ACL. For Meilisearch, verify master-key and derived-key behavior with
+   the deployed version and preserve an index backup.
+2. Update provider and encrypted Secrets in the coordinated order supported by each
+   provider, reconcile only the Secret resources, and verify the intended Secret
+   versions reached the cluster without printing values. Suspending a HelmRelease
+   does not stop existing pods; keep controllers from initiating unrelated Helm
+   actions and verify none is in flight. Do not revoke old credentials yet.
+3. Restart every affected server and client after its new credentials are available.
+   The checked-in application charts render Deployments named `web`, `note`,
+   `billing`, `document`, `search-worker`, and `authorization` in `notopia`:
+   for each affected deployment, after confirming the live name and intended
+   operation, run `kubectl -n notopia rollout restart deployment/<name>` and
+   `kubectl -n notopia rollout status deployment/<name> --timeout=10m`.
+   These commands restart pods, not Helm hooks; for authorization confirm no Helm
+   action or seeding is in progress and preserve its existing image and policy.
+   Restart only after database credentials are valid. Do not scale document above
+   one replica. Completed Jobs retain old environments; ensure future Jobs are
+   newly created with the current Secret, without rerunning migrations as a test.
+4. For `meilisearch` and `valkey-note`, `valkey-billing`, `valkey-document`, inspect
+   each installed release's `helm get manifest <release> -n notopia` and live
+   workload to identify its exact Deployment or StatefulSet name, controller,
+   replica count and Secret mounts; chart versions can differ. After confirming
+   the supported reload/rotation procedure, use `kubectl -n notopia rollout
+   restart <deployment-or-statefulset>/<actual-name>` followed by `kubectl -n
+   notopia rollout status <deployment-or-statefulset>/<actual-name> --timeout=10m`.
+   Do not guess selectors or restart all workloads. Coordinate Valkey server and
+   its note or billing client; document currently has no Valkey URL configured,
+   so inventory any separately configured consumers. For Meilisearch coordinate
+   the server and search-worker master key, retrieve the new worker-seeded search
+   key securely, update note's Secret and restart note; verify tenant tokens and
+   browser search. Determine whether seeding is needed from the deployed version;
+   do not blindly rerun a Helm release or its hooks.
+5. Verify replacement pods, readiness, authenticated functionality and provider
+   logs without revealing credentials; confirm every consumer and newly created
+   Job has switched. Only then revoke old credentials. If any restart, health or
+   functional check fails, stop the sequence and keep traffic blocked as needed.
+   Restore the previous provider credentials and encrypted Secret where supported,
+   reconcile the Secret and restart affected workloads again, checking compatibility
+   and data recovery first. If reversal is unsupported, remain in maintenance and
+   use the provider's documented recovery; Helm rollback does not restore external
+   credentials or data. Escalate rather than revoking a still-needed credential.
 
 ## Ordered initial bootstrap
 

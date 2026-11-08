@@ -138,7 +138,7 @@ class InfrastructureTest(unittest.TestCase):
         rule = route["spec"]["rules"][0]
         self.assertEqual(rule["backendRefs"][0]["name"], "meilisearch")
         cors = next(f["cors"] for f in rule["filters"] if f["type"] == "CORS")
-        self.assertEqual(cors["allowOrigins"], ["https://notopia.${PUBLIC_DOMAIN}"])
+        self.assertEqual(cors["allowOrigins"], ["https://notopia.${PUBLIC_DOMAIN}", "https://notopia.${LOCAL_DOMAIN}"])
 
     def test_secrets_are_encrypted(self):
         output = subprocess.check_output(
