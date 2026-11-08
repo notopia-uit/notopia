@@ -1,3 +1,8 @@
+---
+authorship:
+  - ai
+---
+
 # Follow-up (2026-10): blocknote 0.55, transitive bundling, and a container that actually boots
 
 > Follow-up to [`nestjs-bundling-otel.md`](./nestjs-bundling-otel.md). Read that first for the _why_ of

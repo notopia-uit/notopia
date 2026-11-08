@@ -1,3 +1,8 @@
+---
+authorship:
+  - ai
+---
+
 # The SSE Ghost That Lived After the Request Died
 
 _A story about a goroutine that didn't know when to quit, a pipe that got closed under its feet, and the panic that followed._

@@ -6,7 +6,7 @@ order: 2
 
 :::info
 
-- Stripe runs in **sandbox** only: Stripe doesn't onboard Vietnamese businesses for live payouts. See `story/BILLING_PAYMENT_PROVIDERS.md`.
+- Stripe runs in **sandbox** only: Stripe doesn't onboard Vietnamese businesses for live payouts. See [the payment provider story](/stories/BILLING_PAYMENT_PROVIDERS).
 - Webhooks are **fetch-and-sync**: the payload only gives an id, and billing reads the current state back from Stripe, so event order doesn't matter.
 - Entitlements are always read from billing's own database. Other services call gRPC on every check and never cache.
 

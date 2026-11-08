@@ -9784,7 +9784,7 @@ git commit -m "docs(billing): service guide and diagrams"
 
 ### 2026-10-13: end of session
 
-**Done:** Tasks 1–10 (checkboxes ticked). Commits after Task 10: `4d59961b` typed kafka decode, `27e3d62b`/`71c6380e` stripe CLI + `stripe-listen --all-snapshot`, `2c307bd4` oapi-codegen version in nx inputs, `97cdbcf7` `commonconfig.Secret` redaction, `24c6f124` authorization bootstraps policies from `policy.csv` with `AddPoliciesEx`. Stories: `story/watermill-event-gaps.md`, `story/BILLING_PAYMENT_PROVIDERS.md`. Manual guide: `tmp/TEST_FLOW_BILLING.md` (gitignored).
+**Done:** Tasks 1–10 (checkboxes ticked). Commits after Task 10: `4d59961b` typed kafka decode, `27e3d62b`/`71c6380e` stripe CLI + `stripe-listen --all-snapshot`, `2c307bd4` oapi-codegen version in nx inputs, `97cdbcf7` `commonconfig.Secret` redaction, `24c6f124` authorization bootstraps policies from `policy.csv` with `AddPoliciesEx`. Stories: `docs/src/stories/watermill-event-gaps.md`, `docs/src/stories/BILLING_PAYMENT_PROVIDERS.md`. Manual guide: `tmp/TEST_FLOW_BILLING.md` (gitignored).
 
 **E2E against Stripe sandbox (subagent run):** PASS: seed (idempotent), checkout + webhooks, event resend idempotency, portal session, bad signature → 400, cancel-now + refund, workspace deleted → cancel + refund.
 Not yet tested: payer removal + `payer/claim` (Task 10), plan change inside the portal, failing/3DS cards, duplicate-checkout guard, crons.
@@ -9803,7 +9803,7 @@ Not yet tested: payer removal + `payer/claim` (Task 10), plan change inside the 
 - Task 11 `215463a2`: reconcile (hourly) + prune (daily 04:00) crons, Redis-locked. Two-instance manual check skipped: covered by `pkg/cron` `TestJobRunsOnceAcrossSchedulers`.
 - Task 12 `994bab4f`, `ec535af3`: billing sequence/state docs, billing in architecture diagrams, AGENTS updates.
 - Full sandbox E2E (Step 2): all 11 checklist items PASS, plus authorization dev-mode restart check. Payment failure was forced via the Stripe CLI (failing card + `always_invoice` upgrade) since `--billing-cycle-anchor now` is rejected by the current API version.
-- Authorization: `8e55c60d` fixed the role-manager clobber regression introduced by `24c6f124` (both prod and dev now keep DB memberships across restart); `f85c26e5` runs the 36-case matrix through both the string adapter and the CSV sync. Story: `story/casbin-role-manager-clobber.md`.
+- Authorization: `8e55c60d` fixed the role-manager clobber regression introduced by `24c6f124` (both prod and dev now keep DB memberships across restart); `f85c26e5` runs the 36-case matrix through both the string adapter and the CSV sync. Story: `docs/src/stories/casbin-role-manager-clobber.md`.
 - Open issues 1–4 of 2026-10-13 are resolved or dismissed (1: fixed; 2: stale PATH, nx runtime input in place; 3, 4: no action).
 
 **Still open**
@@ -9828,7 +9828,7 @@ Deviations from the plan text (details in the executing-plans ledger):
 - Commands return only `error`; `catalog.createPrice` too. Checkout and portal are queries (`StartCheckout`, `StartPortal`) because the session URL is the answer.
 - Mocks via mockery (`internal/billing/.mockery.yaml`, nx `internal/billing:gen:mockery`), not hand-written fakes; repositories use the in-memory `memStore`.
 - Webhook: unknown checkout purpose is logged and marked processed; `stripeID` returns an error instead of discarding it.
-- Kafka: one consumer group per topic; typed handlers through `decode[T]` (not Watermill's CQRS processor, see `story/watermill-event-gaps.md`); undecodable payloads and permanent use-case errors are logged and acked.
+- Kafka: one consumer group per topic; typed handlers through `decode[T]` (not Watermill's CQRS processor, see `docs/src/stories/watermill-event-gaps.md`); undecodable payloads and permanent use-case errors are logged and acked.
 - Provider cancel moved after the local commit (final review); refunds are quoted over each payment's own coverage; past-due grace measured from `past_due_since`.
 - Migrations merged into `00001_init.sql` while in development (`past_due_since` is the last column of `subscriptions`).
 - `stripe-listen` forwards `--all-snapshot` events; unrouted types return 204.

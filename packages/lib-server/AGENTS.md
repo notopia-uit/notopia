@@ -9,9 +9,9 @@ Node-only shared code for NestJS services.
 
 ## Locks
 
-- With `redisUrl`, locks use `RedisLockStore`. That Redis must run with `noeviction` and
-  persistence, and the app must call `app.enableShutdownHooks()`.
-- Without `redisUrl`, an in-memory store is used and a warning is logged. **This is
-  intended, also in production**: it keeps single-instance deployments and local
-  development free of an extra Redis. Do not turn it into a startup error. Running more
-  than one instance without `redisUrl` lets every instance run the same cron.
+- With `redisUrl`, locks use `RedisLockStore`. Redis must use `noeviction` and
+  persistence; app must call `app.enableShutdownHooks()`.
+- Without `redisUrl`, uses in-memory store and logs warning. **Intentional, also in
+  production**: avoids extra Redis for single-instance deployments and local
+  development. Do not make startup error. Multiple instances without `redisUrl`
+  each run same cron.

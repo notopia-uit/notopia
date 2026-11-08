@@ -28,8 +28,8 @@ packages/                       # JS packages
   lib-server/                   # Shared server-side (node-only) code
   pb/                           # Protobuf generated code, use grpc, protovalidate
   ui/                           # React UI components, using shadcn/ui (@notopia-uit/ui)
-docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.), and AI (superpowers,...)
-story/                          # The stories/blogs while doing this project (AI/human written)
+docs/                           # VitePress docs in src/; agent guidance and non-rendered AI materials outside src/
+  src/stories/                  # Engineering stories and project write-ups
 cmd/                            # Go services (entrypoint only: main.go + wire)
   note/                         # Note service (nx: note)
   authorization/                # Authorization service (nx: authorization)
@@ -79,7 +79,7 @@ pkg/                            # Go packages
 - Wiring is google/wire: edit `wire.go`, run `nx run {service}:gen:wire`, never hand-edit `wire_gen.go`.
   Each package exposes `var ProvideX = NewX`
 - Services are DDD + CQRS: layering, command/query rules, domain vs app models, sqlc split are in
-  [`docs/ai/GO_CLEAN_ARCH.md`](./docs/ai/GO_CLEAN_ARCH.md) (read before writing Go service code);
+  [`docs/src/conventions/go-clean-architecture.md`](./docs/src/conventions/go-clean-architecture.md) (read before writing Go service code);
   concrete layout in [`internal/note/AGENTS.md`](./internal/note/AGENTS.md)
 - Shared building blocks (config, `Cmd`/`Query`, gin, otel) are in [`pkg/`](./pkg/AGENTS.md)
 - Go 1.26: `new(value)` / `new(fn(...))` returns a pointer; Go 1.27 supports generic methods on structs

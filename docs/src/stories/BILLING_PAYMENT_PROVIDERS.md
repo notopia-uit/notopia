@@ -1,3 +1,8 @@
+---
+authorship:
+  - ai
+---
+
 # Taking Money in Vietnam: Stripe, PayPal, SePay, and a Provider-Agnostic Billing Core
 
 _Why Notopia bills through a Stripe sandbox it can never take live, why PayPal "works in Vietnam" but not in VND, and how the billing service is shaped so the payment provider can be swapped later._

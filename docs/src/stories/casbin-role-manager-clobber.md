@@ -1,3 +1,8 @@
+---
+authorship:
+  - ai
+---
+
 # The Helper Enforcer That Erased Everyone's Membership
 
 _How a "harmless" temporary casbin enforcer, built only to parse a CSV, silently replaced the real enforcer's role manager, and why every workspace member got `403` after a restart._

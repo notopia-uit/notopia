@@ -5,9 +5,8 @@ order: 1
 
 # Conventions
 
-Go services follow DDD with CQRS. The full rules are in
-[`docs/ai/GO_CLEAN_ARCH.md`](https://github.com/notopia-uit/notopia/blob/main/docs/ai/GO_CLEAN_ARCH.md);
-this page is a summary. The Note service (`internal/note`) is the reference implementation.
+Go services follow DDD with CQRS. The [full rules](/conventions/go-clean-architecture) expand
+on this summary. The Note service (`internal/note`) is the reference implementation.
 
 - **Layers**: `controller -> app -> domain <- infra`. `domain` is stdlib only, `controller`
   imports `app` only (never `domain`), wiring with google/wire is the only place that joins

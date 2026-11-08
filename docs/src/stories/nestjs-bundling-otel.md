@@ -1,3 +1,8 @@
+---
+authorship:
+  - ai
+---
+
 # Bundling the NestJS apps (document / search-worker): OpenTelemetry logs, CJS, and the externals split
 
 > **Update 2026-10:** see [`nestjs-bundling-otel-2026-10-blocknote-055.md`](./nestjs-bundling-otel-2026-10-blocknote-055.md).

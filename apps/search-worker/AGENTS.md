@@ -1,6 +1,6 @@
 # Search Worker (nx: `search-worker`)
 
-Kafka consumer → Meilisearch, with an HTTP health listener. Small enough that `src/` is flat:
+Kafka consumer → Meilisearch, with HTTP health listener. Flat `src/`:
 `app.controller.ts` (event handlers), `app.service.ts` (indexing), config, otel, errors.
 
 ## Topics consumed (`app.controller.ts`)
@@ -12,34 +12,34 @@ Kafka consumer → Meilisearch, with an HTTP health listener. Small enough that 
 | `events.integration.note.note.deleted` | Delete from `notes` |
 | `events.integration.document.document.committed` | Convert BlockNote blocks → markdown, index as content |
 
-Content is only indexed on **commit**, not on edit — an uncommitted document is invisible
+Content indexed only on **commit**, not edit — uncommitted documents invisible
 to search. See `apps/document/AGENTS.md`.
 
 ## Things worth knowing
 
-- Payload types come from `@notopia-uit/api-share-gen`; add new event shapes in
+- Payload types from `@notopia-uit/api-share-gen`; add new event shapes in
   `api/share/components/schemas/`, not here.
-- Upsert semantics — a partial document (`model.ts`: `Partial<NoteSearch> & { id }`) is a
-  valid update, which is why the note-created and document-committed handlers can each
-  write disjoint fields of the same record.
-- The frontend never queries Meilisearch with the master key; it uses scoped tenant tokens
+- Upsert: partial document (`model.ts`: `Partial<NoteSearch> & { id }`) is a
+  valid update; note-created and document-committed handlers can each
+  write disjoint fields of same record.
+- Frontend never queries Meilisearch with master key; uses scoped tenant tokens
   minted by `internal/note` (`q_workspacesearchtoken.go`). Index-level filterable attributes
-  must line up with the filters those tokens embed.
-- `kafka-max-retry.exception-filter.ts` bounds retries — a handler that throws is retried,
-  then dropped. Don't rely on a throw to reprocess later.
-- `seed/` (`nx run search-worker:seed`, or `node dist/seed.cjs`) ensures the Meilisearch index and settings exist; idempotent, needed in every environment. Host, master key and note search key UID are required. The UID must match `NOTOPIA_NOTE_MEILISEARCH_NOTE_SEARCH_KEY_UID`; newly created key values are printed only outside production. Seed emits a root span without auto-instrumentation so credentials are not captured.
-- `/search-worker/health/live` and `/search-worker/health/ready` listen on `NOTOPIA_SEARCH_WORKER_HEALTH_CHECK_PORT` (default 28083), independently of Kafka startup. Readiness checks Meilisearch and consumer group join/heartbeat; it goes down after 15 seconds without a heartbeat or on consumer failures, and recovers on group join or heartbeat.
-- `fixtures/` (`nx run search-worker:fixtures`, after `fixtures:transform`) loads dev-only fake documents into the index.
-- Deletion tombstones (`tombstone.ts`): topics are separate, so a late `note.updated` /
-  `document.committed` can arrive after `note.deleted` and upsert the note back.
-  `note.deleted` marks a tombstone before deleting; upserts skip tombstoned ids and re-check
-  after writing (deleting again if a tombstone appeared meanwhile). With
-  `NOTOPIA_SEARCH_WORKER_REDIS_URL` set, tombstones live in Redis (`SET EX`), required when
-  running more than one instance. Unset, an in-memory `lru-cache` is used (single instance,
-  a warning is logged). TTL `..._TOMBSTONE_TTL_SECONDS` (default 86400) must exceed the worst
-  consumer lag plus retries; `..._TOMBSTONE_MAX` caps the in-memory entries.
-- Every Meilisearch write awaits `waitTask()`; a failed task throws `MeiliTaskError` so the
+  must match filters embedded in tokens.
+- `kafka-max-retry.exception-filter.ts` bounds retries — throwing handler retried,
+  then dropped. Don't rely on throw to reprocess later.
+- `seed/` (`nx run search-worker:seed`, or `node dist/seed.cjs`) ensures Meilisearch index and settings exist; idempotent, required in every environment. Host, master key and note search key UID required. UID must match `NOTOPIA_NOTE_MEILISEARCH_NOTE_SEARCH_KEY_UID`; newly created key values printed only outside production. Seed emits root span without auto-instrumentation to avoid capturing credentials.
+- `/search-worker/health/live` and `/search-worker/health/ready` listen on `NOTOPIA_SEARCH_WORKER_HEALTH_CHECK_PORT` (default 28083), independent of Kafka startup. Readiness checks Meilisearch and consumer group join/heartbeat; goes down after 15 seconds without heartbeat or on consumer failures, recovers on group join or heartbeat.
+- `fixtures/` (`nx run search-worker:fixtures`, after `fixtures:transform`) loads dev-only fake documents into index.
+- Deletion tombstones (`tombstone.ts`): topics separate, so late `note.updated` /
+  `document.committed` can arrive after `note.deleted` and upsert note back.
+  `note.deleted` marks tombstone before deleting; upserts skip tombstoned ids and re-check
+  after writing (delete again if tombstone appeared meanwhile). With
+  `NOTOPIA_SEARCH_WORKER_REDIS_URL` set, tombstones live in Redis (`SET EX`), required for
+  multiple instances. Unset, uses in-memory `lru-cache` (single instance,
+  logs warning). TTL `..._TOMBSTONE_TTL_SECONDS` (default 86400) must exceed worst
+  consumer lag plus retries; `..._TOMBSTONE_MAX` caps in-memory entries.
+- Every Meilisearch write awaits `waitTask()`; failed task throws `MeiliTaskError` so
   Kafka retry path sees it.
-- `app.service.spec.ts` covers the tombstone guards and task failure with a fake Meilisearch
-  (no Meilisearch testcontainer for JS). `tmp/search-worker/tombstone.it.ts` is a manual
-  check against the real local Meilisearch + Redis.
+- `app.service.spec.ts` covers tombstone guards and task failure with fake Meilisearch
+  (no Meilisearch testcontainer for JS). `tmp/search-worker/tombstone.it.ts` manually
+  checks against real local Meilisearch + Redis.

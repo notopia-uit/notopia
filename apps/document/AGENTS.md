@@ -1,6 +1,6 @@
 # Document Service (nx: `document`)
 
-Owns document *content* (note metadata lives in `internal/note`). NestJS: HTTP REST +
+Owns document *content* (metadata in `internal/note`). NestJS: HTTP REST +
 Yjs WebSocket + Kafka producer/consumer. Spec: `api/document/`.
 
 ## Modules (`src/`)
@@ -12,109 +12,104 @@ Yjs WebSocket + Kafka producer/consumer. Spec: `api/document/`.
 | `hocuspocus/` | Yjs server, connection auth, live permission revocation |
 | `blocknote/` | Schema provider + YDoc↔blocks conversion, tag/link extraction |
 | `note/`, `authorization/` | gRPC clients (generated from `proto/`) |
-| `authentication/` | Multi-issuer JWKS validation — for the **WebSocket** token |
+| `authentication/` | Multi-issuer JWKS validation — for **WebSocket** token |
 | `common/` | `UserGuard` + `@User()` — for **HTTP**, reads gateway-forwarded headers |
 | `storage/`, `kafka/`, `database/`, `config/` | S3 presign, Kafka client, TypeORM, Zod config |
 
-Two auth paths, easy to trip on: HTTP trusts Traefik's forwarded headers; the WebSocket
-gets a raw JWT in the connect payload and validates it itself in
-`Hocuspocus.onAuthenticate`.
+Two auth paths: HTTP trusts Traefik forwarded headers; WebSocket validates raw JWT
+from connect payload itself in `Hocuspocus.onAuthenticate`.
 
 ## The commit pipeline
 
-`DocumentService.commitIfDue()` is the hinge of the whole system. In one transaction
-(pessimistic write lock on the document) it: saves a `RevisionEntity` of the current
-blocks, clears `modified`, and emits
-`events.integration.document.document.committed`. Three callers, one revision when they race
+`DocumentService.commitIfDue()` hinges system. One transaction (pessimistic write lock
+on document): saves `RevisionEntity` of current blocks, clears `modified`, emits
+`events.integration.document.document.committed`. Three callers, one revision on race
 (row lock + min-interval/hash check):
 
 | Trigger | Caller | Gate |
 | --- | --- | --- |
 | `manual` | `POST /document/documents/{id}/commit` | write permission (viewers 403); always commits changed content |
 | `auto` | `AutoCommitExtension.afterStoreDocument` | plan feature `auto_commit` + `auto_commit_min_interval_seconds` |
-| `sweeper` | `SweeperCron` | stale `modified` docs idle ≥ `idleSeconds`; walks all of them in batches of 500 per tick |
+| `sweeper` | `SweeperCron` | stale `modified` docs idle ≥ `idleSeconds`; walks all in batches of 500 per tick |
 
-Manual responses: `201 {revisionId}` revision created, `200 {revisionId}` content equals the
-latest revision (returns it), `204` nothing changed and no revision exists. When the content
-hash equals the latest revision only `modified` is cleared; `pendingContributorIds` is kept
-for the next real commit.
+Manual responses: `201 {revisionId}` revision created, `200 {revisionId}` content equals
+latest revision (returns it), `204` nothing changed, no revision exists. If content hash
+equals latest revision, only `modified` cleared; `pendingContributorIds` kept for next real commit.
 
-Callers clear the in-memory `modified` flag only when the loaded Y.Doc's content hash equals
-the committed one (state vectors miss delete-only edits).
+Callers clear in-memory `modified` only when loaded Y.Doc content hash equals committed
+hash (state vectors miss delete-only edits).
 
-Billing unreachable: auto-commit is skipped (warn), the sweeper and purge skip the batch,
+Billing unreachable: auto-commit skipped (warn), sweeper and purge skip batch,
 editing continues.
 
 Downstream: `internal/note` (`e_documentcommitted.go`) updates note size/tags/outgoing
-links; `search-worker` indexes the content into Meilisearch. **Nothing else re-indexes** —
-if a document is never committed, its content is never searchable and its links never
-appear in the graph.
+links; `search-worker` indexes content into Meilisearch. **Nothing else re-indexes** —
+uncommitted document content never searchable, links never appear in graph.
 
 ## Yjs / Hocuspocus
 
-Extension hooks run by descending priority, not array order:
+Extension hooks run descending priority, not array order:
 
 | Extension | Priority | Role |
 | --- | --- | --- |
-| `ContributorFlushExtension` | 1100 | Flushes tracked editors to `pendingContributorIds` in `onStoreDocument`, and retries in `afterStoreDocument` (a brand-new document has no row yet during its first store) |
-| `@hocuspocus/extension-redis` | 1000 | Store lock; an instance missing it throws `SkipFurtherHooksError`, skipping later hooks, hence the flush runs before it |
-| Database (`HocuspocusDatabase`) | 100 | Upserts the row |
-| `AutoCommitExtension` | 50 | Must run after the row is stored. No forced commit on disconnect (the sweeper covers idle docs). Resolves the workspace with `NoteService.batchGetNoteWorkspaces` (no auth, marked `HACK:`; should become a service-account role) |
+| `ContributorFlushExtension` | 1100 | Flushes tracked editors to `pendingContributorIds` in `onStoreDocument`, retries in `afterStoreDocument` (new document has no row during first store) |
+| `@hocuspocus/extension-redis` | 1000 | Store lock; instance missing it throws `SkipFurtherHooksError`, skips later hooks, so flush runs first |
+| Database (`HocuspocusDatabase`) | 100 | Upserts row |
+| `AutoCommitExtension` | 50 | Runs after row stored. No forced commit on disconnect (sweeper covers idle docs). Resolves workspace with `NoteService.batchGetNoteWorkspaces` (no auth, marked `HACK:`; should become service-account role) |
 
-- `HocuspocusDatabase.store` upserts the row and writes `modified` from the Yjs metadata
-  (`DocumentService.upsertData`). Stores are debounced server-wide by
+- `HocuspocusDatabase.store` upserts row, writes `modified` from Yjs metadata
+  (`DocumentService.upsertData`). Stores debounced server-wide by
   `NOTOPIA_DOCUMENT_HOCUSPOCUS_DEBOUNCE_MS` (default 2000) and
-  `NOTOPIA_DOCUMENT_HOCUSPOCUS_MAX_DEBOUNCE_MS` (default 10000). The manual commit calls
-  `HocuspocusService.flushStore` first, so edits still in the debounce are stored before
-  `commitIfDue` reads the row.
-- `AutoCommitExtension` skips the note/billing calls when `lastCommittedAt` is less than
-  `NOTOPIA_DOCUMENT_AUTO_COMMIT_CHECK_FLOOR_SECONDS` (default 60, the shortest plan interval;
-  `0` disables) ago. Only a cheap local precondition, not a cache: the real interval comes
-  from the plan's `auto_commit_min_interval_seconds`.
-- `afterLoadDocument` applies the DB `modified` column into the `metadata` Y.Map
-  (`YDocMetadataMap`) with origin `{ source: 'local', skipStoreHooks: true }`, so loading
-  does not trigger a store. Clients read `{ modified }` from it.
-  After a commit, callers use `HocuspocusService.clearModifiedIfCommitted` (or
-  `DocumentService.clearModifiedIfCommitted` with the loaded `Y.Doc`), which clears the flag
-  only when the loaded doc's content hash equals the committed one, so edits not stored yet
-  keep `modified`.
-- `note.deleted` → `HocuspocusService.onNoteDeleted` marks the id in `deletedDocumentIds`
-  (the store guard), closes its connections, waits for in-flight stores
-  (`waitForPendingStores`) and deletes the row; revisions cascade by FK. Without the guard,
-  the final store on unload would upsert the row back. The set only holds loaded documents
-  and is cleared in `afterUnloadDocument`, so it does not grow.
-  Scaling out: the instance consuming `note.deleted` may not hold the live document, so a
-  shared set (Redis) does not help. The event must reach every instance (one consumer group
+  `NOTOPIA_DOCUMENT_HOCUSPOCUS_MAX_DEBOUNCE_MS` (default 10000). Manual commit calls
+  `HocuspocusService.flushStore` first, storing debounced edits before
+  `commitIfDue` reads row.
+- `AutoCommitExtension` skips note/billing calls when `lastCommittedAt` is less than
+  `NOTOPIA_DOCUMENT_AUTO_COMMIT_CHECK_FLOOR_SECONDS` (default 60, shortest plan interval;
+  `0` disables) ago. Cheap local precondition, not cache: real interval from plan's
+  `auto_commit_min_interval_seconds`.
+- `afterLoadDocument` applies DB `modified` column to `metadata` Y.Map
+  (`YDocMetadataMap`) with origin `{ source: 'local', skipStoreHooks: true }`, preventing
+  store on load. Clients read `{ modified }` from it.
+  After commit, callers use `HocuspocusService.clearModifiedIfCommitted` (or
+  `DocumentService.clearModifiedIfCommitted` with loaded `Y.Doc`), clearing flag only
+  when loaded doc content hash equals committed hash, so unstored edits keep `modified`.
+- `note.deleted` → `HocuspocusService.onNoteDeleted` marks id in `deletedDocumentIds`
+  (store guard), closes connections, waits for in-flight stores
+  (`waitForPendingStores`), deletes row; revisions cascade by FK. Without guard,
+  final store on unload would upsert row back. Set holds only loaded documents,
+  cleared in `afterUnloadDocument`, so does not grow.
+  Scaling out: instance consuming `note.deleted` may not hold live document, so shared
+  set (Redis) does not help. Event must reach every instance (one consumer group
   per instance, or Hocuspocus Redis extension).
-- `onRoleChanged` / `onMemberRemoved` consume Kafka events from `authorization` and walk
+- `onRoleChanged` / `onMemberRemoved` consume Kafka events from `authorization`, walk
   live connections to flip `readOnly` or close with codes 4001/4002.
 
 ## Crons and locks
 
 `@notopia-uit/lib-server/locks` provides `LocksSetupModule.forRoot({ redisUrl?, ttl? })`.
-With no `redisUrl` it uses an in-memory store (single instance only, a warning is logged, intended even in production, see `packages/lib-server/AGENTS.md`); with one it uses `RedisLockStore`. The lock
-Redis must run with `noeviction` and persistence, and the app must call
-`app.enableShutdownHooks()`. `redis.url` (`NOTOPIA_DOCUMENT_REDIS_URL`) picks the lock store;
-`scaling.enabled` (`NOTOPIA_DOCUMENT_SCALING_ENABLED`, requires the URL) only adds
-`@hocuspocus/extension-redis`. Its clients come from the app's ioredis via `createClient` (the
-extension's own ioredis 5.6.1 parses URLs with the deprecated `url.parse()`). Local compose
-Redis for this service is `document_redis`.
+Without `redisUrl`, uses in-memory store (single instance only, logs warning, intended even in production, see `packages/lib-server/AGENTS.md`); with URL uses `RedisLockStore`. Lock
+Redis must use `noeviction` and persistence; app must call
+`app.enableShutdownHooks()`. `redis.url` (`NOTOPIA_DOCUMENT_REDIS_URL`) picks lock store;
+`scaling.enabled` (`NOTOPIA_DOCUMENT_SCALING_ENABLED`, requires URL) only adds
+`@hocuspocus/extension-redis`. Its clients come from app's ioredis via `createClient` (extension's
+own ioredis 5.6.1 parses URLs with deprecated `url.parse()`). Local compose Redis:
+`document_redis`.
 
-Crons (`src/cron/`) are not `@Cron` decorators (those cannot read config): `CronRegistrar`
-adds them to `SchedulerRegistry` in `onModuleInit` from `NOTOPIA_DOCUMENT_CRON_*` (name = lock
-key, schedule, enabled, timeout seconds), with no `timeZone`, so they run in the process TZ.
-Each tick runs in `Locks.withLock(name, …)`; `LockNotAcquiredError` means another instance has
-it. Jobs get an `AbortSignal` (lock lost or timeout) and stop between batches when it aborts.
+Crons (`src/cron/`) not `@Cron` decorators (cannot read config): `CronRegistrar`
+adds to `SchedulerRegistry` in `onModuleInit` from `NOTOPIA_DOCUMENT_CRON_*` (name = lock
+key, schedule, enabled, timeout seconds), no `timeZone`, so run in process TZ.
+Each tick runs in `Locks.withLock(name, …)`; `LockNotAcquiredError` means another instance
+holds lock. Jobs get `AbortSignal` (lock lost or timeout), stop between batches on abort.
 Defaults: `document:sweeper` `*/10 * * * *` (timeout 300 s, idle 600 s),
 `document:revision-purge` `30 3 * * *` (timeout 1800 s); each has `_ENABLED=false` to disable.
-Revision purge deletes revisions older than the plan's `revision_history_days` and always keeps
-the latest one.
+Revision purge deletes revisions older than plan's `revision_history_days`, always keeps
+latest.
 
 ## Revisions are hard-deleted
 
-Revisions have no `deletedAt` (no soft delete); the API delete and the revision purge cron
-remove rows. For an existing schema that still has `deletedAt`, remove soft-deleted rows
-before dropping that column, otherwise those rows become visible again:
+Revisions have no `deletedAt` (no soft delete); API delete and revision purge cron
+remove rows. For existing schema with `deletedAt`, remove soft-deleted rows
+before dropping column, else rows become visible again:
 
 ```sql
 DELETE FROM revisions WHERE "deletedAt" IS NOT NULL;
@@ -122,19 +117,19 @@ DELETE FROM revisions WHERE "deletedAt" IS NOT NULL;
 
 ## Conventions
 
-- HTTP handlers extend the generated abstract class from
-  `@notopia-uit/api-document-nestjs-server` — change `api/document/` and run `nx gen api`
-  first, then implement the new method.
-- Kafka payload types come from `@notopia-uit/api-share-gen` (defined in `api/share/`),
+- HTTP handlers extend generated abstract class from
+  `@notopia-uit/api-document-nestjs-server` — change `api/document/`, run `nx gen api`
+  first, then implement new method.
+- Kafka payload types from `@notopia-uit/api-share-gen` (defined in `api/share/`),
   never hand-written interfaces.
 - `@Traceable()` on services; structured logger calls are `this.logger.log({...}, 'msg')`.
 
 ## Database schema and migrations
 
-No sync or migrate on startup (`synchronize: false`). Schema changes go through the TypeORM
-CLI via `nx run document:db:{sync,generate,create,migrate,revert,status}` (see `package.json`).
-`db:sync` is dev only and destructive; production runs `dist/migrate.cjs` before starting
-the service. The initial migration targets an empty database; existing schemas need a carefully
-verified baseline before it can be recorded as applied. `just fixtures-document` runs `db:sync` first.
-Health endpoints are `/document/health/live`, `/document/health/ready`, and
-`/document/health/startup` on the main port.
+No sync or migrate on startup (`synchronize: false`). Schema changes via TypeORM
+CLI: `nx run document:db:{sync,generate,create,migrate,revert,status}` (see `package.json`).
+`db:sync` dev only, destructive; production runs `dist/migrate.cjs` before starting
+service. Initial migration targets empty database; existing schemas need carefully
+verified baseline before recording it as applied. `just fixtures-document` runs `db:sync` first.
+Health endpoints: `/document/health/live`, `/document/health/ready`, and
+`/document/health/startup` on main port.

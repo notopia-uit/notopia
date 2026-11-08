@@ -1,3 +1,8 @@
+---
+authorship:
+  - ai
+---
+
 # NestJS gRPC: no `.proto` files at runtime, but `@grpc/proto-loader` must be installed
 
 > Related: [`nestjs-bundling-otel-2026-10-blocknote-055.md`](./nestjs-bundling-otel-2026-10-blocknote-055.md) §4.1.

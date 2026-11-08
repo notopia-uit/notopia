@@ -1,3 +1,8 @@
+---
+authorship:
+  - ai
+---
+
 # Casbin Remembers, the Database Changes
 
 _Why a casbin enforcer doesn't see policy rows written by anyone else, and what that means for seeding and for running more than one authorization instance._

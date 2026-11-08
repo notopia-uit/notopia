@@ -1,3 +1,8 @@
+---
+authorship:
+  - ai
+---
+
 # The Event Processor That Would Have Eaten Every Message
 
 _Why the billing service's Kafka consumers don't use Watermill's CQRS `EventProcessor`, even though the note service does, and the one-line metadata convention that makes the difference._

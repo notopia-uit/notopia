@@ -1,12 +1,12 @@
 # Authorization Service
 
-Casbin-backed workspace roles and permission checks. gRPC only — no HTTP API.
+Casbin-backed workspace roles and permission checks. gRPC only; no HTTP API.
 Entrypoint: `cmd/authorization/`. Contract: `proto/authorization/authorization.proto`.
 
 ## Layout
 
 - `app/` — flat, one file per RPC (`createworkspace.go`, `hasworkspacepermission.go`, …),
-  each with a `_test.go`. No `cmd_`/`q_` prefixes here, unlike `internal/note/`.
+  each with `_test.go`. No `cmd_`/`q_` prefixes, unlike `internal/note/`.
 - `app/casbin.go` — enforcer setup
 - `policy/` — embedded `model.conf`, `policy.csv`, `policy_fixtures.csv`; `Seed`, `LoadFixtures`, `DetectDrift`
 - `infra/` — `db.go` (Casbin postgres adapter), `casbin.go`, `integrationevent.go`
@@ -14,7 +14,7 @@ Entrypoint: `cmd/authorization/`. Contract: `proto/authorization/authorization.p
 
 ## Casbin model (`policy/model.conf`)
 
-Request is `sub, dom, obj, act` = user, workspace, object type, action.
+Request: `sub, dom, obj, act` = user, workspace, object type, action.
 
 ```
 m = g(r.sub, p.sub, r.dom)   # user has role in this workspace (domain-scoped)
@@ -22,47 +22,46 @@ m = g(r.sub, p.sub, r.dom)   # user has role in this workspace (domain-scoped)
  && r.act == p.act
 ```
 
-Two grouping relations, easy to confuse:
+Two easily confused grouping relations:
 
-- `g` — **user → role, scoped by workspace**. Stored in the DB; this is the membership data.
+- `g` — **user → role, scoped by workspace**. DB-stored membership data.
 - `g2` — **concrete object → object class**, static in `policy.csv`:
   `note → workspace_item`, `folder → workspace_item`.
 
-`policy.csv` (`p` lines) holds only the role→permission matrix for `owner`/`editor`/`viewer`
-over `workspace` and `workspace_item`. It is static config: change it to change what a role
-can do; it is not per-tenant data.
+`policy.csv` (`p` lines) holds only role→permission matrix for `owner`/`editor`/`viewer`
+over `workspace` and `workspace_item`. Static config, not per-tenant data; change it to change role permissions.
 
-`policy.csv` is the single source of truth for the static matrix (`p` + `g2`). `policy.Seed` syncs it:
-adds missing rows and prunes stale `p` rows from the DB. `policy_fixtures.csv` holds dev memberships
-(`g`), add-only, loaded by `policy.LoadFixtures`; tests reuse it. DB `g` rows are runtime memberships
-and are never pruned. Sync parses CSV into a standalone model and applies rules to the real enforcer;
-never build a second enforcer on the shared model, it replaces the role manager and drops loaded `g` links.
+`policy.csv` is source of truth for static matrix (`p` + `g2`). `policy.Seed` syncs it:
+adds missing rows, prunes stale DB `p` rows. `policy_fixtures.csv` holds dev memberships
+(`g`), add-only, loaded by `policy.LoadFixtures`; tests reuse it. DB `g` rows are runtime memberships,
+never pruned. Sync parses CSV into standalone model, applies rules to real enforcer;
+never build second enforcer on shared model: it replaces role manager, drops loaded `g` links.
 
-The service itself never seeds or loads fixtures. Seeding uses `cmd/authorization seed` (`internal/authorization/seed`, runs
-`policy.Seed`, `just seed-authorization`). Dev fixtures use `cmd/authorizationfixtures`
+Service never seeds or loads fixtures. Seeding: `cmd/authorization seed` (`internal/authorization/seed`, runs
+`policy.Seed`, `just seed-authorization`). Dev fixtures: `cmd/authorizationfixtures`
 (`internal/authorizationfixtures`, runs `policy.LoadFixtures`, `just fixtures-authorization`). Nothing
-is auto-loaded in development.
+auto-loads in development.
 
-At startup the service calls `policy.DetectDrift` once (every `p`/`g2` rule of `policy.csv` absent from
-the in-memory policy, or any `p` rule in it that `policy.csv` does not contain). On drift it logs an error and keeps running instead of crashing. The
-`policy` startup health check (`controller/health`) fails with the same condition, so the pod stays not
-ready. The check is in-memory on purpose: the enforcer does not watch the DB, so only a restart picks up a seed.
+At startup, service calls `policy.DetectDrift` once (any `p`/`g2` rule in `policy.csv` absent from
+in-memory policy, or any `p` rule in memory absent from `policy.csv`). On drift, logs error and keeps running.
+`policy` startup health check (`controller/health`) fails on same condition, leaving pod not ready.
+Check intentionally in-memory: enforcer does not watch DB, so only restart picks up seed.
 
-Note `editor` may `delete` a `workspace_item` but only `read` the `workspace` itself.
+`editor` may `delete` a `workspace_item` but only `read` the `workspace` itself.
 
 Billing permissions on `workspace`: `billing_read` (owner, editor, viewer) and
 `billing_manage` (owner only).
 
 ## Adding a permission or role
 
-1. Add the `p` lines to `policy/policy.csv` (and a `g2` line if it's a new object type)
-2. Extend the enum in `proto/authorization/authorization.proto`, run `nx gen proto`
-3. Map the enum in `controller/grpc/service.go` and in each caller's `svc_authorization.go`
-4. `app/model_test.go` and `policy/policy_fixtures.csv` cover the matrix — extend them
+1. Add `p` lines to `policy/policy.csv` (and `g2` line for new object type)
+2. Extend enum in `proto/authorization/authorization.proto`, run `nx gen proto`
+3. Map enum in `controller/grpc/service.go` and each caller's `svc_authorization.go`
+4. `app/model_test.go` and `policy/policy_fixtures.csv` cover matrix — extend them
 
 ## Consumers
 
 `internal/note` (`infra/service/authorization.go`) and `apps/document`
-(`src/authorization/`) are the only callers, both over gRPC. `integrationevent.go` publishes
-role-change and member-removal events that `apps/document` consumes to drop live
+(`src/authorization/`) are the only callers, both via gRPC. `integrationevent.go` publishes
+role-change and member-removal events; `apps/document` consumes them to drop live
 Hocuspocus connections.
