@@ -19,7 +19,7 @@ spec:
   upgrade:
     remediation:
       retries: 0
-      remediateLastFailure: true
+      remediateLastFailure: false
       strategy: rollback
   valuesFrom:
   - kind: ConfigMap

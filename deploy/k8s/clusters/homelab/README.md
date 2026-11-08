@@ -48,6 +48,9 @@ provided from the CNPG Secret, and document must remain at one replica.
 
 Authorization requires external policy seeding from the same image before every
 install, upgrade, and rollback; follow `charts/authorization/README.md`.
+Authorization upgrades are blocked until the controls in
+[`Authorization upgrade and recovery`](#authorization-upgrade-and-recovery)
+are verified; ordinary automatic remediation is incompatible with its policy seed.
 Do not set `security.externalBoundaryAcknowledged` until the independent edge
 boundary has been implemented and verified as described in the edge chart README.
 Suspending a HelmRelease does not remove an already deployed release.
@@ -72,14 +75,28 @@ the homelab SOPS age key; the Flux decryption key must already be provisioned.
 | --- | --- |
 | `valkey-note`, `valkey-billing`, `valkey-document` | Each has its own `password` key for the default Valkey user. |
 | `meilisearch` | `MEILI_MASTER_KEY`, a production master key. |
-| `search-worker` | The same Meilisearch master key under the worker's configured environment key. |
-| `note` | Meilisearch search API key, obtained after worker seed as described below. |
-| `billing` | Stripe secret key and webhook signing secret. |
-| `document` | RustFS access key and secret for the document bucket. |
-| `web` | `BETTER_AUTH_SECRET` and `AUTHENTIK_CLIENT_SECRET`; configure the client ID as well. |
+| `search-worker` | `NOTOPIA_SEARCH_WORKER_MEILI_API_KEY`: the same Meilisearch master key. |
+| `note` | `NOTOPIA_NOTE_MEILISEARCH_API_KEY`: worker-seeded search key; `NOTOPIA_NOTE_AUTHENTIK_TOKEN`: least-privilege Authentik API token. |
+| `billing` | `NOTOPIA_BILLING_STRIPE_SECRET_KEY`: Stripe API secret; `NOTOPIA_BILLING_STRIPE_WEBHOOK_SECRET`: signing secret for the configured endpoint. |
+| `document` | `NOTOPIA_DOCUMENT_S3_ACCESS_KEY_ID` and `NOTOPIA_DOCUMENT_S3_SECRET_ACCESS_KEY`: RustFS credentials scoped to the document bucket. |
+| `web` | `BETTER_AUTH_SECRET`: independently generated secret; `AUTHENTIK_CLIENT_SECRET`: confidential provider secret. |
 
-Use each service's current configuration definitions to select its exact
-environment variable names. Provision Authentik application/provider `app-web`
+The Secret keys above are passed through `envFrom`, except the explicit Valkey
+and Meilisearch chart references. CNPG supplies database credentials separately.
+Set nonsecret `AUTHENTIK_CLIENT_ID` to the actual provider client ID in web
+values; set `NOTOPIA_DOCUMENT_S3_ENDPOINT`, `NOTOPIA_DOCUMENT_S3_REGION`, and
+`NOTOPIA_DOCUMENT_S3_BUCKET_NAME` in document values from the provisioned RustFS
+service. Configure the actual Authentik user IDs as
+`NOTOPIA_NOTE_IDENTITY_SERVICE_ACCOUNT_USER_ID`,
+`NOTOPIA_DOCUMENT_IDENTITY_SERVICE_ACCOUNT_USER_ID`, and
+`NOTOPIA_BILLING_IDENTITY_SERVICE_ACCOUNT_USER_ID` in their respective values.
+Confirm current service configuration before provisioning. Sources:
+`internal/note/config/config.go`, `pkg/common/config/authentik.go`,
+`pkg/common/config/meilisearch.go`, `internal/billing/config/config.go`,
+`apps/document/src/config/env.validation.ts`, `apps/search-worker/seed/seed.ts`,
+and `apps/web/lib/auth.ts`.
+
+Provision Authentik application/provider `app-web`
 as confidential, with callback `https://notopia.${PUBLIC_DOMAIN}/api/auth/callback/authentik`,
 the `notopia` scope mapping, `notopia-admins` group, and cron service accounts.
 Provision the RustFS bucket and scoped key, and a Stripe webhook at
@@ -203,6 +220,48 @@ append it directly to `https://flux-webhook.${PUBLIC_DOMAIN}`. The status path
 already starts with `/hook/`; **do not** prepend another `/hook/`. Verify a ping
 and a push reach the Receiver and trigger the Notopia GitRepository reconcile.
 Rotate the shared token on both sides in a coordinated window without exposing it.
+
+## Authorization upgrade and recovery
+
+The general plan calls for automatic rollback on a failed upgrade, but that can
+restart the old image with the new image's policy before an operator can seed
+the old policy. Authorization is therefore an explicit exception: its checked-in
+HelmRelease has `upgrade.remediation.retries: 0` and
+`upgrade.remediation.remediateLastFailure: false`. The `rollback` strategy
+remains configured but no final-failure remediation is requested. Other releases
+retain the planned automatic rollback. See the
+[Flux HelmRelease failure handling documentation](https://fluxcd.io/flux/components/helm/helmreleases/#configuring-failure-handling).
+
+**Do not permit unattended authorization upgrades.** Before initial install or
+any later upgrade, verify the deployed helm-controller version honors these
+settings, the live HelmRelease has observed them, and no other automation can
+rollback, reinstall, change the chart or values, or restart authorization pods
+during seeding and failure recovery. This has not been tested in the homelab.
+If those controls cannot be verified, keep authorization suspended and do not
+upgrade it. A false remediation setting alone does not enforce policy seeding,
+stop running pods, or prevent new source revisions from triggering upgrades.
+
+Use a supervised maintenance window for every desired change, including chart,
+image, and values changes. First suspend the HelmRelease in Git and confirm the
+live suspension has been observed and no Helm action is in flight; block traffic,
+stop pods and prevent their recreation and concurrent seeders as required by the
+authorization chart. Seed once with the target immutable image and database.
+Only after success apply the reviewed desired revision and resume reconciliation
+for that operation. Monitor the result; once stable, suspend the release again to
+prevent unattended subsequent upgrades. Control other reconciler and autoscaler
+activity throughout. Suspension is not a substitute for blocking traffic or
+stopping workloads, and cannot cancel an already-running Helm action.
+
+On failed upgrade, keep traffic blocked and stop any remaining target pods;
+ensure no controller can recreate them. Do not force a Flux retry or run a Helm
+rollback before seeding. With reconciliation suspended and no action in flight,
+assess database migration compatibility and restore data if necessary; seed
+exactly once using the chosen rollback image and matching database and secrets.
+Only then use a reviewed, operator-controlled rollback/reconciliation to the
+matching chart, image and values, verify the actual pods and policy, and restore
+traffic. If Flux or Helm state prevents that sequence, remain stopped and resolve
+it before proceeding. This is a proposed operational alternative, not a
+live-validated rollback guarantee.
 
 ## Live verification (pending authorization)
 

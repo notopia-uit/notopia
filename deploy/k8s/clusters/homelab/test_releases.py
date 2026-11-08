@@ -74,6 +74,8 @@ class ReleasesTest(unittest.TestCase):
                 self.assertEqual(spec['timeout'], '10m')
                 self.assertEqual(spec['install']['remediation']['retries'], 0)
                 self.assertEqual(spec['upgrade']['remediation']['strategy'], 'rollback')
+                self.assertEqual(spec['upgrade']['remediation']['retries'], 0)
+                self.assertEqual(spec['upgrade']['remediation']['remediateLastFailure'], name != 'authorization')
                 self.assertEqual(spec['chart']['spec']['chart'], './deploy/k8s/charts/' + name)
                 self.assertEqual(spec['chart']['spec']['sourceRef'], {'kind': 'GitRepository', 'name': 'notopia', 'namespace': 'flux-system'})
                 ref = spec['valuesFrom'][0]['name']
