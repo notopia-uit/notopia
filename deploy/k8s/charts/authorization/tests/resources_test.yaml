@@ -5,6 +5,7 @@ templates:
   - httproute.yaml
   - istio/authorizationpolicy.yaml
   - job-seed.yaml
+  - hook-serviceaccount.yaml
 tests:
   - it: exposes service ports
     template: service.yaml
@@ -33,7 +34,15 @@ tests:
   - it: configures seed hook
     template: job-seed.yaml
     asserts:
-      - equal: { path: 'metadata.annotations["helm.sh/hook"]', value: 'post-install,post-upgrade' }
+      - equal: { path: 'metadata.annotations["helm.sh/hook"]', value: 'pre-install,pre-upgrade' }
       - equal: { path: 'metadata.annotations["helm.sh/hook-weight"]', value: '5' }
       - equal: { path: 'metadata.annotations["helm.sh/hook-delete-policy"]', value: before-hook-creation }
       - equal: { path: 'spec.template.spec.containers[0].command', value: ['./authorization', seed] }
+      - equal: { path: spec.template.spec.serviceAccountName, value: RELEASE-NAME-authorization-hook }
+  - it: creates a tokenless account before the seed hook
+    template: hook-serviceaccount.yaml
+    asserts:
+      - equal: { path: 'metadata.annotations["helm.sh/hook"]', value: 'pre-install,pre-upgrade' }
+      - equal: { path: 'metadata.annotations["helm.sh/hook-weight"]', value: '-10' }
+      - equal: { path: 'metadata.annotations["helm.sh/hook-delete-policy"]', value: before-hook-creation }
+      - equal: { path: automountServiceAccountToken, value: false }

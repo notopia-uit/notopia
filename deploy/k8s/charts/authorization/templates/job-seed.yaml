@@ -6,4 +6,5 @@
 {{- end -}}
 {{- $_ := set $values "extraEnv" $extra -}}
 {{- $_ := set $root "Values" $values -}}
-{{ include "notopia-common.hookJob" (dict "root" $root "name" "seed" "hook" "post-install,post-upgrade" "weight" 5 "command" (list "./authorization" "seed")) }}
+{{- $_ := set $values "serviceAccount" (dict "create" false "name" (printf "%s-hook" (include "notopia-common.fullname" . | trunc 58 | trimSuffix "-"))) -}}
+{{ include "notopia-common.hookJob" (dict "root" $root "name" "seed" "hook" "pre-install,pre-upgrade" "weight" 5 "command" (list "./authorization" "seed")) }}

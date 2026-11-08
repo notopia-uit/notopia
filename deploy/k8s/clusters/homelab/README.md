@@ -65,11 +65,54 @@ reconciliation must not wait for all releases before the worker can run.
 
 Create production credentials through the relevant provider or a secure local
 process. Never put plaintext in Git, shell history, command-line arguments, or
-unprotected temporary files. Create each Kubernetes Secret locally with the
-appropriate name and keys, encrypt it with SOPS using the root `.sops.yaml` rule,
-review that all `data` or `stringData` values are encrypted, and add the
-`.secret.sops.yaml` file to `infra/secrets/kustomization.yaml`. The recipient is
-the homelab SOPS age key; the Flux decryption key must already be provisioned.
+unprotected temporary files. The Secret manifests in `infra/secrets/` are SOPS
+encrypted with the root `.sops.yaml` rule, but contain only the placeholder
+`REPLACE_BEFORE_USE`, not credentials. They are intentionally absent from the
+Kustomization: encryption alone does not make a Secret ready to apply. CNPG
+manages its own Secrets and has no manifest here.
+
+### Provisioning with Neovim
+
+For each Notopia Secret, open its existing file from the repository root
+(example for Valkey note):
+
+```sh
+nvim deploy/k8s/clusters/homelab/infra/secrets/valkey-note.secret.sops.yaml
+```
+
+1. Enable and trust this repository's `.nvim.lua` in Neovim. It uses the age
+   identity at `~/projects/homelab/secret/age.agekey`; verify that identity
+   matches the recipient in `.sops.yaml` before editing.
+   Use a trusted machine and terminal; disable terminal recording, clipboard
+   managers and other capture, and protect against memory/swap exposure. Do not
+   write, autosave, or copy a plaintext file at any point.
+2. Use `\d` to decrypt in the buffer. Replace every placeholder in `stringData`
+   with the actual credential as a YAML string, using proper quoting. The
+   worker's key is the Meilisearch master
+   key; note's search key is obtained only after the worker seed succeeds as
+   described below. Provision note's Secret only when both values are ready.
+3. Run `:write`. The repository's Neovim configuration encrypts the buffer before
+   writing this matching filename; if encryption fails it must not write the file.
+   Use `\e` to replace the plaintext buffer with the encrypted version, or `\d`
+   to decrypt an existing encrypted file in the buffer. Check the on-disk file
+   contains SOPS metadata and `ENC[...]` values under `stringData` and that its
+   recipient matches `.sops.yaml`. Verify decryption with the actual Flux identity
+   without printing plaintext; structural checks alone are insufficient. Never
+   write the plaintext buffer to a different filename or expose it to untrusted
+   editor plugins, clipboard managers, or language servers.
+4. Confirm all placeholders are replaced without disclosing values, review and
+   commit only the encrypted file, then add its filename under `resources` in
+   `infra/secrets/kustomization.yaml`. Keep affected releases suspended until
+   their credentials and all other prerequisites are ready.
+
+For the Receiver, `receiver.secret.sops.yaml` is an encrypted placeholder
+reference for `notopia-webhook-token` in `flux-system`, not a resource for this
+repository's infra Kustomization. Provision it using a secure SOPS editing
+workflow **in the homelab repository**, using its destination path, SOPS creation
+rule and Flux recipient after verifying them there. The Notopia Neovim shortcuts
+above do not apply to that repository. Add the resulting encrypted file to that
+repository's webhook kustomization, not this one. Do not assume this repository's
+SOPS rule or recipient applies to the other repository.
 
 | Secret | Required contents / source |
 | --- | --- |
@@ -261,7 +304,9 @@ Stop at any failed gate; do not expose an incomplete deployment.
    database and secrets as the intended deployment. For upgrades and rollbacks,
    block traffic, stop all authorization pods and prevent recreation and
    concurrent seeders; restore traffic only after replacement pods are healthy.
-   The chart's post hook is too late. Then resume authorization and each other
+   The chart also runs a pre-install/pre-upgrade seed hook, but it does not replace
+   the required external seed or protect against concurrent policy writers. Then
+   resume authorization and each other
    app in Git only after its own secrets, image, dependencies and migrations are
    ready; keep document at one replica. Explicitly inspect migrate and seed Jobs.
 8. **Secure edge, then restore the graph.** Independently implement and verify
@@ -360,8 +405,8 @@ temporarily changed wait settings once safe; never remove the edge security gate
 
 ## Local checks
 
-Run `python3 -m unittest discover -s deploy/k8s/clusters/homelab -p 'test_*.py' -v`
-from the repository root. The tests require PyYAML, `kubectl`, Git, and SOPS;
+Run `node --test deploy/k8s/clusters/homelab/*.test.ts`
+from the repository root. The tests require installed dependencies, `helm`, `kubectl`, Git, and SOPS;
 synthetic credentials are encrypted in memory for the validation tests. The
 repository check examines Git-tracked and non-ignored untracked YAML and JSON
 Kubernetes Secret documents, including `List` resources. Structural SOPS

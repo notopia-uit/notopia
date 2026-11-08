@@ -1,6 +1,6 @@
 # authorization
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
 ## Requirements
 
 | Repository | Name | Version |
@@ -12,24 +12,42 @@
 **Before every install and upgrade**, an operator must seed the database using
 `./authorization seed` from the same immutable image that will serve traffic,
 with the same database connection and external secrets. Wait for that command
-to succeed before starting the release. The chart's post-install/post-upgrade
-seed hook is not early enough for `helm --wait`, and policy is loaded only at
-process startup.
+to succeed before starting the release. The pre-install/pre-upgrade hook seeds
+again before Helm applies workload resources; it does not replace this required
+external procedure. Policy is loaded only at process startup.
 
 For an upgrade, schedule a maintenance window: stop all authorization pods and
 block traffic, suspend autoscaling and any controller that could recreate them,
 and wait for termination before running exactly one external seed. Ensure no
-other policy seeder runs concurrently. After seeding succeeds, deploy the same
-image, restore the intended replica count and autoscaling, and verify every
+other policy seeder runs concurrently, including while the Helm hook runs. After
+external seeding succeeds, deploy the same image, restore the intended replica
+count and autoscaling, and verify every
 replacement pod is healthy before restoring traffic. On rollback, repeat this
 procedure using the rollback image's policy; do not run the old and new policy
-seeders concurrently.
+seeders concurrently. Helm rollback does not run the pre-upgrade hook; external
+seeding with the rollback image is still mandatory.
+
+The hook service account is created before the seed job; Helm waits for the job
+to succeed before applying workload resources. A failed seed may have partially
+changed shared policy, and a later upgrade failure can leave the old release with
+the new policy. Generic Helm automatic rollback is unsafe: it can restore old
+workloads without restoring matching policy. On any failed upgrade, keep traffic
+blocked and controllers suspended until version-matched manual recovery is complete.
+Stop any remaining pods and
+seed jobs, select the intended recovery image, run its external seed without
+concurrent writers, and verify the policy and recovered workloads match that image
+before restoring controllers and traffic. Coordinate any rollback accordingly.
 
 The chart does not verify that the external seed ran or that the database policy
 matches the selected image. This manual procedure causes downtime and is not an
 automated upgrade guarantee. Failed or omitted seeding can leave Helm waiting or
 leave pods with stale authorization rules. Do not proceed without coordinating
-the database, deployment controller, and traffic controls.
+the database, deployment controller, and traffic controls. The hook does not stop
+old pods, prevent mixed-version policy writers, or make authorization fail closed.
+Provide the database secret and every secret referenced by `envFrom`, `extraEnv`,
+or image pull configuration before starting Helm; the chart does not create or
+verify their readiness. Helm replaces the retained hook service account before
+the next hook run; it must be removed manually after uninstall when no longer needed.
 
 ## Values
 
