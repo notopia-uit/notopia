@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authorization
+spec:
+  suspend: true
+  interval: 12h
+  timeout: 10m
+  chart:
+    spec:
+      chart: ./deploy/k8s/charts/authorization
+      sourceRef:
+        kind: GitRepository
+        name: notopia
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 0
+  upgrade:
+    remediation:
+      retries: 0
+      remediateLastFailure: false
+      strategy: rollback
+  valuesFrom:
+  - kind: ConfigMap
+    name: authorization-helm-values

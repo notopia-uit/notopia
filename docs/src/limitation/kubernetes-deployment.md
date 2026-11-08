@@ -3,11 +3,13 @@
 Chart rendering and unit tests do not establish that deployments, upgrades, or identity boundaries
 are safe. Complete the following checks on the intended cluster and built images before deployment.
 
-- **Authorization seeding:** the post-install/upgrade hook runs too late for `helm --wait`, while
-  policy loads at startup. Follow the downtime-requiring external seed procedure in the
+- **Authorization seeding:** policy loads at startup. A pre-install/upgrade hook orders seeding
+  before new workload resources but does not stop old pods or prevent concurrent policy writers.
+  Follow the downtime-requiring external seed procedure in the
   `deploy/k8s/charts/authorization/README.md` for installs,
-  upgrades, and rollbacks. The chart cannot verify it occurred. A future design must address
-  rollout, rollback, and concurrency.
+  upgrades, and rollbacks. On failed upgrades keep traffic blocked and controllers suspended
+  until version-matched manual recovery; generic automatic rollback is unsafe. The chart cannot
+  verify external seeding occurred. A future design must address rollout, rollback, and concurrency.
 - **Edge trust boundary:** implement and independently verify a non-bypassable identity-header
   boundary and prevent direct downstream access. NetworkPolicy and acknowledgement flags alone
   are not proof. Follow the blockers in the

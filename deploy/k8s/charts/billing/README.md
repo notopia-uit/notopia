@@ -1,12 +1,35 @@
 # billing
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
-
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../notopia-common-chart | notopia-common-chart | 0.1.0 |
+
+## Migration and seeding
+
+On install and upgrade, Helm creates the hook service account, runs the migration,
+then runs the seed job before applying workload resources. Provide the database,
+Redis, Stripe and all other referenced external secrets and image pull secrets
+before starting Helm; the chart does not create or verify their readiness.
+
+Seeding can create or change Stripe products, prices and portal configuration.
+Coordinate releases, manual seeds and retries: hook ordering does not guarantee
+safe concurrent or repeated executions, and failed releases do not undo Stripe
+side effects. A failed migration or seed may have partially changed database or
+Stripe state, even if the workload upgrade never occurs.
+
+## Rollback compatibility
+
+Rollback does not run these pre-upgrade hooks and can restore old code against
+the new migration and seed state. Helm does not automatically roll back database
+or Stripe state. Before upgrading or rolling back, verify the old code is
+compatible with the resulting schema, data and Stripe configuration; plan and
+perform any recovery explicitly before resuming service. Automatic rollback is
+not a substitute for this compatibility check. Helm replaces the retained hook
+service account before the next hook run; remove it manually after uninstall when
+no longer needed.
 
 ## Values
 

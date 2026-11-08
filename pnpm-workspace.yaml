@@ -138,6 +138,7 @@ catalog:
   ws: "^8.19.0"
   yjs: "^13.6.30"
   zod: "^4.4.3"
+  yaml: 2.9.0
 overrides:
   "@nestjs/common": "catalog:"
   "@nestjs/core": "catalog:"

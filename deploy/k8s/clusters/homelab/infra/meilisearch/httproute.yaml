@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: meilisearch
+spec:
+  parentRefs:
+    - name: default
+      namespace: istio-system
+      kind: Gateway
+      sectionName: https-wildcard
+  hostnames:
+    - notopia-meilisearch.${PUBLIC_DOMAIN}
+  rules:
+    - filters:
+        - type: CORS
+          cors:
+            allowOrigins:
+              - https://notopia.${PUBLIC_DOMAIN}
+              - https://notopia.${LOCAL_DOMAIN}
+            allowMethods: [GET, POST, OPTIONS]
+            allowHeaders: [Authorization, Content-Type]
+      backendRefs:
+        - name: meilisearch
+          port: 7700

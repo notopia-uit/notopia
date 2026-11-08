@@ -4,6 +4,112 @@ local root = vim.fn.expand("%:p:h")
 local uri_root = vim.uri_from_fname(root)
 local lsp_watchfile = vim.lsp._watchfiles
 
+local project_root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h")
+local sops_group = vim.api.nvim_create_augroup("NotopiaSops", { clear = true })
+local sops_prefix = vim.fs.normalize(project_root .. "/deploy/k8s/clusters") .. "/"
+local sops_keyfile = vim.fn.expand("~/projects/homelab/secret/age.agekey")
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+	group = sops_group,
+	callback = function(event)
+		local filename = vim.fs.normalize(vim.api.nvim_buf_get_name(event.buf))
+		if filename:sub(1, #sops_prefix) ~= sops_prefix or not filename:match("%.sops%.ya?ml$") then
+			return
+		end
+
+		local buffer = event.buf
+		local decrypted = event.event == "BufNewFile"
+		vim.bo[buffer].swapfile = false
+		vim.bo[buffer].undofile = false
+
+		local function run_sops(args, input)
+			local result = vim.system(args, {
+				stdin = input,
+				text = true,
+				env = { SOPS_AGE_KEY_FILE = sops_keyfile },
+			}):wait()
+			if result.code ~= 0 then
+				error("SOPS failed: " .. (result.stderr or "unknown error"))
+			end
+			return result.stdout
+		end
+
+		local function contents()
+			return table.concat(vim.api.nvim_buf_get_lines(buffer, 0, -1, false), "\n") .. "\n"
+		end
+
+		map("n", "<localleader>d", function()
+			if decrypted then
+				return
+			end
+			if vim.bo[buffer].modified then
+				error("Discard changes before decrypting")
+			end
+			local plaintext = run_sops({ "sops", "decrypt", "--input-type", "yaml", "--output-type", "yaml" }, contents())
+			vim.api.nvim_buf_set_lines(buffer, 0, -1, false, vim.split(plaintext:gsub("\n$", ""), "\n", { plain = true }))
+			decrypted = true
+			vim.bo[buffer].modified = false
+		end, { buffer = buffer, desc = "SOPS | Decrypt in buffer" })
+
+		vim.api.nvim_create_autocmd("BufWriteCmd", {
+			group = sops_group,
+			buffer = buffer,
+			callback = function(write_event)
+				if vim.fs.normalize(vim.fn.fnamemodify(write_event.match, ":p")) ~= filename then
+					error("Saving a SOPS buffer to another file is not supported")
+				end
+				if not decrypted then
+					if not vim.bo[buffer].modified then
+						return
+					end
+					error("Decrypt the SOPS buffer before editing or saving")
+				end
+				local ciphertext = run_sops({
+					"sops", "--config", project_root .. "/.sops.yaml", "encrypt",
+					"--filename-override", filename, "--input-type", "yaml", "--output-type", "yaml",
+				}, contents())
+				local uv = vim.uv
+				local file, temporary = assert(uv.fs_mkstemp(filename .. ".XXXXXX"))
+				local ok, err = pcall(function()
+					local existing = uv.fs_stat(filename)
+					if existing then
+						assert(uv.fs_fchmod(file, existing.mode % 512))
+					end
+					local written = assert(uv.fs_write(file, ciphertext, 0))
+					assert(written == #ciphertext, "Incomplete SOPS file write")
+					assert(uv.fs_close(file))
+					file = nil
+					assert(uv.fs_rename(temporary, filename))
+				end)
+				if file then uv.fs_close(file) end
+				if not ok then
+					uv.fs_unlink(temporary)
+					error(err)
+				end
+				vim.bo[buffer].modified = false
+			end,
+		})
+
+		vim.api.nvim_create_autocmd({ "FileWriteCmd", "FileAppendCmd" }, {
+			group = sops_group,
+			buffer = buffer,
+			callback = function()
+				error("Writing a SOPS buffer to another file is not supported")
+			end,
+		})
+
+		map("n", "<localleader>e", function()
+			if not decrypted then
+				return
+			end
+			vim.cmd.write()
+			vim.api.nvim_buf_set_lines(buffer, 0, -1, false, vim.fn.readfile(filename))
+			decrypted = false
+			vim.bo[buffer].modified = false
+		end, { buffer = buffer, desc = "SOPS | Encrypt and close plaintext buffer" })
+	end,
+})
+
 vim.filetype.add({
 	filename = {
 		["project.json"] = "jsonc",

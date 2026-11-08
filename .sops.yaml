@@ -1,0 +1,4 @@
+creation_rules:
+  - path_regex: deploy/k8s/clusters/.*\.sops\.ya?ml$
+    encrypted_regex: '^(data|stringData)$'
+    age: age1ytym5g6mxf0974syp2g2ecrh0y74tnl0u9ee4xm8caawhyv25pls3f2sy4
