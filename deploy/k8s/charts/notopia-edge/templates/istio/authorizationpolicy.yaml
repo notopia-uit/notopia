@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/security.istio.io/authorizationpolicy_v1.json
 {{- if .Values.istio.enabled }}
 {{- $public := list (dict "paths" (list "/note/health/*" "/authorization/health/*" "/billing/health/*" "/document/health/*" "/search-worker/health/*" "/billing/webhooks/stripe" "/document/ws/document")) (dict "paths" (list "/billing/plans") "methods" (list "GET")) | concat .Values.istio.publicRules }}
 {{- $groups := list (dict "paths" (list "/billing/admin" "/billing/admin/*") "groups" (list .Values.istio.adminGroup)) | concat .Values.istio.groupRules }}

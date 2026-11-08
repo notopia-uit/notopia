@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/networkpolicy.json
 {{- if or (not (kindIs "bool" .Values.security.externalBoundaryAcknowledged)) (not .Values.security.externalBoundaryAcknowledged) }}{{ fail "security.externalBoundaryAcknowledged must be true after establishing and verifying the external non-bypassable identity-header boundary; see README" }}{{ end }}
 {{- if and (not .Values.istio.enabled) (or (not (kindIs "bool" .Values.security.externalIdentityLayerAcknowledged)) (not .Values.security.externalIdentityLayerAcknowledged)) }}{{ fail "security.externalIdentityLayerAcknowledged must be true with Istio disabled after establishing and verifying external JWT, header, and authorization enforcement; see README" }}{{ end }}
 {{- if not .Values.gateway.enabled }}{{ fail "gateway.enabled=false is unsupported: an existing gateway cannot be secured by this chart" }}{{ end }}

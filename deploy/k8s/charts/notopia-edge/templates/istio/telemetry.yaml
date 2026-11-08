@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/telemetry.istio.io/telemetry_v1.json
 {{- if and .Values.istio.enabled .Values.istio.telemetry.enabled }}
 apiVersion: telemetry.istio.io/v1
 kind: Telemetry
