@@ -243,7 +243,7 @@ const vitePressSidebarOptions = {
   useFolderTitleFromIndexFile: true,
   sortMenusByFrontmatterOrder: true,
   collapsed: true,
-  collapseDepth: 2,
+  collapseDepth: 1,
 } satisfies VitePressSidebarOptions;
 
 export default defineConfig(withSidebar(vitePressOptions, vitePressSidebarOptions));
