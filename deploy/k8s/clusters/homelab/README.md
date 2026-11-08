@@ -1,5 +1,11 @@
 # Homelab infrastructure provisioning
 
+This is an operator runbook, not authorization to deploy. The homelab Flux
+Kustomizations, Receiver, and every HelmRelease are checked in suspended; the
+Receiver token is absent. No live verification or deployment has been performed
+by this runbook. Obtain explicit authorization before cluster access, credential
+creation, or deployment.
+
 The Valkey and Meilisearch HelmReleases are suspended because no credentials have
 been supplied. Do not resume a release until its encrypted Secret is committed,
 included in `infra/secrets/kustomization.yaml`, and Flux has the matching age
@@ -95,8 +101,138 @@ The route uses the homelab's Gateway API CORS filter. Confirm the installed
 Gateway API CRDs and Istio implementation support this filter and enforce the
 specified origin before exposing search. CORS only controls browsers.
 
-Finally configure the GitHub push webhook to the Notopia Flux Receiver as
-described in the homelab wiring design; this is a separate manual operation.
+## Ordered initial bootstrap
+
+All paths below are relative to this repository unless identified as homelab.
+Stop at any failed gate; do not expose an incomplete deployment.
+
+1. **Plan and protect existing data.** Inventory existing databases, Valkey,
+   Meilisearch, buckets, Kafka offsets and releases before changing them. CNPG
+   `initdb` creates new databases; it does not migrate existing data. Arrange
+   tested backups and an explicit restore/migration plan, migration compatibility
+   and maintenance windows; do not overwrite existing volumes or assume a Helm
+   rollback reverses schema changes. The single-instance CNPG clusters have no
+   configured backups. Validate image pull access and immutable, chart-compatible
+   images for every release; empty tags are not verified versions.
+2. **Verify the platform.** Confirm the Flux source, `sops-age` decryption,
+   `clustersetting` substitutions, Gateway API CORS support, DNS, TLS, storage,
+   CNPG, Istio service accounts, ambient enrollment and mTLS. The namespace's
+   ambient label is intentionally omitted: determine the actual enrollment
+   mechanism before adding any label; verify capture and policy enforcement
+   with an independently provisioned test workload before enabling pointers.
+   Verify the checked-in Redpanda address,
+   advertised listeners and network access against the live deployment. Confirm
+   the webhook path routing and existing shared gateway applications. Do not
+   assume local identities or service account names are production identities.
+3. **Provision identities and secrets.** Configure Authentik's confidential
+   `app-web` provider and callback, attach the `notopia` scope mapping from the
+   design's referenced identity contract, create `notopia-admins`, and provision
+   distinct cron service-account users. Configure their actual user IDs and a
+   least-privilege Authentik API token for note; never substitute a human or local
+   development identity. Provision the RustFS bucket and scoped credentials,
+   Stripe secret and signing secret, and a unique Better Auth secret. Populate
+   the nonsecret values and encrypted Secrets described above. For search-worker
+   use `NOTOPIA_SEARCH_WORKER_MEILI_API_KEY` with the Meilisearch master key;
+   note eventually needs `NOTOPIA_NOTE_MEILISEARCH_API_KEY` and its Authentik
+   token. Check the current service configuration for every other exact key.
+   Commit only encrypted Secrets and their kustomization entries; confirm Flux can
+   decrypt them without printing values. Use provider-supported rotation and
+   revoke superseded credentials only after all consumers have switched.
+4. **Stage Flux in Git.** The homelab `notopia-infra`, `notopia-edge`, and
+   `notopia-apps` Kustomizations are suspended. `notopia-apps` depends on both
+   infra and edge; both infra and edge use `wait: true`. A suspended HelmRelease
+   may prevent a waiting Kustomization from becoming Ready. Do not assume the
+   dependency chain allows the worker to start. For bootstrap, make a reviewed,
+   temporary homelab Git change removing only `notopia-edge` from the apps
+   `dependsOn`; if suspended infra releases block readiness, temporarily set
+   infra `wait: false`. Keep the edge Kustomization and HelmRelease suspended,
+   and all app releases except the worker suspended. Resume infra and apps by
+   changing their homelab `spec.suspend` to `false`, and reconcile the homelab
+   source using the normal Flux process. This staging bypass is not approval to
+   expose edge; restore both dependency and original `wait` after the edge has
+   been independently secured and is Ready. Confirm each stage's status rather
+   than assuming suspended resources are healthy.
+5. **Start infrastructure and worker.** In this repository change the relevant
+   infrastructure HelmRelease `spec.suspend` to `false` in Git after its Secret
+   and prerequisites are ready. Reconcile source and infra and verify CNPG,
+   Meilisearch, and required Valkey instances are healthy. Then set a verified
+   worker image tag, change `apps/search-worker/helmrelease.yaml` to
+   `spec.suspend: false`, commit and reconcile apps. The worker's seed hook must
+   complete independently of note. Both worker and note currently use UID
+   `00000000-0000-4000-8000-000000000001`; confirm they still match. The seed
+   creates or reuses a `notes`-only search key and configures index settings; it
+   does not backfill existing data. Plan and verify a separate reindex if needed.
+6. **Transfer the search key securely.** After the seed Job succeeds, use an
+   authenticated, verified TLS connection to Meilisearch's `/keys/<uid>` API
+   with the master key and securely transfer the returned `key` into the note
+   Secret's `NOTOPIA_NOTE_MEILISEARCH_API_KEY`. Use a secret manager or protected
+   interactive tooling that does not expose credentials in command arguments,
+   history, logs, terminal recording, or temporary files; do not print the
+   response. Encrypt and commit the Secret and reconcile infra before note is
+   resumed. The master key must never reach a browser. A master-key rotation can
+   change derived keys: coordinate worker and Meilisearch credentials, retrieve
+   the new search key, update note and verify tenant tokens before revocation.
+7. **Seed authorization and start applications.** Before every authorization
+   install, upgrade **and rollback**, follow
+   [`authorization/README.md`](../../charts/authorization/README.md): run
+   exactly one external `./authorization seed` using the same verified image,
+   database and secrets as the intended deployment. For upgrades and rollbacks,
+   block traffic, stop all authorization pods and prevent recreation and
+   concurrent seeders; restore traffic only after replacement pods are healthy.
+   The chart's post hook is too late. Then resume authorization and each other
+   app in Git only after its own secrets, image, dependencies and migrations are
+   ready; keep document at one replica. Explicitly inspect migrate and seed Jobs.
+8. **Secure edge, then restore the graph.** Independently implement and verify
+   the non-bypassable identity-header boundary and adversarial tests in
+   [`notopia-edge/README.md`](../../charts/notopia-edge/README.md). Only then set
+   its acknowledgment value, resume the edge HelmRelease and its homelab
+   Kustomization in Git, and reconcile. An acknowledgment is not a control.
+   Restore apps' edge dependency and infra's original `wait: true` if changed;
+   verify the full graph is Ready. Suspending or a failed upgrade does not remove
+   or secure an existing release; do not rely on suspension as traffic control.
+
+## GitHub Receiver
+
+In the homelab repository securely create and SOPS-encrypt the missing
+`notopia-webhook-token` Secret in `flux-system` with key `token`, include it in
+the webhook kustomization, confirm
+Flux can decrypt it, then set Receiver `spec.suspend: false` and reconcile.
+Configure a GitHub JSON webhook for `ping` and `push` using the same secret.
+After the Receiver becomes Ready, obtain its actual `.status.webhookPath` and
+append it directly to `https://flux-webhook.${PUBLIC_DOMAIN}`. The status path
+already starts with `/hook/`; **do not** prepend another `/hook/`. Verify a ping
+and a push reach the Receiver and trigger the Notopia GitRepository reconcile.
+Rotate the shared token on both sides in a coordinated window without exposing it.
+
+## Live verification (pending authorization)
+
+Record actual timestamps and results, without tokens or sensitive response bodies:
+
+```sh
+flux get kustomizations -n flux-system
+flux get helmreleases -n notopia
+kubectl -n notopia get jobs
+```
+
+Confirm all intended Notopia Kustomizations and HelmReleases are Ready and the
+latest migrate and seed Jobs completed. Check public `/note/health/ready` is 200;
+protected requests without a token and forged-group requests are 403. Verify a
+valid non-admin receives 403 on a real billing admin endpoint and a valid admin
+is allowed. Run the full edge adversarial suite, including all five spoofed
+headers and bypass paths, before exposure. Verify web login, `wss` editing,
+tenant-token search, webhook-triggered reconciliation, Tempo edge → note →
+authorization and migrate Job spans, and unchanged Kite and Authentik operation.
+All of these cluster and external checks remain pending until authorized and run.
+
+## Failure and rollback
+
+Stop reconciliation or traffic as appropriate and investigate failed Jobs,
+health, and logs without publishing secrets. Git-revert the affected desired
+configuration and reconcile only after assessing the data impact; Helm rollback
+cannot undo database or index migrations. Restore from tested backups if needed.
+Authorization rollback requires the exclusive external seed procedure above using
+the rollback image before pods restart. Restore staging dependencies and any
+temporarily changed wait settings once safe; never remove the edge security gate.
 
 ## Local checks
 
