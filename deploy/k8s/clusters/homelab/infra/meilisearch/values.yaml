@@ -1,0 +1,8 @@
+fullnameOverride: meilisearch
+environment:
+  MEILI_ENV: production
+auth:
+  existingMasterKeySecret: meilisearch
+persistence:
+  enabled: true
+  size: 10Gi
