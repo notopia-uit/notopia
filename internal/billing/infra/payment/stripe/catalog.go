@@ -83,14 +83,16 @@ func (p *Provider) CreatePortalConfiguration(ctx context.Context, activePrices [
 			Mode:    stripego.String(string(stripego.BillingPortalConfigurationFeaturesSubscriptionCancelModeAtPeriodEnd)),
 		},
 		SubscriptionUpdate: &stripego.BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParams{
-			Enabled:               stripego.Bool(len(products) > 0),
-			DefaultAllowedUpdates: []*string{stripego.String("price")},
-			Products:              products,
-			ProrationBehavior:     stripego.String("always_invoice"),
+			Enabled: stripego.Bool(len(products) > 0),
+			DefaultAllowedUpdates: []*string{
+				stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdatePrice),
+			},
+			Products:          products,
+			ProrationBehavior: stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehaviorAlwaysInvoice),
 			ScheduleAtPeriodEnd: &stripego.BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndParams{
 				Conditions: []*stripego.BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionParams{
-					{Type: stripego.String("decreasing_item_amount")},
-					{Type: stripego.String("shortening_interval")},
+					{Type: stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeDecreasingItemAmount)},
+					{Type: stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeShorteningInterval)},
 				},
 			},
 		},
