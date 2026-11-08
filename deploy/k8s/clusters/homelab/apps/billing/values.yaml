@@ -1,0 +1,33 @@
+image:
+  tag: ''
+otel:
+  endpoint: http://alloy-alloy.monitoring.svc:4317
+istio:
+  allowedPrincipals:
+  - cluster.local/ns/notopia/sa/notopia-edge-istio
+  - cluster.local/ns/notopia/sa/note
+  - cluster.local/ns/notopia/sa/document
+database:
+  urlSecret:
+    name: cnpg-billing-app
+    key: uri
+redis:
+  addr: valkey-billing:6379
+  passwordSecret:
+    name: valkey-billing
+    key: password
+envFrom:
+- secretRef:
+    name: billing
+route:
+  enabled: true
+  parentRefs:
+  - name: notopia-edge
+    kind: Gateway
+  hostnames:
+  - notopia-api.${PUBLIC_DOMAIN}
+env:
+  NOTOPIA_BILLING_SERVER_URL: https://notopia-api.${PUBLIC_DOMAIN}
+  NOTOPIA_BILLING_BILLING_WEB_BASE_URL: https://notopia.${PUBLIC_DOMAIN}
+  NOTOPIA_BILLING_SERVICES_AUTHORIZATION_URL: authorization:18089
+  NOTOPIA_BILLING_SERVICES_AUTHORIZATION_LIVE_URL: http://authorization:28089/authorization/health/live

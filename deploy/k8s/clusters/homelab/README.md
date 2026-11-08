@@ -4,9 +4,43 @@ The Valkey and Meilisearch HelmReleases are suspended because no credentials hav
 been supplied. Do not resume a release until its encrypted Secret is committed,
 included in `infra/secrets/kustomization.yaml`, and Flux has the matching age
 private key. Application releases that depend on missing credentials must also
-remain suspended; this directory does not yet contain the application releases.
+remain suspended. All application and edge releases are also suspended.
 Do not expose the edge until the independent identity-header boundary checks in
 `deploy/k8s/AGENTS.md` have passed.
+
+## Application release prerequisites
+
+The empty `image.tag` values are intentionally not deployable image selections:
+the chart falls back to its default app version, which has not been verified.
+Publish or independently verify an immutable image for each service and set its
+tag before resuming that release. Verify image access and migration compatibility.
+No application images or credentials were verified for this wiring.
+
+The homelab Git configuration identifies Redpanda but does not establish a
+verified client Service address or advertised listeners. Set each service's
+`NOTOPIA_*_KAFKA_BROKERS` environment variable to the verified in-cluster
+broker address before resuming; the application defaults point to localhost.
+Also verify the Istio-generated `default-istio` and `notopia-edge-istio` service
+account names, ambient enrollment and mTLS, Valkey and Meilisearch service names,
+and service-to-service health checks against the actual deployment.
+
+Set the Authentik client ID, service-account user IDs, RustFS endpoint, region
+and bucket, and other production settings from the provisioned systems. Include
+the note Authentik token in its Secret. Use the exact environment names from the
+services, not local development credentials. Document's database fields are
+provided from the CNPG Secret, and document must remain at one replica.
+
+Authorization requires external policy seeding from the same image before every
+install, upgrade, and rollback; follow `charts/authorization/README.md`.
+Do not set `security.externalBoundaryAcknowledged` until the independent edge
+boundary has been implemented and verified as described in the edge chart README.
+Suspending a HelmRelease does not remove an already deployed release.
+
+For search-key bootstrap, provision and resume Meilisearch and its credentials,
+then configure and resume search-worker independently of note. Once its seed
+has succeeded, provision note's search key and other prerequisites before
+resuming note. Do not make the worker depend on note readiness. Flux app
+reconciliation must not wait for all releases before the worker can run.
 
 ## Secrets
 
