@@ -14,12 +14,22 @@ The empty `image.tag` values are intentionally not deployable image selections:
 the chart falls back to its default app version, which has not been verified.
 Publish or independently verify an immutable image for each service and set its
 tag before resuming that release. Verify image access and migration compatibility.
-No application images or credentials were verified for this wiring.
+No chart-compatible application images or credentials have been verified.
 
-The homelab Git configuration identifies Redpanda but does not establish a
-verified client Service address or advertised listeners. Set each service's
-`NOTOPIA_*_KAFKA_BROKERS` environment variable to the verified in-cluster
-broker address before resuming; the application defaults point to localhost.
+Anonymous GHCR inspection found `2603.07.1311` for web, note, and document,
+but those images were built from revision `5e62e887` before the current chart
+contracts. In particular that revision's note executable does not implement the
+chart's migration command, and its document image does not contain the current
+migration entrypoint. Do not use those old images merely because their tags
+exist. Authorization exposed only a build-cache tag; anonymous access to billing
+and search-worker was denied. Publish current compatible images or verify
+authorized registry access and compatibility before setting each tag.
+
+The Kafka broker is `redpanda.redpanda.svc.cluster.local:9093`, derived by
+rendering the homelab's pinned Redpanda chart 26.2.5 with its checked-in values.
+The rendered headless Service and internal broker listener use that port. This
+is not a live-cluster check: verify the deployed Service, advertised listeners,
+connectivity, and configuration drift before resuming any Kafka client.
 Also verify the Istio-generated `default-istio` and `notopia-edge-istio` service
 account names, ambient enrollment and mTLS, Valkey and Meilisearch service names,
 and service-to-service health checks against the actual deployment.

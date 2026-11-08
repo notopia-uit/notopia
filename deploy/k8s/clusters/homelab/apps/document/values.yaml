@@ -21,6 +21,7 @@ env:
   NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_GRPC_URL: authorization:18089
   NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL: billing:18084
   NOTOPIA_DOCUMENT_AUTHENTICATION_JWKS_URLS: http://authentik-server.authentik/application/o/app-web/jwks/
+  NOTOPIA_DOCUMENT_KAFKA_BROKERS: redpanda.redpanda.svc.cluster.local:9093
 extraEnv:
 - name: NOTOPIA_DOCUMENT_DB_HOST
   valueFrom:

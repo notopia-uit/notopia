@@ -19,3 +19,5 @@ route:
     kind: Gateway
   hostnames:
   - notopia-api.${PUBLIC_DOMAIN}
+env:
+  NOTOPIA_AUTHORIZATION_KAFKA_BROKERS: redpanda.redpanda.svc.cluster.local:9093
