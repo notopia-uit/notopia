@@ -42,7 +42,8 @@ A different OpenAI-compatible model endpoint can be configured through the AI ap
 
 Start note, authorization, billing, document, search-worker, web and AI using their normal
 Nx development targets. AI listens on 8085; its billing gRPC endpoint is localhost:18084.
-The health endpoint is `http://api.notopia.localhost/ai/health`.
+Health: `http://api.notopia.localhost/ai/health/live` (always 200),
+`/ai/health/startup`, and `/ai/health/ready` (pings Redis). `/ai/health` is a live alias.
 
 Use a workspace with AI credits: Free defaults to zero, while Plus/Pro provide credits.
 There is no need to make a real payment to test: the existing `just fixtures-billing`
