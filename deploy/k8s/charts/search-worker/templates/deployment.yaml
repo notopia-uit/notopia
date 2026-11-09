@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment.json
-{{- $root := merge (dict) . -}}
+{{ $root := merge (dict) . -}}
 {{- $values := deepCopy .Values -}}
 {{- $extra := default list $values.extraEnv -}}
 {{- if and (or (gt (int $values.replicaCount) 1) $values.autoscaling.enabled) (or (not $values.redis.urlSecret.name) (not $values.redis.urlSecret.key)) -}}{{ fail "search-worker scaling requires redis.urlSecret.name and key" }}{{- end -}}

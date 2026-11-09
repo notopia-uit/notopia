@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment.json
-{{- $root := merge (dict) . -}}
+{{ $root := merge (dict) . -}}
 {{- $values := deepCopy .Values -}}
 {{- $extra := default list $values.extraEnv -}}
 {{- $_ := set $values "extraEnv" $extra -}}

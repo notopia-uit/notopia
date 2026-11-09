@@ -68,7 +68,13 @@ test('Istio disabled emits no Istio objects', () => {
       encoding: 'utf8',
     }
   );
-  assert.doesNotMatch(yaml, /(?:security|telemetry)\.istio\.io/);
+  const apiVersions: string[] = JSON.parse(
+    execFileSync('yq', ['eval-all', '-o=json', '[select(. != null) | .apiVersion]', '-'], {
+      input: yaml,
+      encoding: 'utf8',
+    })
+  );
+  assert.ok(apiVersions.every((version) => !/^(?:security|telemetry)\.istio\.io\//.test(version)));
 });
 
 test('conflicting paths and unsupported wildcards are rejected', () => {
