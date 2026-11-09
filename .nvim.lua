@@ -4,6 +4,8 @@ local root = vim.fn.expand("%:p:h")
 local uri_root = vim.uri_from_fname(root)
 local lsp_watchfile = vim.lsp._watchfiles
 
+vim.env.IS_EDITOR = "true"
+
 local project_root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h")
 local sops_group = vim.api.nvim_create_augroup("NotopiaSops", { clear = true })
 local sops_prefix = vim.fs.normalize(project_root .. "/deploy/k8s/clusters") .. "/"

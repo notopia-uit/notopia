@@ -4,6 +4,7 @@ name: notopia
 include:
   - ./infrastructure/authentik.yaml
   - ./infrastructure/dbgate.yaml
+  - ./infrastructure/ollama.yaml
   - ./infrastructure/meilisearch.yaml
   - ./infrastructure/redpanda.yaml
   - ./infrastructure/rustfs.yaml
@@ -15,6 +16,7 @@ include:
   - ./monitoring/prometheus.yaml
   - ./monitoring/tempo.yaml
 
+  - ./services/ai.yaml
   - ./services/note.yaml
   - ./services/document.yaml
   - ./services/authorization.yaml

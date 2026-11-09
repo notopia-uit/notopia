@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://www.schemastore.org/traefik-v3-file-provider.json
+http:
+  routers:
+    ai:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/ai`)
+      service: ai
+      middlewares:
+        - cors
+        - jwt
+
+    ai-public:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/ai/health`)
+      service: ai
+      middlewares:
+        - cors
+
+  services:
+    ai:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:8085

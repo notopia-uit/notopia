@@ -73,3 +73,31 @@ Then import the boundary wrapper in the server component page instead of the com
 ### Avoid access process.env here
 
 We will pass the from the consumer packages like `apps/web` as props. This is guarded by oxlint
+
+## AI integration
+
+`AiProvider` (`contexts/ai-context.tsx`) receives the AI URL from the consuming app. Use
+`useAiTransport({ workspaceId })` for workspace chat or `useAiTransport({ noteId })` for an
+editor, including linked-note previews. Do not pass the AI URL through editor/schema/reference
+props or infer a billing workspace from prompt text. The web workspace layout owns the provider.
+Other consumers, such as the editor sandbox, must wrap AI-enabled editor previews too.
+
+`lib/ai-transport.ts` shares authentication and HTTP error normalization between useChat and
+BlockNote. Successful SSE responses pass through untouched. `EditorAiError` subscribes to the
+BlockNote AI store to display specific errors beside the editor. Workspace chat can restore a
+failed prompt and stop generation; resubmitting creates a new message ID, because the backend
+rejects duplicate generation IDs. Keep chat/editor state scoped to its workspace/note.
+
+`nx test packages/ui` verifies transport context, BlockNote tool-body merging, SSE preservation,
+and readable HTTP errors. Commit actions remain separate from collaborative persistence:
+committing updates the content available to search and the assistant.
+
+Workspace note editing uses `useAssistantChat`, `AssistantRunner`, and one shared Chat.
+`AssistantEditorSession` gates execution on an authenticated, initially synced Hocuspocus
+room. The assistant transport sends server-issued continuation tokens and matching results,
+never replacement history. `AssistantAiBridge` uses BlockNote's exported full-document
+request/executor helpers and fork-based accept/reject; do not implement snapshot rollback.
+Its guarded, delay-free executors prevent queued operations from running after Stop/review.
+Resolve suggestions before another prompt or Commit. API/WebSocket URLs come from web props.
+The deterministic real-editor browser fixture lives in `tests/browser/`; setup and evidence
+limits are documented in `docs/ai/ASSISTANT_NOTE_EDITING.md`.

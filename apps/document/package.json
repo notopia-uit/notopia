@@ -59,6 +59,7 @@
     "marked": "catalog:",
     "nestjs-otel": "catalog:",
     "nestjs-pino": "catalog:",
+    "pg": "catalog:",
     "pino": "catalog:",
     "pino-http": "catalog:",
     "pino-pretty": "catalog:",
