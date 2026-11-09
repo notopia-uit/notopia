@@ -1,10 +1,18 @@
 'use client';
 
+import type { Chat } from '@ai-sdk/react';
 import { BlockNoteEditor } from '@blocknote/core';
 import { MyEditor } from '@blocknote/core';
+import { en } from '@blocknote/core/locales';
 import { withCollaboration } from '@blocknote/core/yjs';
-import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
+import {
+  SuggestionMenuController,
+  getDefaultReactSlashMenuItems,
+  useCreateBlockNote,
+} from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
+import { AIExtension, AIMenuController, getAISlashMenuItems } from '@blocknote/xl-ai';
+import { en as aiEn } from '@blocknote/xl-ai/locales';
 import {
   useHocuspocusProvider,
   useHocuspocusAwareness,
@@ -21,12 +29,15 @@ import {
 } from '@notopia-uit/ui/block-note';
 import { getMenuItemsWithState } from '@notopia-uit/ui/block-note/menu-states';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
+import { useAiTransport } from '@notopia-uit/ui/hooks/use-ai-transport';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { uploadDocumentAttachment } from '@notopia-uit/ui/lib/actions/upload';
+import type { UIMessage } from 'ai';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { forwardRef, useMemo, useCallback, useEffect } from 'react';
 
+import { EditorAiError } from './editor-ai-error';
 import { NoteSuggestionMenu } from './note-suggestion-menu';
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
@@ -40,7 +51,9 @@ interface EditorCoreProps {
   };
   noteId: string;
   isViewer?: boolean;
+  apiUrl: string;
   onEditorReady?: (editor: MyEditor) => void;
+  assistantChat?: Chat<UIMessage>;
 }
 
 function EditorStatusBar() {
@@ -118,11 +131,12 @@ function EditorStatusBar() {
 }
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
-  { sessionUser, noteId, isViewer, onEditorReady },
+  { sessionUser, noteId, isViewer, apiUrl, onEditorReady, assistantChat },
   ref
 ) {
   const { resolvedTheme } = useTheme();
-  const mySchema = useMemo(() => createBlockNoteSchema(), []);
+  const mySchema = useMemo(() => createBlockNoteSchema({ apiUrl }), [apiUrl]);
+  const transport = useAiTransport({ noteId });
   const provider = useHocuspocusProvider();
   const meilisearchClient = useMeilisearch();
 
@@ -151,6 +165,13 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
           avatar: 'https://placehold.net/default.svg',
         }) satisfies CollaborationUser,
       },
+      dictionary: {
+        ...en,
+        ai: aiEn,
+      },
+      extensions: [
+        AIExtension(assistantChat ? { chatProvider: () => assistantChat } : { transport }),
+      ],
       uploadFile,
       resolveFileUrl,
     })
@@ -158,14 +179,14 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
 
   useEffect(() => {
     if (ref) {
-      (ref as React.MutableRefObject<any>).current = editor;
+      (ref as React.RefObject<any>).current = editor;
     }
     if (onEditorReady) {
       onEditorReady(editor);
     }
     return () => {
       if (ref) {
-        (ref as React.MutableRefObject<any>).current = null;
+        (ref as React.RefObject<any>).current = null;
       }
     };
   }, [editor, ref, onEditorReady]);
@@ -217,10 +238,34 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     [searchTagsWithCache, editor]
   );
 
+  const handleSlashMenuSearch = useCallback(
+    async (query: string) => {
+      const items = [
+        ...(assistantChat ? [] : getAISlashMenuItems(editor)),
+        ...getDefaultReactSlashMenuItems(editor),
+      ];
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        return items;
+      }
+      return items.filter(
+        (item) =>
+          item.title.toLowerCase().includes(q) ||
+          item.aliases?.some((alias) => alias.toLowerCase().includes(q))
+      );
+    },
+    [editor, assistantChat]
+  );
+
   return (
     <>
       <EditorStatusBar />
+      <EditorAiError editor={editor} />
       <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'} editable={!isViewer}>
+        {!assistantChat && <AIMenuController />}
+
+        <SuggestionMenuController triggerCharacter={'/'} getItems={handleSlashMenuSearch} />
+
         <SuggestionMenuController triggerCharacter={'#'} getItems={handleTagMenuSearch} />
 
         <SuggestionMenuController

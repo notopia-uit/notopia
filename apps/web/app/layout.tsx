@@ -4,9 +4,10 @@ import { ApiProvider } from '@notopia-uit/ui/components/token-provider';
 
 import './globals.css';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { EnvInit } from './env-init';
 import { Inter as FontSans } from 'next/font/google';
 import localFont from 'next/font/local';
+
+import { EnvInit } from './env-init';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -23,6 +24,10 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
+  const betterAuthUrl = process.env.BETTER_AUTH_URL;
+  if (!betterAuthUrl) {
+    throw new Error('BETTER_AUTH_URL is not set');
+  }
   return (
     <>
       <html lang="en" suppressHydrationWarning>
@@ -43,9 +48,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           >
             <QueryClientProvider>
               <ApiProvider>
-                <EnvInit betterAuthUrl={process.env.BETTER_AUTH_URL || 'http://localhost:3000'}>
-                  {children}
-                </EnvInit>
+                <EnvInit betterAuthUrl={betterAuthUrl}>{children}</EnvInit>
               </ApiProvider>
             </QueryClientProvider>
           </ThemeProvider>

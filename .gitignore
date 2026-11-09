@@ -38,6 +38,7 @@ vitest.config.*.timestamp*
 
 # Agent skill
 .agents/skills/better-auth-best-practices/
+.agents/skills/seed-data/
 .agents/skills/ckm-banner-design/
 .agents/skills/ckm-brand/
 .agents/skills/ckm-design/
@@ -50,8 +51,10 @@ vitest.config.*.timestamp*
 .agents/skills/fixtures-data/
 .agents/skills/ui-ux-pro-max/
 .agents/skills/vercel-react-best-practices/
+.agents/skills/ai-elements/
 
 .claude/skills/better-auth-best-practices/
+.claude/skills/seed-data/
 .claude/skills/ckm-banner-design/
 .claude/skills/ckm-brand/
 .claude/skills/ckm-design/
@@ -62,8 +65,8 @@ vitest.config.*.timestamp*
 .claude/skills/next-cache-components/
 .claude/skills/next-upgrade/
 .claude/skills/fixtures-data/
+.claude/skills/terraform-engineer/
 .claude/skills/ui-ux-pro-max/
 .claude/skills/vercel-react-best-practices/
-.claude/skills/terraform-engineer/
 /deploy/k8s/charts/*/charts/
 /deploy/k8s/charts/notopia-common-chart/tests/fixture/charts/

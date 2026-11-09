@@ -12,12 +12,7 @@ export function EnvInit({
   betterAuthUrl: string;
 }) {
   if (!configured) {
-    if (!betterAuthUrl) {
-      console.warn(
-        'BETTER_AUTH_URL is not set. Falling back to http://localhost:3000'
-      );
-    }
-    configureAuthClient(betterAuthUrl || 'http://localhost:3000');
+    configureAuthClient(betterAuthUrl);
     configured = true;
   }
   return <>{children}</>;
