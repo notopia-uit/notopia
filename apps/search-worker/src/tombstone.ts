@@ -18,12 +18,13 @@ export class MemoryTombstoneStore extends TombstoneStore {
     this.cache = new LRUCache({ max, ttl: ttlSeconds * 1000 });
   }
 
-  async mark(id: string): Promise<void> {
+  mark(id: string): Promise<void> {
     this.cache.set(id, true);
+    return Promise.resolve();
   }
 
-  async has(id: string): Promise<boolean> {
-    return this.cache.has(id);
+  has(id: string): Promise<boolean> {
+    return Promise.resolve(this.cache.has(id));
   }
 }
 

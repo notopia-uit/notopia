@@ -30,7 +30,7 @@
     "run": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "go run ./cmd/note/",
+        "command": "go run ./cmd/note/ serve",
         "cwd": "{workspaceRoot}",
         "tty": true
       },
@@ -63,7 +63,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "./note",
+        "command": "./note serve",
         "cwd": "{projectRoot}",
         "tty": true
       },
@@ -73,7 +73,7 @@
     "debug": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dlv debug --headless --listen=127.0.0.1:23451 --accept-multiclient --output ./cmd/note/__debug_bin ./cmd/note/",
+        "command": "dlv debug --headless --listen=127.0.0.1:23451 --accept-multiclient --output ./cmd/note/__debug_bin ./cmd/note/ -- serve",
         "cwd": "{workspaceRoot}",
         "tty": true
       },
@@ -128,7 +128,7 @@
       "dependsOn": ["migration:validate"]
     },
     "gen:sqlc": {
-      "inputs": ["sqlc"],
+      "inputs": ["sqlc", "sqlcVersion"],
       "outputs": ["{workspaceRoot}/internal/note/infra/persistence/pgsqlc/*.go"],
       "executor": "nx:run-commands",
       "options": {
@@ -142,6 +142,13 @@
     },
     "nx-release-publish": {
       "parallelism": false
+    },
+    "migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run ./cmd/note migrate up",
+        "cwd": "{workspaceRoot}"
+      }
     }
   },
   "implicitDependencies": ["pkg"],

@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment.json
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fixture
+spec:
+  selector:
+    matchLabels:
+      app: fixture
+  template:
+    metadata:
+      labels:
+        app: fixture
+    spec:
+      securityContext:
+        {{- include "notopia-common.podSecurityContext" . | nindent 8 }}
+      containers:
+        - name: fixture
+          image: {{ include "notopia-common.image" . | quote }}
+          securityContext:
+            {{- include "notopia-common.containerSecurityContext" . | nindent 12 }}
+          env:
+            {{- include "notopia-common.env" . | nindent 12 }}
+          envFrom:
+            {{- toYaml .Values.envFrom | nindent 12 }}

@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment.json
+{{ $root := merge (dict) . -}}
+{{- $values := deepCopy .Values -}}
+{{- $extra := default list $values.extraEnv -}}
+{{- if $values.database.urlSecret.name -}}
+{{- $extra = append $extra (dict "name" "NOTOPIA_BILLING_DATABASE_URL" "valueFrom" (dict "secretKeyRef" $values.database.urlSecret)) -}}
+{{- end -}}
+{{- if not (hasKey $values.redis "db") -}}{{ fail "redis.db is required" }}{{- end -}}
+{{- if not $values.redis.addr -}}{{ fail "redis.addr is required" }}{{- end -}}
+{{- if not $values.redis.passwordSecret.name -}}{{ fail "redis.passwordSecret.name is required" }}{{- end -}}
+{{- if not $values.redis.passwordSecret.key -}}{{ fail "redis.passwordSecret.key is required" }}{{- end -}}
+{{- $extra = concat $extra (list (dict "name" "NOTOPIA_BILLING_REDIS_ADDR" "value" $values.redis.addr) (dict "name" "NOTOPIA_BILLING_REDIS_DB" "value" (toString $values.redis.db)) (dict "name" "NOTOPIA_BILLING_REDIS_PASSWORD" "valueFrom" (dict "secretKeyRef" $values.redis.passwordSecret))) -}}
+{{- $_ := set $values "extraEnv" $extra -}}
+{{- $_ := set $root "Values" $values -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "notopia-common.fullname" $root }}
+  labels:
+    {{- include "notopia-common.labels" $root | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "notopia-common.selectorLabels" $root | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "notopia-common.selectorLabels" $root | nindent 8 }}
+        {{- with .Values.podLabels }}{{- toYaml . | nindent 8 }}{{- end }}
+      annotations:
+        checksum/env: {{ printf "%s%s" (include "notopia-common.env" $root) (toYaml .Values.envFrom) | sha256sum }}
+        {{- with .Values.podAnnotations }}{{- toYaml . | nindent 8 }}{{- end }}
+    spec:
+      serviceAccountName: {{ include "notopia-common.serviceAccountName" $root }}
+      automountServiceAccountToken: false
+      securityContext:
+        {{- include "notopia-common.podSecurityContext" $root | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: billing
+          image: {{ include "notopia-common.image" $root | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["./billing", "serve"]
+          securityContext:
+            {{- include "notopia-common.containerSecurityContext" $root | nindent 12 }}
+          ports:
+            - { name: http, containerPort: 8084, protocol: TCP }
+            - { name: grpc, containerPort: 18084, protocol: TCP }
+            - { name: health, containerPort: 28084, protocol: TCP }
+          startupProbe:
+            httpGet: { path: /billing/health/startup, port: 28084 }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /billing/health/ready, port: 28084 }
+          livenessProbe:
+            httpGet: { path: /billing/health/live, port: 28084 }
+          env:
+            {{- include "notopia-common.env" $root | nindent 12 }}
+          {{- with .Values.envFrom }}
+          envFrom: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.extraVolumeMounts }}
+          volumeMounts: {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.extraVolumes }}
+      volumes: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}

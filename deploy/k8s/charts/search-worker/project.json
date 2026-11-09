@@ -1,0 +1,52 @@
+{
+  "name": "search-worker-chart",
+  "targets": {
+    "gen": {
+      "dependsOn": ["gen:schema", "gen:readme"]
+    },
+    "gen:schema": {
+      "inputs": ["chartSchema"],
+      "outputs": ["{projectRoot}/values.schema.json"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "helm-schema -p -c deploy/k8s/charts/search-worker"
+      }
+    },
+    "gen:readme": {
+      "inputs": ["chartReadme"],
+      "outputs": ["{projectRoot}/README.md"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "helm-docs -c deploy/k8s/charts/search-worker"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/search-worker.lock helm dependency build --skip-refresh deploy/k8s/charts/search-worker",
+          "flock -s tmp/chart-lock/search-worker.lock helm lint --strict deploy/k8s/charts/search-worker --set istio.enabled=false",
+          "flock -s tmp/chart-lock/search-worker.lock bash -o pipefail -c 'helm template test deploy/k8s/charts/search-worker --set route.enabled=true --set autoscaling.enabled=true --set redis.urlSecret.name=redis --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+        ],
+        "parallel": false
+      },
+      "inputs": ["chart"],
+      "dependsOn": []
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/search-worker.lock helm dependency build --skip-refresh deploy/k8s/charts/search-worker",
+          "flock -s tmp/chart-lock/search-worker.lock helm unittest deploy/k8s/charts/search-worker",
+          "flock -s tmp/chart-lock/search-worker.lock node --test deploy/k8s/charts/search-worker/tests/*.test.ts"
+        ],
+        "parallel": false
+      },
+      "inputs": ["chart"],
+      "dependsOn": []
+    }
+  }
+}

@@ -4,6 +4,8 @@ import type * as Y from 'yjs';
 
 const metadataOf = (doc: Y.Doc) => doc.getMap('metadata') as YDocMetadataMap;
 
+export const hasModifiedMetadata = (doc: Y.Doc): boolean => metadataOf(doc).has('metadata');
+
 export const readModified = (doc: Y.Doc): boolean =>
   metadataOf(doc).get('metadata')?.modified ?? false;
 

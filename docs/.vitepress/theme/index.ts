@@ -8,6 +8,8 @@ import 'vitepress-openapi/dist/style.css';
 import DefaultTheme from 'vitepress/theme';
 import { h, nextTick, watch } from 'vue';
 
+import Authorship from './Authorship.vue';
+
 // sort-imports-ignore
 import '@catppuccin/vitepress/theme/mocha/lavender.css';
 
@@ -31,7 +33,7 @@ export default {
     watch(() => isDark.value, initMermaid);
 
     return h(DefaultTheme.Layout, null, {
-      // https://vitepress.dev/guide/extending-default-theme#layout-slots
+      'doc-top': () => h(Authorship),
     });
   },
   async enhanceApp(ctx) {

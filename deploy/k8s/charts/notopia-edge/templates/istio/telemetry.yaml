@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/telemetry.istio.io/telemetry_v1.json
+{{- if and .Values.istio.enabled .Values.istio.telemetry.enabled }}
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: {{ include "notopia-common.fullname" . }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: {{ include "notopia-common.fullname" . }}
+  {{- with .Values.istio.telemetry.tracingProviders }}
+  tracing:
+    - providers:
+        {{- range . }}
+        - name: {{ . | quote }}
+        {{- end }}
+      randomSamplingPercentage: {{ $.Values.istio.telemetry.randomSamplingPercentage }}
+  {{- end }}
+  {{- with .Values.istio.telemetry.accessLogProviders }}
+  accessLogging:
+    - providers:
+        {{- range . }}
+        - name: {{ . | quote }}
+        {{- end }}
+  {{- end }}
+{{- end }}

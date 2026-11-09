@@ -1,0 +1,17 @@
+fullnameOverride: valkey-note
+deploymentStrategy: Recreate
+replica:
+  enabled: false
+dataStorage:
+  enabled: true
+  requestedSize: 1Gi
+valkeyConfig: |
+  maxmemory-policy noeviction
+  appendonly yes
+auth:
+  enabled: true
+  usersExistingSecret: valkey-note
+  aclUsers:
+    default:
+      permissions: "~* &* +@all"
+      passwordKey: password

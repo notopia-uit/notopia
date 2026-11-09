@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://www.schemastore.org/kustomization.json
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: notopia
+resources:
+- web/helmrelease.yaml
+- note/helmrelease.yaml
+- authorization/helmrelease.yaml
+- billing/helmrelease.yaml
+- document/helmrelease.yaml
+- search-worker/helmrelease.yaml
+configurations:
+- kustomizeconfig.yaml
+configMapGenerator:
+- name: web-helm-values
+  files:
+  - values.yaml=web/values.yaml
+- name: note-helm-values
+  files:
+  - values.yaml=note/values.yaml
+- name: authorization-helm-values
+  files:
+  - values.yaml=authorization/values.yaml
+- name: billing-helm-values
+  files:
+  - values.yaml=billing/values.yaml
+- name: document-helm-values
+  files:
+  - values.yaml=document/values.yaml
+- name: search-worker-helm-values
+  files:
+  - values.yaml=search-worker/values.yaml

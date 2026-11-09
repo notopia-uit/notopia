@@ -34,16 +34,23 @@ export-authentik-blueprint:
 shadcnadd component:
     pnpm exec shadcn add {{ component }} -c ./packages/ui/
 
+helm-setup:
+    set -e; if ! helm plugin list | grep -qE '^unittest[[:space:]]+1\.2\.1([[:space:]]|$)'; then \
+      if helm plugin list | grep -qE '^unittest[[:space:]]'; then helm plugin uninstall unittest; fi; \
+      helm plugin install https://github.com/helm-unittest/helm-unittest --version 1.2.1; \
+    fi
+
 seed: seed-authorization seed-search seed-billing
 
 seed-authorization:
-    nx run authorizationseed:run
+    nx run authorization:seed
 
 seed-search:
     nx run search-worker:seed
 
 seed-billing:
-    nx run billingseed:run
+    nx run billing:migrate
+    nx run billing:seed
 
 fixtures: seed fixtures-authorization fixtures-note fixtures-document fixtures-search fixtures-billing
 

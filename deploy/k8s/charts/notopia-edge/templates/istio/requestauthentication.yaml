@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/security.istio.io/requestauthentication_v1.json
+{{- if .Values.istio.enabled }}
+apiVersion: security.istio.io/v1
+kind: RequestAuthentication
+metadata:
+  name: {{ include "notopia-common.fullname" . }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: {{ include "notopia-common.fullname" . }}
+  jwtRules:
+    - issuer: {{ .Values.istio.jwt.issuer | quote }}
+      jwksUri: {{ .Values.istio.jwt.jwksUri | quote }}
+      outputClaimToHeaders:
+        - header: X-Forwarded-ID
+          claim: sub
+        - header: X-Forwarded-Email
+          claim: email
+        - header: X-Forwarded-Name
+          claim: name
+        - header: X-Forwarded-Groups
+          claim: groups_json
+{{- end }}

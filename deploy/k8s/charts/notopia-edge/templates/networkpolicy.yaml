@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/networkpolicy.json
+{{- if or (not (kindIs "bool" .Values.security.externalBoundaryAcknowledged)) (not .Values.security.externalBoundaryAcknowledged) }}{{ fail "security.externalBoundaryAcknowledged must be true after establishing and verifying the external non-bypassable identity-header boundary; see README" }}{{ end }}
+{{- if and (not .Values.istio.enabled) (or (not (kindIs "bool" .Values.security.externalIdentityLayerAcknowledged)) (not .Values.security.externalIdentityLayerAcknowledged)) }}{{ fail "security.externalIdentityLayerAcknowledged must be true with Istio disabled after establishing and verifying external JWT, header, and authorization enforcement; see README" }}{{ end }}
+{{- if not .Values.gateway.enabled }}{{ fail "gateway.enabled=false is unsupported: an existing gateway cannot be secured by this chart" }}{{ end }}
+{{- if ne (empty .Values.frontRoute.trustedNamespace) (empty .Values.frontRoute.trustedGateway) }}{{ fail "frontRoute.trustedNamespace and trustedGateway must both be set" }}{{ end }}
+{{- if and .Values.frontRoute.trustedGateway (not .Values.frontRoute.enabled) }}{{ fail "frontRoute.enabled must be true when allowing a trusted gateway" }}{{ end }}
+{{- if .Values.frontRoute.trustedGateway }}
+  {{- if ne (len .Values.frontRoute.parentRefs) 1 }}{{ fail "exactly one frontRoute.parentRefs entry is required for the trusted gateway" }}{{ end }}
+  {{- $parent := index .Values.frontRoute.parentRefs 0 }}
+  {{- if or (ne $parent.name .Values.frontRoute.trustedGateway) (ne (default .Release.Namespace $parent.namespace) .Values.frontRoute.trustedNamespace) (ne (default "Gateway" $parent.kind) "Gateway") (ne (default "gateway.networking.k8s.io" $parent.group) "gateway.networking.k8s.io") }}{{ fail "frontRoute.parentRefs must reference the trusted gateway and namespace" }}{{ end }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "notopia-common.fullname" . }}-front-only
+spec:
+  podSelector:
+    matchLabels:
+      gateway.networking.k8s.io/gateway-name: {{ include "notopia-common.fullname" . }}
+  policyTypes:
+    - Ingress
+  {{- if and .Values.frontRoute.trustedNamespace .Values.frontRoute.trustedGateway }}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.frontRoute.trustedNamespace | quote }}
+          podSelector:
+            matchLabels:
+              gateway.networking.k8s.io/gateway-name: {{ .Values.frontRoute.trustedGateway | quote }}
+  {{- else }}
+  ingress: []
+  {{- end }}

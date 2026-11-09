@@ -1,6 +1,6 @@
 import * as Y from 'yjs';
 
-import { applyStoredModified, readModified } from './document-metadata';
+import { applyStoredModified, hasModifiedMetadata, readModified } from './document-metadata';
 
 describe('document metadata', () => {
   it('applies the stored flag with a store-skipping origin', () => {
@@ -16,5 +16,12 @@ describe('document metadata', () => {
 
   it('reads false when metadata is missing', () => {
     expect(readModified(new Y.Doc())).toBe(false);
+  });
+
+  it('reports whether metadata exists', () => {
+    const doc = new Y.Doc();
+    expect(hasModifiedMetadata(doc)).toBe(false);
+    applyStoredModified(doc, false);
+    expect(hasModifiedMetadata(doc)).toBe(true);
   });
 });

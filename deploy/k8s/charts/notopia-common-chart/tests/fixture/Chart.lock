@@ -1,0 +1,6 @@
+dependencies:
+- name: notopia-common-chart
+  repository: file://../..
+  version: 0.1.0
+digest: sha256:312a1e4ac0ff597ee77d3afc79228489d78c9464b0b4ed33ce97ffe5e81aaba9
+generated: "2026-11-03T19:26:51.021289624+07:00"

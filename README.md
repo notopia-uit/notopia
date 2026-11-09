@@ -192,13 +192,27 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
       But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
 - [ ] Revision endpoints aren't protected with authorization
 - [ ] Caching the subscription in other services so that it will not harm the billing service
-  > Skipped for simplicity
+  > These bullets below written by AI, I haven't verified yet
+  > Skipped for simplicity. These call another service over gRPC on every request/run;
+  > consider storing the state internally, kept fresh by integration events
+  > (`billing.subscription.changed`, `note.created`/`note.deleted`, authorization role events)
+  - [ ] note → billing `GetEntitlements`: `q_getworkspacegraph`, `q_getnotegraph`,
+        `cmd_updateworkspacemembers` (members limit + payer), `cmd_leaveworkspace` (payer),
+        public published-workspace reads (planned)
+  - [ ] note → billing `BatchGetEntitlements`: `cmd_purgeexpiredtrash` (cron)
+  - [ ] document → billing `getEntitlements`: `auto-commit.extension` (per document change)
+  - [ ] document → billing `batchGetEntitlements` / `listPlans`: `sweeper.cron`, `revision-purge.cron`
+  - [ ] document → note `getWorkspaceByNote` / `batchGetNoteWorkspaces` (note → workspace mapping):
+        `authorization.service`, `hocuspocus.service`, `auto-commit.extension`, crons,
+        public published-revision reads (planned)
+  - [ ] note / document / billing → authorization permission checks on every request
+        (lower priority: caching permissions risks serving revoked access)
 - [ ] Consider split the workspace event (SSE) into a dedicated service, not bounded to `note` service
   > Events from subscription changed
 - [ ] Make backend services have an option to must trust request comes from api gateway
-- [ ] OpenAPI upgrade 3.1
 - [ ] App admin edit doesn't propagate the SSE to web client. We only have workspace event SSE
 - [ ] Service-account role: replace the `HACK:` lookup with a read-only service-account role in authorization
+- [x] OpenAPI upgrade 3.1
 - [x] Authorization service health check
 - [x] no env validation for document, search-worker
 - [x] NestJS service doesn't have a polite migration mechanism for production (document: TypeORM CLI, no migration files generated yet)

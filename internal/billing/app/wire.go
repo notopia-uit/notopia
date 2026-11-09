@@ -3,15 +3,14 @@ package app
 import "github.com/goforj/wire"
 
 var ProviderSet = wire.NewSet(
-	ProvideHandlerProvider,
 	ProvideCmds,
 	ProvideQueries,
 
-	ProvideRefundRunner,
-	ProvideCanceller,
+	ProvideSubscriptionCanceller,
 
 	ProvideArchivePriceHandler,
 	ProvideCancelNowHandler,
+	ProvideCancelProviderSubscriptionHandler,
 	ProvideCompleteCheckoutHandler,
 	ProvideCreatePriceHandler,
 	ProvideEnsureDefaultsHandler,
@@ -20,6 +19,7 @@ var ProviderSet = wire.NewSet(
 	ProvideHandleWorkspaceDeletedHandler,
 	ProvidePruneProviderEventsHandler,
 	ProvideReconcileSubscriptionsHandler,
+	ProvideSubmitRefundHandler,
 	ProvideSyncRefundHandler,
 	ProvideSyncSubscriptionHandler,
 	ProvideUpdatePlanHandler,

@@ -9,7 +9,9 @@ import (
 var ProviderSet = wire.NewSet(
 	ProvideFromPersistenceToQSLForwarder,
 	ProvideSchemaAdapter,
-	wire.Bind(new(sql.SchemaAdapter), new(*sql.DefaultPostgreSQLSchema)),
+	wire.Bind(new(sql.SchemaAdapter), new(*sql.PostgreSQLQueueSchema)),
+	ProvideOffsetsAdapter,
+	wire.Bind(new(sql.OffsetsAdapter), new(*sql.PostgreSQLQueueOffsetsAdapter)),
 	wire.Bind(new(pgrepo.PublisherFactory), new(*FromPersistenceToQSLForwarder)),
 
 	ProvideOutbox,

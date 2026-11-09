@@ -40,7 +40,7 @@ func (m *BillingReadModel) subscriptions(ctx context.Context, rows []*pgsqlc.Sub
 	if err != nil {
 		return nil, toErr("read refunds", err)
 	}
-	return pgmapper.ToSubscriptions(rows, refundRows), nil
+	return pgmapper.ToSubscriptions(rows, refundRows)
 }
 
 func (m *BillingReadModel) CurrentSubscription(ctx context.Context, workspaceID uuid.UUID) (*domain.Subscription, error) {
@@ -74,7 +74,7 @@ func (m *BillingReadModel) Account(ctx context.Context, workspaceID uuid.UUID) (
 	if err != nil {
 		return nil, toErr("read billing account", err)
 	}
-	return pgmapper.ToAccount(row), nil
+	return pgmapper.ToAccount(row)
 }
 
 func (m *BillingReadModel) Plans(ctx context.Context) (map[domain.PlanTier]*domain.Plan, error) {
@@ -101,7 +101,7 @@ func (m *BillingReadModel) ActivePrices(ctx context.Context) ([]*domain.Price, e
 	if err != nil {
 		return nil, toErr("read active prices", err)
 	}
-	return pgmapper.ToPrices(rows), nil
+	return pgmapper.ToPrices(rows)
 }
 
 func (m *BillingReadModel) Prices(ctx context.Context) ([]*domain.Price, error) {
@@ -109,5 +109,5 @@ func (m *BillingReadModel) Prices(ctx context.Context) ([]*domain.Price, error) 
 	if err != nil {
 		return nil, toErr("read prices", err)
 	}
-	return pgmapper.ToPrices(rows), nil
+	return pgmapper.ToPrices(rows)
 }

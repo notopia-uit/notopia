@@ -1,13 +1,7 @@
 # API Reference Site (nx: `api-web`)
 
-Vite + React page that renders the whole OpenAPI spec with Scalar. Served at the API host
-root (`api.notopia.localhost`). Essentially one component: `src/app/app.tsx`.
+Vite + React page renders whole OpenAPI spec with Scalar. Served at API host root (`api.notopia.localhost`). Essentially one component: `src/app/app.tsx`.
 
-There is almost nothing to change here. The spec is imported as
-`@notopia-uit/api/openapi` (a JSON import) — so **content changes belong in `api/`**, not
-in this app. `nx dev api-web` depends on `watch-bundle:json` for `api/note` and
-`api/document`, so edits to the spec yaml rebuild the bundle and hot-reload the page.
+Almost nothing to change here. Spec imported as `@notopia-uit/api/openapi` (JSON import) — **content changes belong in `api/`**, not this app. `nx dev api-web` depends on `watch-bundle:json` for `api/note` and `api/document`, so spec yaml edits rebuild bundle and hot-reload page.
 
-Edit this app only to change Scalar itself — `configuration` options, extra `sources`,
-theming, or the page shell. When a new API surface is added under `api/`, add it to
-`sources` here and to the `dev` target's `dependsOn` in `project.json`.
+Edit app only for Scalar changes — `configuration` options, extra `sources`, theming, or page shell. When adding API surface under `api/`, add it to `sources` here and `dev` target's `dependsOn` in `project.json`.

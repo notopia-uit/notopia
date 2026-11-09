@@ -19,8 +19,8 @@ type CreatePrice struct {
 
 type CreatePriceHandler struct{ catalog *catalog }
 
-func NewCreatePriceHandler(uow domain.UnitOfWork, provider PaymentProvider, settings *Settings) *CreatePriceHandler {
-	return &CreatePriceHandler{catalog: newCatalog(uow, provider, settings)}
+func NewCreatePriceHandler(uow domain.UnitOfWork, prices domain.PriceRepo, policies domain.BillingPolicyRepo, provider PaymentProvider, settings *Settings) *CreatePriceHandler {
+	return &CreatePriceHandler{catalog: newCatalog(uow, prices, policies, provider, settings)}
 }
 
 var ProvideCreatePriceHandler = NewCreatePriceHandler
@@ -30,15 +30,20 @@ type CreatePriceCmd commonhandler.Cmd[CreatePrice]
 var _ CreatePriceCmd = (*CreatePriceHandler)(nil)
 
 func (h *CreatePriceHandler) Handle(ctx context.Context, cmd *CreatePrice) error {
+	currency, err := domain.ParseCurrency(cmd.Currency)
+	if err != nil {
+		return err
+	}
+	amount, err := domain.NewMoney(cmd.Amount, currency)
+	if err != nil {
+		return err
+	}
 	return h.catalog.createPrice(
 		ctx,
 		cmd.ID,
 		toDomainPlanTier(cmd.Plan),
 		toDomainInterval(cmd.Interval),
-		domain.Money{
-			Amount:   cmd.Amount,
-			Currency: cmd.Currency,
-		},
+		amount,
 		cmd.UserID,
 	)
 }

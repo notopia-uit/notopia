@@ -16,8 +16,8 @@ type ArchivePrice struct {
 
 type ArchivePriceHandler struct{ catalog *catalog }
 
-func NewArchivePriceHandler(uow domain.UnitOfWork, provider PaymentProvider, settings *Settings) *ArchivePriceHandler {
-	return &ArchivePriceHandler{catalog: newCatalog(uow, provider, settings)}
+func NewArchivePriceHandler(uow domain.UnitOfWork, prices domain.PriceRepo, policies domain.BillingPolicyRepo, provider PaymentProvider, settings *Settings) *ArchivePriceHandler {
+	return &ArchivePriceHandler{catalog: newCatalog(uow, prices, policies, provider, settings)}
 }
 
 var ProvideArchivePriceHandler = NewArchivePriceHandler

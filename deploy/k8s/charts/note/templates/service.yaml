@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/service.json
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "notopia-common.fullname" . }}
+  labels:
+    {{- include "notopia-common.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "notopia-common.selectorLabels" . | nindent 4 }}
+  ports:
+    - { name: http, port: 8081, targetPort: http, appProtocol: http }
+    - { name: grpc, port: 18081, targetPort: grpc, appProtocol: kubernetes.io/h2c }
+    - { name: health, port: 28081, targetPort: health, appProtocol: http }

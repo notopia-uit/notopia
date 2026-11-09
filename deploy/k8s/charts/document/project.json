@@ -1,0 +1,52 @@
+{
+  "name": "document-chart",
+  "targets": {
+    "gen": {
+      "dependsOn": ["gen:schema", "gen:readme"]
+    },
+    "gen:schema": {
+      "inputs": ["chartSchema"],
+      "outputs": ["{projectRoot}/values.schema.json"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "helm-schema -p -c deploy/k8s/charts/document"
+      }
+    },
+    "gen:readme": {
+      "inputs": ["chartReadme"],
+      "outputs": ["{projectRoot}/README.md"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "helm-docs -c deploy/k8s/charts/document"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/document.lock helm dependency build --skip-refresh deploy/k8s/charts/document",
+          "flock -s tmp/chart-lock/document.lock helm lint --strict deploy/k8s/charts/document --set istio.enabled=false",
+          "flock -s tmp/chart-lock/document.lock bash -o pipefail -c 'helm template test deploy/k8s/charts/document --set route.enabled=true --set autoscaling.enabled=true --set scaling.enabled=true --set scaling.redisUrlSecret.name=redis --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+        ],
+        "parallel": false
+      },
+      "inputs": ["chart"],
+      "dependsOn": []
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/document.lock helm dependency build --skip-refresh deploy/k8s/charts/document",
+          "flock -s tmp/chart-lock/document.lock helm unittest deploy/k8s/charts/document",
+          "flock -s tmp/chart-lock/document.lock node --test deploy/k8s/charts/document/tests/*.test.ts"
+        ],
+        "parallel": false
+      },
+      "inputs": ["chart"],
+      "dependsOn": []
+    }
+  }
+}

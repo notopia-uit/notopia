@@ -4,11 +4,19 @@ http:
     billing:
       entryPoints:
         - web
-      rule: Host(`api.notopia.localhost`) && PathPrefix(`/billing`) && !PathPrefix(`/billing/health`) && !Path(`/billing/webhooks/stripe`) && !(Path(`/billing/plans`) && Method(`GET`))
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/billing`) && !PathPrefix(`/billing/admin`) && !PathPrefix(`/billing/health`) && !Path(`/billing/webhooks/stripe`) && !(Path(`/billing/plans`) && Method(`GET`))
       service: billing
       middlewares:
         - cors
         - jwt
+    billing-admin:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/billing/admin`)
+      service: billing
+      middlewares:
+        - cors
+        - jwt-admin
     billing-public:
       entryPoints:
         - web

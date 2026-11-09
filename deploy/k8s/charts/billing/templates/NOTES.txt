@@ -1,0 +1,5 @@
+Provide all external secrets before installing. Migration runs before the seed hook.
+Seeding can change Stripe resources; coordinate retries and concurrent seeders.
+Rollback does not undo database or Stripe changes; verify old-code compatibility.
+The hook ServiceAccount is retained after a run and replaced before the next hook.
+Helm does not delete retained hook resources on uninstall; remove it manually when no longer needed.

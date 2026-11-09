@@ -1,0 +1,42 @@
+security:
+  externalBoundaryAcknowledged: false
+gateway:
+  className: istio
+  annotations:
+    networking.istio.io/service-type: ClusterIP
+  hostname: notopia-api.${PUBLIC_DOMAIN}
+frontRoute:
+  parentRefs:
+  - name: default
+    namespace: istio-system
+    kind: Gateway
+    sectionName: https-wildcard
+  trustedNamespace: istio-system
+  trustedGateway: default
+  hostnames:
+  - notopia-api.${PUBLIC_DOMAIN}
+istio:
+  jwt:
+    issuer: https://authentik.${PUBLIC_DOMAIN}/
+    jwksUri: http://authentik-server.authentik/application/o/app-web/jwks/
+  adminGroup: notopia-admins
+  publicRules:
+  - paths:
+    - /note/health/*
+    - /authorization/health/*
+    - /billing/health/*
+    - /document/health/*
+  - paths:
+    - /billing/webhooks/stripe
+  - paths:
+    - /billing/plans
+    methods:
+    - GET
+  - paths:
+    - /document/ws/document
+  telemetry:
+    enabled: true
+    tracingProviders:
+    - otel-trace
+    accessLogProviders:
+    - otel-log

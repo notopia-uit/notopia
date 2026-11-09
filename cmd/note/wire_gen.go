@@ -13,7 +13,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
-	"github.com/notopia-uit/notopia/internal/note/controller/cron"
+	cron2 "github.com/notopia-uit/notopia/internal/note/controller/cron"
 	"github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
@@ -29,21 +29,23 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/search"
 	"github.com/notopia-uit/notopia/internal/note/infra/service"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
+	"github.com/notopia-uit/notopia/pkg/common/cli"
 	"github.com/notopia-uit/notopia/pkg/common/http"
+	"github.com/notopia-uit/notopia/pkg/cron"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
 // Injectors from wire.go:
 
-func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
+func InitializeServer(ctx context.Context) (cli.Runner, func(), error) {
 	validate := component.ProvideValidate()
 	viper := config.NewViper()
-	configConfig, err := config.New(validate, viper)
+	v, err := config.New(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &configConfig.Database
+	sql := &v.Database
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
@@ -75,8 +77,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	db := persistence.NewPgxPoolStdlib(pool)
-	log := &configConfig.Log
-	general := &configConfig.General
+	log := &v.Log
+	general := &v.General
 	stdoutHandler := logging.NewStdoutHandler(log, general)
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
@@ -99,8 +101,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger, global)
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, global)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
-	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
-	services := &configConfig.Services
+	services := &v.Services
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
 	authorization, cleanup5, err := service.NewAuthorization(services, loggingLogger, global)
 	if err != nil {
@@ -110,13 +111,13 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	advanced := &configConfig.Advanced
+	advanced := &v.Advanced
 	domainEvent := advanced.DomainEvent
 	loggerAdapter := logging.NewWatermill(logger)
 	configDomainEvent := &advanced.DomainEvent
-	defaultPostgreSQLSchema := outbox.NewSchemaAdapter(configDomainEvent)
+	postgreSQLQueueSchema := outbox.NewSchemaAdapter(configDomainEvent)
 	jsonMarshaler := component.NewWatermillJsonMarshaler()
-	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName, jsonMarshaler, global)
+	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, postgreSQLQueueSchema, serviceName, jsonMarshaler, global)
 	runInTx := pgrepo.NewRunInTx(fromPersistenceToQSLForwarder)
 	unitOfWork := pgrepo.NewUnitOfWork(pool, fromPersistenceToQSLForwarder, runInTx)
 	changeWorkspaceSlugHandler := app.NewChangeWorkspaceSlugHandler(authorization, unitOfWork)
@@ -146,7 +147,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspace := pgrepo.NewNoTransactionWorkspace(pool, queries, runInTx)
 	publishWorkspaceHandler := app.NewPublishWorkspaceHandler(workspace)
 	trashWorkspaces := pgreadmodel.NewTrashWorkspaces(queries)
-	commonconfigIdentity := &configConfig.Identity
+	commonconfigIdentity := &v.Identity
 	purgeExpiredTrashHandler := app.NewPurgeExpiredTrashHandler(unitOfWork, trashWorkspaces, billing, trashService, commonconfigIdentity)
 	renameFolderHandler := app.NewRenameFolderHandler(authorization, unitOfWork)
 	renameNoteHandler := app.NewRenameNoteHandler(authorization, unitOfWork)
@@ -156,7 +157,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	unpublishNoteHandler := app.NewUnpublishNoteHandler(pgrepoNote)
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	workspaceEvent := &advanced.WorkspaceEvent
-	redis := &configConfig.Redis
+	redis := &v.Redis
 	redisClient, cleanup7 := common.NewRedisClient(ctx, redis, logger)
 	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName, global)
 	if err != nil {
@@ -170,11 +171,11 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization, billing)
-	cmds := app.NewCmds(handlerProvider, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, emptyTrashHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, purgeExpiredTrashHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
+	cmds := app.NewCmds(tracerProvider, logger, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, emptyTrashHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, purgeExpiredTrashHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
 	billingChangedHandler := app.NewBillingChangedHandler(workspaceEventHub, commonconfigIdentity)
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
-	kafka := &configConfig.Kafka
+	kafka := &v.Kafka
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
 	kafkaPublisher, cleanup8, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
@@ -236,10 +237,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(authorization, billing, workspaceGraph)
 	workspaceBySlug := pgreadmodel.NewWorkspaceBySlug(queries)
 	getWorkspaceBySlugHandler := app.NewGetWorkspaceBySlugHandler(authorization, workspaceBySlug)
-	authentik := &configConfig.Authentik
+	authentik := &v.Authentik
 	identityAuthentik := identity.NewAuthentik(authentik, logger, global)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(identityAuthentik, authorization)
-	meilisearch := &configConfig.Meilisearch
+	meilisearch := &v.Meilisearch
 	searchMeilisearch := search.NewMeilisearch(meilisearch, logger, global)
 	getWorkspaceSearchTokenHandler := app.NewGetWorkspaceSearchTokenHandler(authorization, searchMeilisearch)
 	workspaceTree := pgreadmodel.NewWorkspaceTree(queries)
@@ -247,14 +248,14 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	searchUsersHandler := app.NewSearchUsersHandler(identityAuthentik, authorization)
 	showTrash := pgreadmodel.NewShowTrash(queries)
 	showTrashHandler := app.NewShowTrashHandler(authorization, showTrash)
-	appQueries := app.NewQueries(handlerProvider, batchGetNoteWorkspacesHandler, checkWorkspaceSlugExistsHandler, getMyWorkspacesHandler, getNoteGraphHandler, getNoteHandler, getNoteLinksHandler, getWorkspaceByNoteHandler, getWorkspaceGraphHandler, getWorkspaceBySlugHandler, getWorkspaceMembersHandler, getWorkspaceSearchTokenHandler, getWorkspaceTreeHandler, searchUsersHandler, showTrashHandler)
+	appQueries := app.NewQueries(tracerProvider, logger, batchGetNoteWorkspacesHandler, checkWorkspaceSlugExistsHandler, getMyWorkspacesHandler, getNoteGraphHandler, getNoteHandler, getNoteLinksHandler, getWorkspaceByNoteHandler, getWorkspaceGraphHandler, getWorkspaceBySlugHandler, getWorkspaceMembersHandler, getWorkspaceSearchTokenHandler, getWorkspaceTreeHandler, searchUsersHandler, showTrashHandler)
 	server := &app.Server{
 		Cmds:              cmds,
 		Events:            events,
 		Queries:           appQueries,
 		WorkspaceEventHub: workspaceEventHub,
 	}
-	configServer := &configConfig.Server
+	configServer := &v.Server
 	strictHandler, err := http.NewStrictHandler(server, configServer, workspaceEventHub)
 	if err != nil {
 		cleanup8()
@@ -267,8 +268,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	v := http.NewHandler(strictHandler)
-	httpHTTP, cleanup9, err := http.New(ctx, engine, v, configServer, logger)
+	v2 := http.NewHandler(strictHandler)
+	httpHTTP, cleanup9, err := http.New(ctx, engine, v2, configServer, logger)
 	if err != nil {
 		cleanup8()
 		cleanup7()
@@ -308,7 +309,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	v2, err := common.NewCronLocker(redisClient)
+	locker, err := cron.NewRedisLocker(redisClient)
 	if err != nil {
 		cleanup10()
 		cleanup9()
@@ -322,8 +323,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	configCron := &configConfig.Cron
-	cronCron, err := cron.New(server, v2, configCron, logger)
+	configCron := &v.Cron
+	cronCron, err := cron2.New(server, locker, configCron, logger)
 	if err != nil {
 		cleanup10()
 		cleanup9()
@@ -337,7 +338,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, defaultPostgreSQLSchema, pool)
+	postgreSQLQueueOffsetsAdapter := outbox.NewOffsetsAdapter(configDomainEvent)
+	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, postgreSQLQueueSchema, postgreSQLQueueOffsetsAdapter, pool)
 	if err != nil {
 		cleanup10()
 		cleanup9()
@@ -370,6 +372,72 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 var (
 	_wireServiceNameValue    = ServiceName
 	_wireServiceVersionValue = ServiceVersion
+)
+
+func InitializeMigrator(ctx context.Context) (cli.Migrator, func(), error) {
+	validate := component.ProvideValidate()
+	viper := config.NewViper()
+	migrateConfig, err := config.NewMigrateConfig(validate, viper)
+	if err != nil {
+		return nil, nil, err
+	}
+	sql := &migrateConfig.Database
+	serviceName := _wireMetadataServiceNameValue
+	serviceVersion := _wireMetadataServiceVersionValue
+	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
+	if err != nil {
+		return nil, nil, err
+	}
+	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, resource)
+	if err != nil {
+		return nil, nil, err
+	}
+	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, resource)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	textMapPropagator := otel.NewTextMapPropagator()
+	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider, textMapPropagator)
+	pool, cleanup4, err := persistence.NewPgPool(ctx, sql, global)
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	db := persistence.NewPgxPoolStdlib(pool)
+	log := &migrateConfig.Log
+	general := &migrateConfig.General
+	stdoutHandler := logging.NewStdoutHandler(log, general)
+	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
+	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
+	provider, err := persistence.NewGooseProvider(db, logger)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	migrator := persistence.NewMigrator(provider, logger)
+	return migrator, func() {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+	}, nil
+}
+
+var (
+	_wireMetadataServiceNameValue    = ServiceName
+	_wireMetadataServiceVersionValue = ServiceVersion
 )
 
 // wire.go:

@@ -103,12 +103,4 @@ func (p *Pg) Ping(ctx context.Context) error {
 	return p.pgxPool.Ping(ctx)
 }
 
-func (p *Pg) RunMigrations(ctx context.Context) error {
-	_, err := p.gooseProvider.Up(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
-	return nil
-}
-
 var ProvidePg = NewPg

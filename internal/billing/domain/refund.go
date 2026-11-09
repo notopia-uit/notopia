@@ -37,6 +37,11 @@ func UnmarshalRefund(p UnmarshalRefundParams) *Refund {
 	}
 }
 
+// AwaitingSubmission reports a refund that still has to be submitted to the provider.
+func (r *Refund) AwaitingSubmission() bool {
+	return r.status == RefundStatusPending && r.providerRefundID == nil
+}
+
 func (r *Refund) ID() uuid.UUID             { return r.id }
 func (r *Refund) ProviderRefundID() *string { return r.providerRefundID }
 func (r *Refund) PaymentRef() string        { return r.paymentRef }

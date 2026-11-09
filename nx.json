@@ -34,6 +34,60 @@
       "{workspaceRoot}/buf.gen.yaml",
       "{workspaceRoot}/buf.mock.yaml",
       "{workspaceRoot}/buf.yaml"
+    ],
+    "bufVersion": [
+      {
+        "runtime": "buf --version"
+      },
+      {
+        "runtime": "protoc-gen-go --version"
+      },
+      {
+        "runtime": "protoc-gen-go-grpc --version"
+      },
+      {
+        "runtime": "protoc-gen-doc --version"
+      },
+      {
+        "runtime": "mise current npm:ts-proto"
+      }
+    ],
+    "sqlcVersion": [
+      {
+        "runtime": "sqlc version"
+      }
+    ],
+    "mockeryVersion": [
+      {
+        "runtime": "mockery version"
+      }
+    ],
+    "goVersion": [
+      {
+        "runtime": "go version"
+      }
+    ],
+    "chart": [
+      "{projectRoot}/**/*",
+      "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/**/*",
+      "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/.helmignore",
+      {
+        "runtime": "helm version --short"
+      },
+      {
+        "runtime": "helm plugin list"
+      }
+    ],
+    "chartSchema": [
+      "{projectRoot}/Chart.yaml",
+      "{projectRoot}/values.yaml",
+      "{workspaceRoot}/mise.toml"
+    ],
+    "chartReadme": [
+      "{projectRoot}/Chart.yaml",
+      "{projectRoot}/values.yaml",
+      "{projectRoot}/README.md.gotmpl",
+      "{workspaceRoot}/mise.toml"
     ]
   },
   "targetDefaults": {
@@ -75,6 +129,20 @@
     },
     "lint*": {
       "cache": true
+    },
+    "@nx/oxlint:lint": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/oxlint.config.ts",
+        "{workspaceRoot}/oxlint-base.config.mts",
+        "{workspaceRoot}/.eslintignore",
+        "{workspaceRoot}/.gitignore",
+        {
+          "externalDependencies": ["oxlint", "oxlint-tsgolint"]
+        }
+      ]
     }
   },
   "plugins": [

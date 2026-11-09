@@ -1,0 +1,302 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "containerSecurityContext": {
+      "additionalProperties": false,
+      "properties": {
+        "readOnlyRootFilesystem": {
+          "default": "true",
+          "description": "Mount the container root filesystem read-only",
+          "required": [],
+          "title": "readOnlyRootFilesystem"
+        }
+      },
+      "required": [],
+      "title": "containerSecurityContext",
+      "type": "object"
+    },
+    "env": {
+      "additionalProperties": true,
+      "description": " type: object additionalProperties: true @schema",
+      "properties": {
+        "FOO": {
+          "default": "bar",
+          "title": "FOO",
+          "type": "string"
+        }
+      },
+      "required": [
+        "FOO"
+      ],
+      "title": "env",
+      "type": "object"
+    },
+    "envFrom": {
+      "description": " type: array items:   type: object   additionalProperties: true @schema",
+      "items": {
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
+      },
+      "title": "envFrom",
+      "type": "array"
+    },
+    "extraEnv": {
+      "description": " type: array items:   type: object   additionalProperties: true @schema",
+      "items": {
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
+      },
+      "title": "extraEnv",
+      "type": "array"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "hooks": {
+      "additionalProperties": true,
+      "description": " type: object additionalProperties: true @schema",
+      "required": [],
+      "title": "hooks",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "default": "",
+          "title": "digest",
+          "type": "string"
+        },
+        "repository": {
+          "default": "example/app",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "latest",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "tag",
+        "digest"
+      ],
+      "title": "image",
+      "type": "object"
+    },
+    "istio": {
+      "additionalProperties": false,
+      "properties": {
+        "allowedPrincipals": {
+          "items": {
+            "required": []
+          },
+          "title": "allowedPrincipals",
+          "type": "array"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "ports": {
+          "items": {
+            "required": []
+          },
+          "title": "ports",
+          "type": "array"
+        }
+      },
+      "required": [
+        "enabled",
+        "allowedPrincipals",
+        "ports"
+      ],
+      "title": "istio",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "notopia-common-chart": {
+      "additionalProperties": false,
+      "properties": {
+        "global": {
+          "additionalProperties": false,
+          "required": [],
+          "title": "global",
+          "type": "object"
+        }
+      },
+      "required": [
+        "global"
+      ],
+      "title": "notopia-common-chart",
+      "type": "object"
+    },
+    "otel": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "endpoint": {
+          "default": "http://collector:4317",
+          "title": "endpoint",
+          "type": "string"
+        },
+        "protocol": {
+          "default": "grpc",
+          "title": "protocol",
+          "type": "string"
+        },
+        "resourceAttributes": {
+          "additionalProperties": true,
+          "description": " type: object additionalProperties: true @schema",
+          "properties": {
+            "custom": {
+              "default": "value",
+              "title": "custom",
+              "type": "string"
+            }
+          },
+          "required": [
+            "custom"
+          ],
+          "title": "resourceAttributes",
+          "type": "object"
+        }
+      },
+      "required": [
+        "enabled",
+        "endpoint",
+        "protocol"
+      ],
+      "title": "otel",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "additionalProperties": false,
+      "properties": {
+        "fsGroup": {
+          "default": 1000,
+          "description": "Group owning supported writable volumes",
+          "minimum": 1,
+          "title": "fsGroup",
+          "type": "integer"
+        },
+        "runAsGroup": {
+          "default": 1000,
+          "description": "Numeric primary group ID",
+          "minimum": 0,
+          "title": "runAsGroup",
+          "type": "integer"
+        },
+        "runAsNonRoot": {
+          "default": "true",
+          "description": "Require the container to run as a non-root user",
+          "required": [],
+          "title": "runAsNonRoot"
+        },
+        "runAsUser": {
+          "default": 1000,
+          "description": "Numeric user ID; image files must be readable and executable by this user",
+          "minimum": 0,
+          "title": "runAsUser",
+          "type": "integer"
+        }
+      },
+      "required": [],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": {
+          "additionalProperties": true,
+          "description": " type: object additionalProperties: true @schema",
+          "properties": {
+            "memory": {
+              "default": "256Mi",
+              "title": "memory",
+              "type": "string"
+            }
+          },
+          "required": [
+            "memory"
+          ],
+          "title": "limits",
+          "type": "object"
+        },
+        "requests": {
+          "additionalProperties": true,
+          "description": " type: object additionalProperties: true @schema",
+          "required": [],
+          "title": "requests",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "resources",
+      "type": "object"
+    },
+    "runtime": {
+      "default": "go",
+      "title": "runtime",
+      "type": "string"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "default": true,
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "create",
+        "name"
+      ],
+      "title": "serviceAccount",
+      "type": "object"
+    }
+  },
+  "required": [
+    "podSecurityContext",
+    "containerSecurityContext",
+    "image",
+    "nameOverride",
+    "fullnameOverride",
+    "serviceAccount",
+    "resources",
+    "runtime",
+    "otel",
+    "istio",
+    "notopia-common-chart"
+  ],
+  "type": "object"
+}

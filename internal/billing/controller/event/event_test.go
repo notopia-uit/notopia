@@ -55,3 +55,19 @@ func TestDecodeAcksPermanentErrors(t *testing.T) {
 		})
 	}
 }
+
+func TestDecodeRefundRequestedFromOutboxPayload(t *testing.T) {
+	subID, refundID := uuid.New(), uuid.New()
+	var got *refundRequestedMessage
+	handler := decode(func(_ context.Context, ev *refundRequestedMessage) error {
+		got = ev
+		return nil
+	})
+	payload := `{"ID":"` + uuid.NewString() + `","OccurredAt":"2026-11-01T00:00:00Z","AggregateID":"` + subID.String() +
+		`","UserID":"u","RefundID":"` + refundID.String() + `","Amount":{}}`
+
+	require.NoError(t, handler(message.NewMessage("1", []byte(payload))))
+	require.NotNil(t, got)
+	assert.Equal(t, subID, got.AggregateID)
+	assert.Equal(t, refundID, got.RefundID)
+}

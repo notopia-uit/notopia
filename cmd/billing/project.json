@@ -30,7 +30,7 @@
     "run": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "go run ./cmd/billing/",
+        "command": "go run ./cmd/billing/ serve",
         "cwd": "{workspaceRoot}",
         "tty": true
       },
@@ -63,7 +63,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "./billing",
+        "command": "./billing serve",
         "cwd": "{projectRoot}",
         "tty": true
       },
@@ -73,7 +73,7 @@
     "debug": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dlv debug --headless --listen=127.0.0.1:23453 --accept-multiclient --output ./cmd/billing/__debug_bin ./cmd/billing/",
+        "command": "dlv debug --headless --listen=127.0.0.1:23453 --accept-multiclient --output ./cmd/billing/__debug_bin ./cmd/billing/ -- serve",
         "cwd": "{workspaceRoot}",
         "tty": true
       },
@@ -128,7 +128,7 @@
       "dependsOn": ["migration:validate"]
     },
     "gen:sqlc": {
-      "inputs": ["sqlc"],
+      "inputs": ["sqlc", "sqlcVersion"],
       "outputs": ["{workspaceRoot}/internal/billing/infra/persistence/pgsqlc/*.go"],
       "executor": "nx:run-commands",
       "options": {
@@ -145,6 +145,20 @@
     },
     "gen:mockery": {
       "dependsOn": ["^gen:mockery"]
+    },
+    "migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run ./cmd/billing migrate up",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run ./cmd/billing seed",
+        "cwd": "{workspaceRoot}"
+      }
     }
   },
   "implicitDependencies": ["pkg", "internal/billing"],

@@ -1,0 +1,11 @@
+suite: rollout safety
+templates:
+  - deployment.yaml
+tests:
+  - it: avoids overlapping replicas by default
+    asserts:
+      - equal: { path: spec.strategy.type, value: Recreate }
+  - it: avoids overlap even with Redis enabled
+    set: { scaling.enabled: true, scaling.redisUrlSecret.name: redis }
+    asserts:
+      - equal: { path: spec.strategy.type, value: Recreate }

@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
-	pkgcron "github.com/notopia-uit/notopia/pkg/cron"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -18,9 +17,7 @@ func NewRedisClient(
 	cfg *commonconfig.Redis,
 	logger *slog.Logger,
 ) (*RedisClient, func()) {
-	client := redis.NewClient(&redis.Options{
-		Addr: cfg.Addr,
-	})
+	client := redis.NewClient(cfg.Options())
 	cleanup := func() {
 		if err := client.Close(); err != nil {
 			logger.ErrorContext(ctx, "failed to shutdown Redis client", slog.Any("error", err))
@@ -30,9 +27,3 @@ func NewRedisClient(
 }
 
 var ProvideRedisClient = NewRedisClient
-
-func NewCronLocker(client *RedisClient) (pkgcron.Locker, error) {
-	return pkgcron.NewRedisLocker(client.Client)
-}
-
-var ProvideCronLocker = NewCronLocker

@@ -1,0 +1,114 @@
+# -- Override the chart name
+nameOverride: ''
+# -- Override the full release name
+fullnameOverride: ''
+security:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Operator acknowledges an externally enforced non-bypassable identity-header boundary
+  externalBoundaryAcknowledged: false
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Operator acknowledges an external JWT, header, and authorization layer when Istio is disabled
+  externalIdentityLayerAcknowledged: false
+gateway:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Create the managed gateway; disabling is unsupported
+  enabled: true
+  # -- GatewayClass name
+  className: istio
+  # @schema
+  # type: object
+  # additionalProperties:
+  #   type: string
+  # @schema
+  # -- Gateway annotations
+  annotations: {}
+  # -- Listener hostname, empty for all hosts
+  hostname: ''
+  # -- Listener port
+  listenerPort: 80
+frontRoute:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Create a route from the front gateway
+  enabled: true
+  # -- Parent gateway references
+  parentRefs: []
+  # -- Route hostnames
+  hostnames: []
+  # -- Namespace of the only front gateway allowed to reach the edge
+  trustedNamespace: ''
+  # -- Gateway API name of the only front gateway allowed to reach the edge
+  trustedGateway: ''
+istio:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Enable Istio authentication and authorization
+  enabled: true
+  jwt:
+    # -- JWT issuer; replace the nonfunctional example before deployment
+    issuer: 'https://auth.example.invalid/'
+    # -- JWKS endpoint; replace the nonfunctional example before deployment
+    jwksUri: 'https://auth.example.invalid/jwks'
+  # @schema
+  # type: array
+  # items:
+  #   type: object
+  #   additionalProperties: false
+  #   required: [paths]
+  #   properties:
+  #     paths:
+  #       type: array
+  #       minItems: 1
+  #       items: {type: string, minLength: 1}
+  #     methods:
+  #       type: array
+  #       minItems: 1
+  #       items:
+  #         type: string
+  #         enum: [GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, CONNECT, TRACE]
+  # @schema
+  # -- Additional public rules; paths must not overlap protected group paths
+  publicRules: []
+  # @schema
+  # type: array
+  # items:
+  #   type: object
+  #   additionalProperties: false
+  #   required: [paths, groups]
+  #   properties:
+  #     paths:
+  #       type: array
+  #       minItems: 1
+  #       items: {type: string, minLength: 1}
+  #     groups:
+  #       type: array
+  #       minItems: 1
+  #       items: {type: string, minLength: 1}
+  # @schema
+  # -- Additional group-protected paths and permitted groups
+  groupRules: []
+  # -- Group required for billing administration
+  adminGroup: admin
+  telemetry:
+    # @schema
+    # type: boolean
+    # @schema
+    # -- Enable Istio telemetry
+    enabled: false
+    # -- Tracing provider names
+    tracingProviders: []
+    # -- Access logging provider names
+    accessLogProviders: []
+    # -- Trace sampling percentage
+    randomSamplingPercentage: 100
+
+# -- Common library configuration
+notopia-common-chart: { global: {} }

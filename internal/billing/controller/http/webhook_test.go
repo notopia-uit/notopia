@@ -1,7 +1,8 @@
 package http
 
 import (
-	"context"
+	"bytes"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -47,41 +48,90 @@ func newWebhookFixture(t *testing.T) *webhookFixture {
 	return f
 }
 
-func webhookContext(payload []byte) context.Context {
-	c, _ := gin.CreateTestContext(httptest.NewRecorder())
-	c.Set(rawBodyKey, payload)
-	return c
+func (f *webhookFixture) post(t *testing.T, payload []byte, signature string) *httptest.ResponseRecorder {
+	t.Helper()
+	gin.SetMode(gin.TestMode)
+	validate, err := ValidateHandler()
+	require.NoError(t, err)
+	engine := gin.New()
+	engine.Use(validate)
+	billing.RegisterHandlersWithOptions(engine, NewHandler(f.handler), handlerOptions())
+
+	req := httptest.NewRequest(http.MethodPost, "/billing/webhooks/stripe", bytes.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Stripe-Signature", signature)
+	rec := httptest.NewRecorder()
+	engine.ServeHTTP(rec, req)
+	return rec
+}
+
+func sign(payload []byte) string {
+	return webhook.GenerateTestSignedPayload(&webhook.UnsignedPayload{Payload: payload, Secret: testWebhookSecret}).Header
 }
 
 const invoicePaidPayload = `{"id":"evt_1","object":"event","api_version":"2020-08-27","type":"invoice.paid",` +
 	`"data":{"object":{"id":"in_1","object":"invoice","parent":{"subscription_details":{"subscription":"sub_123"}}}}}`
 
-func TestStripeWebhookInvoicePaidSyncsSubscription(t *testing.T) {
-	f := newWebhookFixture(t)
-	payload := []byte(invoicePaidPayload)
-	signed := webhook.GenerateTestSignedPayload(&webhook.UnsignedPayload{Payload: payload, Secret: testWebhookSecret})
+const invoicePaidPrettyPayload = `{
+  "id": "evt_1",
+  "object": "event",
+  "api_version": "2020-08-27",
+  "type": "invoice.paid",
+  "data": {
+    "object": {
+      "id": "in_1",
+      "object": "invoice",
+      "parent": {
+        "subscription_details": {
+          "subscription": "sub_123"
+        }
+      }
+    }
+  }
+}`
+
+func (f *webhookFixture) expectInvoicePaid() {
 	f.syncSubscription.EXPECT().
 		Handle(mock.Anything, &app.SyncSubscription{EventID: "evt_1", EventType: "invoice.paid", ProviderSubscriptionID: "sub_123"}).
 		Return(nil).
 		Once()
+}
 
-	res, err := f.handler.StripeWebhook(webhookContext(payload), billing.StripeWebhookRequestObject{
-		Params: billing.StripeWebhookParams{StripeSignature: signed.Header},
-	})
+func TestStripeWebhookInvoicePaidSyncsSubscription(t *testing.T) {
+	f := newWebhookFixture(t)
+	payload := []byte(invoicePaidPayload)
+	f.expectInvoicePaid()
 
-	require.NoError(t, err)
-	assert.IsType(t, billing.StripeWebhook204Response{}, res)
+	rec := f.post(t, payload, sign(payload))
+
+	assert.Equal(t, http.StatusNoContent, rec.Code)
+}
+
+func TestStripeWebhookPrettyPrintedBodyVerifies(t *testing.T) {
+	f := newWebhookFixture(t)
+	payload := []byte(invoicePaidPrettyPayload)
+	f.expectInvoicePaid()
+
+	rec := f.post(t, payload, sign(payload))
+
+	assert.Equal(t, http.StatusNoContent, rec.Code)
+}
+
+func TestStripeWebhookTrailingNewlineBodyVerifies(t *testing.T) {
+	f := newWebhookFixture(t)
+	payload := []byte(invoicePaidPrettyPayload + "\n")
+	f.expectInvoicePaid()
+
+	rec := f.post(t, payload, sign(payload))
+
+	assert.Equal(t, http.StatusNoContent, rec.Code)
 }
 
 func TestStripeWebhookBadSignature(t *testing.T) {
 	f := newWebhookFixture(t)
-	payload := []byte(invoicePaidPayload)
 
-	_, err := f.handler.StripeWebhook(webhookContext(payload), billing.StripeWebhookRequestObject{
-		Params: billing.StripeWebhookParams{StripeSignature: "t=1,v1=bad"},
-	})
+	rec := f.post(t, []byte(invoicePaidPayload), "t=1,v1=bad")
 
-	var e errs.Error
-	require.ErrorAs(t, err, &e)
-	assert.Equal(t, errs.CodeWebhookSignature, e.Code())
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	assert.Contains(t, rec.Body.String(), errs.CodeWebhookSignature.String())
 }

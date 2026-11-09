@@ -21,7 +21,7 @@ export const auth = betterAuth({
           clientSecret: process.env.AUTHENTIK_CLIENT_SECRET as string,
           discoveryUrl: process.env.AUTHENTIK_CLIENT_DISCOVERY_URL as string,
           redirectURI: process.env.AUTHENTIK_REDIRECT_URI as string,
-          scopes: ['openid', 'profile', 'email', 'offline_access'],
+          scopes: ['openid', 'profile', 'email', 'offline_access', 'notopia'],
         },
       ],
     }),

@@ -46,7 +46,7 @@ func (a *BillingAccount) ChangePayer(payer Payer, now time.Time, userID string) 
 	a.payer = payer
 	a.payerMissingSince = nil
 	a.updatedAt = now
-	a.record(&PayerChangedEvent{BaseEvent: NewBaseEvent(a.workspaceID.String(), userID), PayerID: payer.ID})
+	a.record(&PayerChangedEvent{BaseEvent: NewBaseEvent(a.workspaceID.String(), userID), PayerID: payer.ID()})
 }
 
 func (a *BillingAccount) MarkPayerMissing(now time.Time, userID string) {
@@ -59,7 +59,7 @@ func (a *BillingAccount) MarkPayerMissing(now time.Time, userID string) {
 }
 
 func (a *BillingAccount) UpdateContact(email, name string, now time.Time, userID string) {
-	a.payer.Email, a.payer.Name = email, name
+	a.payer = a.payer.WithContact(email, name)
 	a.updatedAt = now
 	a.record(&BillingContactUpdatedEvent{BaseEvent: NewBaseEvent(a.workspaceID.String(), userID)})
 }

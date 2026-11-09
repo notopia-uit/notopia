@@ -19,6 +19,7 @@ post:
         schema:
           type: object
           additionalProperties: true
+          x-go-type: json.RawMessage
   responses:
     204:
       description: Event accepted

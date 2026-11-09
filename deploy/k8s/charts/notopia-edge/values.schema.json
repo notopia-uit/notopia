@@ -1,0 +1,300 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "frontRoute": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "description": "Create a route from the front gateway",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "hostnames": {
+          "description": "Route hostnames",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "hostnames"
+        },
+        "parentRefs": {
+          "description": "Parent gateway references",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "parentRefs"
+        },
+        "trustedGateway": {
+          "default": "",
+          "description": "Gateway API name of the only front gateway allowed to reach the edge",
+          "required": [],
+          "title": "trustedGateway"
+        },
+        "trustedNamespace": {
+          "default": "",
+          "description": "Namespace of the only front gateway allowed to reach the edge",
+          "required": [],
+          "title": "trustedNamespace"
+        }
+      },
+      "required": [],
+      "title": "frontRoute",
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "Override the full release name",
+      "required": [],
+      "title": "fullnameOverride"
+    },
+    "gateway": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Gateway annotations",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "className": {
+          "default": "istio",
+          "description": "GatewayClass name",
+          "required": [],
+          "title": "className"
+        },
+        "enabled": {
+          "default": true,
+          "description": "Create the managed gateway; disabling is unsupported",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "hostname": {
+          "default": "",
+          "description": "Listener hostname, empty for all hosts",
+          "required": [],
+          "title": "hostname"
+        },
+        "listenerPort": {
+          "default": "80",
+          "description": "Listener port",
+          "required": [],
+          "title": "listenerPort"
+        }
+      },
+      "required": [],
+      "title": "gateway",
+      "type": "object"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "istio": {
+      "additionalProperties": false,
+      "properties": {
+        "adminGroup": {
+          "default": "admin",
+          "description": "Group required for billing administration",
+          "required": [],
+          "title": "adminGroup"
+        },
+        "enabled": {
+          "default": true,
+          "description": "Enable Istio authentication and authorization",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "groupRules": {
+          "description": "Additional group-protected paths and permitted groups",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "groups": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "paths": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "paths",
+              "groups"
+            ],
+            "type": "object"
+          },
+          "title": "groupRules",
+          "type": "array"
+        },
+        "jwt": {
+          "additionalProperties": false,
+          "properties": {
+            "issuer": {
+              "default": "https://auth.example.invalid/",
+              "description": "JWT issuer; replace the nonfunctional example before deployment",
+              "required": [],
+              "title": "issuer"
+            },
+            "jwksUri": {
+              "default": "https://auth.example.invalid/jwks",
+              "description": "JWKS endpoint; replace the nonfunctional example before deployment",
+              "required": [],
+              "title": "jwksUri"
+            }
+          },
+          "required": [],
+          "title": "jwt",
+          "type": "object"
+        },
+        "publicRules": {
+          "description": "Additional public rules; paths must not overlap protected group paths",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "methods": {
+                "items": {
+                  "enum": [
+                    "GET",
+                    "HEAD",
+                    "POST",
+                    "PUT",
+                    "PATCH",
+                    "DELETE",
+                    "OPTIONS",
+                    "CONNECT",
+                    "TRACE"
+                  ],
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "paths": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "paths"
+            ],
+            "type": "object"
+          },
+          "title": "publicRules",
+          "type": "array"
+        },
+        "telemetry": {
+          "additionalProperties": false,
+          "properties": {
+            "accessLogProviders": {
+              "description": "Access logging provider names",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "accessLogProviders"
+            },
+            "enabled": {
+              "default": false,
+              "description": "Enable Istio telemetry",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "randomSamplingPercentage": {
+              "default": "100",
+              "description": "Trace sampling percentage",
+              "required": [],
+              "title": "randomSamplingPercentage"
+            },
+            "tracingProviders": {
+              "description": "Tracing provider names",
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "tracingProviders"
+            }
+          },
+          "required": [],
+          "title": "telemetry",
+          "type": "object"
+        }
+      },
+      "required": [
+        "jwt",
+        "telemetry"
+      ],
+      "title": "istio",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "Override the chart name",
+      "required": [],
+      "title": "nameOverride"
+    },
+    "notopia-common-chart": {
+      "additionalProperties": false,
+      "description": "Common library configuration",
+      "properties": {
+        "global": {
+          "additionalProperties": false,
+          "required": [],
+          "title": "global",
+          "type": "object"
+        }
+      },
+      "required": [
+        "global"
+      ],
+      "title": "notopia-common-chart"
+    },
+    "security": {
+      "additionalProperties": false,
+      "properties": {
+        "externalBoundaryAcknowledged": {
+          "default": false,
+          "description": "Operator acknowledges an externally enforced non-bypassable identity-header boundary",
+          "title": "externalBoundaryAcknowledged",
+          "type": "boolean"
+        },
+        "externalIdentityLayerAcknowledged": {
+          "default": false,
+          "description": "Operator acknowledges an external JWT, header, and authorization layer when Istio is disabled",
+          "title": "externalIdentityLayerAcknowledged",
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "title": "security",
+      "type": "object"
+    }
+  },
+  "required": [
+    "security",
+    "gateway",
+    "frontRoute",
+    "istio"
+  ],
+  "type": "object"
+}

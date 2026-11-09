@@ -14,6 +14,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
+	"github.com/notopia-uit/notopia/pkg/common/cli"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
 )
@@ -59,10 +60,6 @@ func NewServer(
 }
 
 func (s *Server) Run(ctx context.Context) error {
-	if err := s.persistence.RunMigrations(ctx); err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
-
 	g, ctx := errgroup.WithContext(ctx)
 
 	httpShutdownTimeout := 10 * time.Second
@@ -149,5 +146,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 	return g.Wait()
 }
+
+var _ cli.Runner = (*Server)(nil)
 
 var ProvideServer = NewServer

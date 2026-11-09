@@ -112,16 +112,21 @@ func (p *Provider) invoicePayments(
 		if ip.StatusTransitions != nil && ip.StatusTransitions.PaidAt > 0 {
 			paidAt = time.Unix(ip.StatusTransitions.PaidAt, 0)
 		}
-		out = append(out, domain.PaymentInfo{
-			Amount: domain.Money{
-				Amount:   ip.AmountPaid,
-				Currency: string(ip.Currency),
-			},
+		amount, err := toDomainMoney(ip.AmountPaid, ip.Currency)
+		if err != nil {
+			return nil, err
+		}
+		payment, err := domain.NewPaymentInfo(domain.PaymentInfoParams{
+			Amount:        amount,
 			PaymentRef:    ip.Payment.PaymentIntent.ID,
 			PaidAt:        paidAt,
 			CoverageStart: covStart,
 			CoverageEnd:   covEnd,
 		})
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, payment)
 	}
 	return out, nil
 }
@@ -131,5 +136,5 @@ func (p *Provider) PaymentForIntent(ctx context.Context, paymentIntentID string)
 	if err != nil {
 		return domain.PaymentInfo{}, providerErr("retrieve payment intent", err)
 	}
-	return paymentFromIntent(pi), nil
+	return paymentFromIntent(pi)
 }

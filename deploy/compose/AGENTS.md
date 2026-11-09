@@ -5,33 +5,42 @@ Layout:
 - `infrastructure/` — Authentik, Traefik, Redpanda, Meilisearch, RustFS, dbgate
 - `services/` — per-service dependencies (e.g. `note.yaml` = `note_postgresql` + `note_redis`)
 - `dev/`, `monitoring/`
-- `compose.yaml` — includes the above
+- `compose.yaml` — includes above
 
 #### Authentik
 
 - Users/Client/Role list in `./deploy/compose/infrastructure/authentik-blueprints/users.yaml`
-  > Read this file for login users. Must use Oauth2 flow, doesn't support direct access grant.
-  > If you need debugging, use curl or anything related.
+  > Read file for login users. Must use Oauth2 flow; no direct access grant.
+  > For debugging, use curl or similar.
 - Frontend App in `./deploy/compose/infrastructure/authentik-blueprints/app-web.yaml`
   (includes JWKS, callback URL, etc.)
-- Blueprint docs at: <https://github.com/goauthentik/authentik/tree/main/website/docs/customize/blueprints>
-- When editing a blueprint, authentik will reconcile itself
+- Blueprint docs: <https://github.com/goauthentik/authentik/tree/main/website/docs/customize/blueprints>
+- Authentik reconciles itself after blueprint edits
 
 #### Traefik
 
 - Config in `./deploy/compose/infrastructure/traefik/`: static (`traefik.yaml`) and
   dynamic (`dynamic/*.yaml`, one file per service)
-- Dynamic config includes `agilezebra/jwt-middleware` for authentication; it authorizes
-  using roles mapped from the OIDC `roles` claim, and injects user headers downstream
-- Traefik mounts the host network, so it can reach services at `localhost:{port}`
-- Backend services are routed by **path prefix on a single API host**, and each service
-  excludes its own health path from the JWT middleware. For example:
+- Dynamic config uses `agilezebra/jwt-middleware` for authentication. `notopia`
+  OAuth scope emits `groups_json`, mapped to `X-Forwarded-Groups`; missing mapped claims
+  remove client-supplied headers. Both JWT chains strip `X-Forwarded-Roles`.
+  `jwt-admin` requires `notopia-admins` group.
+- `node --test deploy/compose/infrastructure/traefik/gateway-security.test.mjs` tests
+  disposable gateway with header-echo backend on `/billing/test-headers` and
+  `/billing/admin/test-headers`. Set `GATEWAY_TEST_URL`, `GATEWAY_TEST_USER_TOKEN`,
+  `GATEWAY_TEST_ADMIN_TOKEN`, `GATEWAY_TEST_NO_GROUPS_TOKEN`, and
+  `GATEWAY_TEST_USER_GROUPS` (JSON array), plus `GATEWAY_TEST_API_WEB_TOKEN` and
+  `GATEWAY_TEST_API_WEB_GROUPS` (nonempty JSON array of its actual groups). Never
+  direct echo backend at production.
+- Traefik mounts host network; can reach services at `localhost:{port}`
+- Backend services route by **path prefix on a single API host**; each service
+  excludes its health path from JWT middleware. Example:
   - `api.notopia.localhost/note`          -> note service (`/note/health` is unauthenticated)
   - `api.notopia.localhost/authorization` -> authorization service
   - `api.notopia.localhost/document`      -> document service
     (`/document/ws/document` is the Hocuspocus websocket route)
   - `api.notopia.localhost` (root)        -> api-web (Scalar spec viewer)
-  - When adding a service, add `dynamic/{service}.yaml` and mirror this pattern.
+  - For new service, add `dynamic/{service}.yaml` and mirror pattern.
     Any endpoint that must skip auth (e.g. a payment webhook) needs its own router
     without the JWT middleware.
 

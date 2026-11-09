@@ -32,5 +32,33 @@
         "disabled": true
       }
     }
+  },
+  "formatter": {
+    "prettier": {
+      "disabled": true
+    },
+    "oxfmt": {
+      "command": ["pnpm", "exec", "oxfmt", "--write", "$FILE"],
+      "extensions": [
+        ".css",
+        ".html",
+        ".js",
+        ".json",
+        ".jsx",
+        ".less",
+        ".md",
+        ".scss",
+        ".ts",
+        ".tsx",
+        "yaml"
+      ]
+    },
+    "gofumpt": {
+      "command": ["gofumpt", "-w", "$FILE"],
+      "extensions": [".go", ".mod"]
+    },
+    "gofmt": {
+      "disabled": true
+    }
   }
 }

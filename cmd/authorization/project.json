@@ -32,7 +32,7 @@
     "run": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "go run ./cmd/authorization/",
+        "command": "go run ./cmd/authorization/ serve",
         "cwd": "{workspaceRoot}",
         "tty": true
       },
@@ -65,7 +65,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "./authorization",
+        "command": "./authorization serve",
         "cwd": "{projectRoot}",
         "tty": true
       },
@@ -75,7 +75,7 @@
     "debug": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dlv debug --headless --listen=127.0.0.1:23459 --accept-multiclient --output ./cmd/authorization/__debug_bin ./cmd/authorization/",
+        "command": "dlv debug --headless --listen=127.0.0.1:23459 --accept-multiclient --output ./cmd/authorization/__debug_bin ./cmd/authorization/ -- serve",
         "cwd": "{workspaceRoot}",
         "tty": true
       },
@@ -99,7 +99,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
-      "inputs": ["default", "test"],
+      "inputs": ["default", "test", "goVersion"],
       "outputs": ["{workspaceRoot}/coverage/authorization"],
       "options": {
         "command": "./test.sh",
@@ -117,6 +117,13 @@
         "command": "codecov --disable-telem upload-process --disable-search --file ./coverage/authorization/coverage.out --flag authorization"
       },
       "dependsOn": ["test"]
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run ./cmd/authorization seed",
+        "cwd": "{workspaceRoot}"
+      }
     }
   },
   "implicitDependencies": ["pkg", "internal/authorization"],

@@ -1,0 +1,14 @@
+{{ template "chart.header" . }}
+{{ template "chart.badgesSection" . }}
+{{ template "chart.requirementsSection" . }}
+
+## Scaling safety
+
+Redis configuration alone does not establish safe document scale-out: deletion and permission event delivery to every replica remains unresolved. Keep homelab at one replica until a separately approved fix and multi-replica integration test exist.
+
+## Health route exposure
+
+`route.exposeHealth: false` creates a more-specific health rule without a backend, preventing this route from forwarding `/document/health` and its descendants. Gateway API documentation specifies a gateway error response (404 or 500 depending on version), not an authorization response. Other routes, listeners, direct service access, URL normalization, and gateway implementation behavior remain outside this chart's control; use a gateway authorization policy when a security boundary is required.
+
+{{ template "chart.valuesSection" . }}
+{{ template "helm-docs.versionFooter" . }}

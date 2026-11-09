@@ -30,7 +30,7 @@ type BillingAccountRepo interface {
 type PriceRepo interface {
 	GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Price, error)
 	GetByProviderPriceID(ctx context.Context, id string) (*Price, error)
-	GetActive(ctx context.Context, plan PlanTier, interval Interval, currency string, forUpdate bool) (*Price, error) // nil, nil when none
+	GetActive(ctx context.Context, plan PlanTier, interval Interval, currency Currency, forUpdate bool) (*Price, error) // nil, nil when none
 	ListActive(ctx context.Context) ([]*Price, error)
 	List(ctx context.Context) ([]*Price, error)
 	Save(ctx context.Context, p *Price) error

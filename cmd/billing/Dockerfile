@@ -1,4 +1,4 @@
-FROM golang:1.26.3-alpine3.23 AS builder
+FROM golang:1.27.3-alpine3.23 AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
@@ -14,3 +14,4 @@ WORKDIR /app
 COPY --from=builder /app/billing .
 EXPOSE 8084 18084 28084
 ENTRYPOINT ["./billing"]
+CMD ["serve"]

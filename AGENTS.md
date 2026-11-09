@@ -28,25 +28,21 @@ packages/                       # JS packages
   lib-server/                   # Shared server-side (node-only) code
   pb/                           # Protobuf generated code, use grpc, protovalidate
   ui/                           # React UI components, using shadcn/ui (@notopia-uit/ui)
-docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.), and AI (superpowers,...)
-story/                          # The stories/blogs while doing this project (AI/human written)
+docs/                           # VitePress docs in src/; agent guidance and non-rendered AI materials outside src/
+  src/stories/                  # Engineering stories and project write-ups
 cmd/                            # Go services (entrypoint only: main.go + wire)
   note/                         # Note service (nx: note)
   authorization/                # Authorization service (nx: authorization)
-  authorizationseed/            # Authorization seed: Casbin policy matrix (nx: authorizationseed)
   authorizationfixtures/        # Authorization dev fixtures: memberships (nx: authorizationfixtures)
   billing/                      # Billing service, Stripe (nx: billing)
   notefixturegen/               # Dev fixture generator (fake notes from Obsidian vault)
-  billingseed/                  # Billing seed: Stripe prices + portal config (nx: billingseed)
   billingfixtures/              # Billing dev fixtures (nx: billingfixtures)
 internal/                       # Internal Go packages (the actual service code)
   note/
   authorization/
-  authorizationseed/
   authorizationfixtures/
   billing/
   notefixturegen/
-  billingseed/
   billingfixtures/
 pkg/                            # Go packages
   api                           # Code gen from oapi-codegen
@@ -57,24 +53,6 @@ pkg/                            # Go packages
   otel
   pb
 ```
-
-### Scoped docs
-
-Read the one for the area you're touching before exploring; they hold the details this file
-deliberately omits.
-
-| Area                                               | Doc                                                             |
-| -------------------------------------------------- | --------------------------------------------------------------- |
-| Contract-first workflow, adding endpoints          | [`api/`](./api/AGENTS.md)                                       |
-| Go DDD/CQRS layout, aggregates, outbox, sqlc/goose | [`internal/note/`](./internal/note/AGENTS.md)                   |
-| Casbin model, roles, policy                        | [`internal/authorization/`](./internal/authorization/AGENTS.md) |
-| Plans, subscriptions, Stripe, entitlements         | [`internal/billing/`](./internal/billing/AGENTS.md)             |
-| Yjs/Hocuspocus, commit pipeline, revisions         | [`apps/document/`](./apps/document/AGENTS.md)                   |
-| Meilisearch indexing                               | [`apps/search-worker/`](./apps/search-worker/AGENTS.md)         |
-| Shared Go packages                                 | [`pkg/`](./pkg/AGENTS.md)                                       |
-| Shared NestJS code, locks module                   | [`packages/lib-server/`](./packages/lib-server/AGENTS.md)       |
-| Scalar API reference site                          | [`apps/api-web/`](./apps/api-web/AGENTS.md)                     |
-| Authentik, Traefik routing, local hosts            | [`deploy/compose/`](./deploy/compose/AGENTS.md)                 |
 
 ## Technologies
 
@@ -98,16 +76,21 @@ deliberately omits.
 ### Go
 
 - Do not run `go generate`, because we don't mange tool via go tool, but via mise. Stick with nx targets
-- Wiring is google/wire: edit `wire.go`, run `nx wire {service}`, never hand-edit `wire_gen.go`.
+- Wiring is google/wire: edit `wire.go`, run `nx run {service}:gen:wire`, never hand-edit `wire_gen.go`.
   Each package exposes `var ProvideX = NewX`
 - Services are DDD + CQRS: layering, command/query rules, domain vs app models, sqlc split are in
-  [`docs/ai/GO_CLEAN_ARCH.md`](./docs/ai/GO_CLEAN_ARCH.md) (read before writing Go service code);
+  [`docs/src/conventions/go-clean-architecture.md`](./docs/src/conventions/go-clean-architecture.md) (read before writing Go service code);
   concrete layout in [`internal/note/AGENTS.md`](./internal/note/AGENTS.md)
 - Shared building blocks (config, `Cmd`/`Query`, gin, otel) are in [`pkg/`](./pkg/AGENTS.md)
 - Go 1.26: `new(value)` / `new(fn(...))` returns a pointer; Go 1.27 supports generic methods on structs
 - Prefer testify for testing, mockery if need interface mocking (list only necessary interfaces)
 - SQLC custom plugin for dynamic query at runtime <https://raw.githubusercontent.com/vtuanjs/sqlc-gen-go/refs/heads/main/README.md>
 - If a (pointer?) struct implement an interface, add e.g. `var _ Interface = (*Struct)(nil)`
+- Do not wrap small/obvious logic (error handling, simple mapping) into a function, inline it for readability
+
+### JS
+
+- Scripting, adhoc, single testing can be written in Typescript and be called with node directly
 
 ### Messaging
 
@@ -164,7 +147,8 @@ deliberately omits.
 
 ### Superpowers
 
-- Skip unnecessary, obvious cases testing for faster, saving tokens
+- Only use the skill when human ask for superpowers workflow
+- Skip unnecessary, not worth, obvious cases testing for faster, resources CI savings
 - Not need to write full code, can use `…`, skip imports, mapper code, or write comments to note expand the code more while writing;
   agents later can fill in the details, but should not skip important logic
 
@@ -175,4 +159,4 @@ Before commit, make sure to:
 - Use conventional commit
 - Should run `oxfmt {pathChanged}` after writing JS code
 - Run `nx lint {projectName} --fix` to apply eslint/golangcilint fix
-- If introduce deps, should run `go mod tidy` for go, and `pnpm install` for JS/TS
+- If introduce deps, should run `go mod tidy` for go, and use pnpm workspace catalog `pnpm install` for Javascript

@@ -16,3 +16,5 @@ var ProviderSet = wire.NewSet(
 		"Kafka",
 	),
 )
+
+var SeedProviderSet = wire.NewSet(ProvideViper, ProvideSeedConfig, wire.FieldsOf(new(*SeedConfig), "General", "Log", "Database"))

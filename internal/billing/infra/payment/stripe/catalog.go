@@ -34,11 +34,15 @@ func (p *Provider) CreatePrice(ctx context.Context, in app.PriceInput) (string, 
 	if err := p.ensureProduct(ctx, tier); err != nil {
 		return "", err
 	}
+	currency, err := toStripeCurrency(in.Amount.Currency())
+	if err != nil {
+		return "", err
+	}
 	params := &stripego.PriceCreateParams{
 		Product:           stripego.String(productID(tier)),
-		Currency:          stripego.String(in.Amount.Currency),
-		UnitAmount:        stripego.Int64(in.Amount.Amount),
-		LookupKey:         stripego.String(domain.LookupKey(in.Plan, in.Interval)),
+		Currency:          stripego.String(string(currency)),
+		UnitAmount:        stripego.Int64(in.Amount.Amount()),
+		LookupKey:         stripego.String(domain.PriceLookupKey(in.Plan, in.Interval)),
 		TransferLookupKey: stripego.Bool(true),
 		Metadata:          map[string]string{"price_id": in.PriceID.String()},
 	}
@@ -79,14 +83,16 @@ func (p *Provider) CreatePortalConfiguration(ctx context.Context, activePrices [
 			Mode:    stripego.String(string(stripego.BillingPortalConfigurationFeaturesSubscriptionCancelModeAtPeriodEnd)),
 		},
 		SubscriptionUpdate: &stripego.BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParams{
-			Enabled:               stripego.Bool(len(products) > 0),
-			DefaultAllowedUpdates: []*string{stripego.String("price")},
-			Products:              products,
-			ProrationBehavior:     stripego.String("always_invoice"),
+			Enabled: stripego.Bool(len(products) > 0),
+			DefaultAllowedUpdates: []*string{
+				stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdatePrice),
+			},
+			Products:          products,
+			ProrationBehavior: stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehaviorAlwaysInvoice),
 			ScheduleAtPeriodEnd: &stripego.BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndParams{
 				Conditions: []*stripego.BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionParams{
-					{Type: stripego.String("decreasing_item_amount")},
-					{Type: stripego.String("shortening_interval")},
+					{Type: stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeDecreasingItemAmount)},
+					{Type: stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeShorteningInterval)},
 				},
 			},
 		},

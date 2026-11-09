@@ -15,22 +15,24 @@ import (
 	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/authorization/controller/health"
 	"github.com/notopia-uit/notopia/internal/authorization/infra"
+	"github.com/notopia-uit/notopia/internal/authorization/seed"
+	"github.com/notopia-uit/notopia/pkg/common/cli"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
 // Injectors from wire.go:
 
-func InitializeServer(ctx context.Context) (*authorization.Server, func(), error) {
+func InitializeServer(ctx context.Context) (cli.Runner, func(), error) {
 	validate := authorization.NewValidate()
 	viper := config.NewViper()
-	configConfig, err := config.NewConfig(validate, viper)
+	v, err := config.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &configConfig.Database
-	log := &configConfig.Log
-	general := &configConfig.General
+	sql := &v.Database
+	log := &v.Log
+	general := &v.General
 	stdoutHandler := logging.NewStdoutHandler(log, general)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
@@ -81,10 +83,9 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		cleanup()
 		return nil, nil, err
 	}
-	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(transactionalEnforcer)
-	kafka := &configConfig.Kafka
+	kafka := &v.Kafka
 	loggerAdapter := logging.NewWatermill(logger)
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
 	integrationPublisher, cleanup5, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
@@ -97,20 +98,20 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer, integrationPublisher)
 	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(transactionalEnforcer, integrationPublisher)
-	cmds := app.NewCmds(handlerProvider, createWorkspaceHandler, deleteWorkspaceHandler, updateWorkspaceMembersHandler, leaveWorkspaceHandler)
+	cmds := app.NewCmds(tracerProvider, logger, createWorkspaceHandler, deleteWorkspaceHandler, updateWorkspaceMembersHandler, leaveWorkspaceHandler)
 	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
 	getUserWorkspacesHandler := app.NewGetUserWorkspacesHandler(transactionalEnforcer)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
 	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
 	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
-	queries := app.NewQueries(handlerProvider, getUserWorkspaceItemPermissionsHandler, getUserWorkspacesHandler, getWorkspaceMembersHandler, hasWorkspaceItemPermissionHandler, hasWorkspacePermissionHandler)
+	queries := app.NewQueries(tracerProvider, logger, getUserWorkspaceItemPermissionsHandler, getUserWorkspacesHandler, getWorkspaceMembersHandler, hasWorkspaceItemPermissionHandler, hasWorkspacePermissionHandler)
 	appApp := &app.App{
 		Enforcer: transactionalEnforcer,
 		Cmds:     cmds,
 		Queries:  queries,
 	}
 	service := grpc.NewService(appApp)
-	serverConfig := &configConfig.Server
+	serverConfig := &v.Server
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
 	server, cleanup6, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger, global)
 	if err != nil {
@@ -145,6 +146,80 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 var (
 	_wireServiceNameValue    = ServiceName
 	_wireServiceVersionValue = ServiceVersion
+)
+
+func InitializeSeeder(ctx context.Context) (cli.Seeder, func(), error) {
+	validate := seed.NewValidate()
+	viper := config.NewViper()
+	seedConfig, err := config.NewSeedConfig(validate, viper)
+	if err != nil {
+		return nil, nil, err
+	}
+	sql := &seedConfig.Database
+	log := &seedConfig.Log
+	general := &seedConfig.General
+	stdoutHandler := logging.NewStdoutHandler(log, general)
+	serviceName := _wireMetadataServiceNameValue
+	serviceVersion := _wireMetadataServiceVersionValue
+	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
+	if err != nil {
+		return nil, nil, err
+	}
+	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, resource)
+	if err != nil {
+		return nil, nil, err
+	}
+	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
+	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
+	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, resource)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	textMapPropagator := otel.NewTextMapPropagator()
+	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider, textMapPropagator)
+	db, cleanup4, err := infra.NewGORMDB(sql, logger, global)
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	adapter, err := infra.NewCasbinAdapter(db)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	slogLogger := infra.NewCasbinLogger(logger)
+	transactionalEnforcer, err := app.NewCasbinEnforcer(adapter, slogLogger)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	seeder := seed.NewSeeder(transactionalEnforcer, logger)
+	return seeder, func() {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+	}, nil
+}
+
+var (
+	_wireMetadataServiceNameValue    = ServiceName
+	_wireMetadataServiceVersionValue = ServiceVersion
 )
 
 // wire.go:

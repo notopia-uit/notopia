@@ -12,7 +12,9 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
 	"github.com/notopia-uit/notopia/internal/billing/controller/http"
+	"github.com/notopia-uit/notopia/internal/billing/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
+	"github.com/notopia-uit/notopia/pkg/common/cli"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
 )
@@ -23,6 +25,7 @@ type Server struct {
 	http        *http.HTTP
 	grpc        *grpc.GRPC
 	event       *event.Event
+	outbox      *outbox.Forwarder
 	cron        *cron.Cron
 	health      *health.Health
 	logger      *slog.Logger
@@ -34,6 +37,7 @@ func NewServer(
 	http *http.HTTP,
 	grpc *grpc.GRPC,
 	event *event.Event,
+	outbox *outbox.Forwarder,
 	cron *cron.Cron,
 	health *health.Health,
 	logger *slog.Logger,
@@ -47,22 +51,18 @@ func NewServer(
 		http:        http,
 		grpc:        grpc,
 		event:       event,
+		outbox:      outbox,
 		cron:        cron,
 		health:      health,
 		logger:      logger,
 	}
 }
 
+var _ cli.Runner = (*Server)(nil)
+
 var ProvideServer = NewServer
 
 func (s *Server) Run(ctx context.Context) error {
-	if err := s.persistence.RunMigrations(ctx); err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
-	if err := s.app.Cmds.EnsureDefaults.Handle(ctx, &app.EnsureDefaults{}); err != nil {
-		return fmt.Errorf("failed to ensure billing defaults: %w", err)
-	}
-
 	g, ctx := errgroup.WithContext(ctx)
 
 	httpShutdownTimeout := 10 * time.Second
@@ -110,6 +110,10 @@ func (s *Server) Run(ctx context.Context) error {
 			return fmt.Errorf("failed to run event router: %w", err)
 		}
 		return nil
+	})
+
+	g.Go(func() error {
+		return s.outbox.Run(ctx)
 	})
 
 	g.Go(func() error {

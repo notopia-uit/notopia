@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type TrashedBy string
@@ -68,6 +69,15 @@ func AllTrashedByValues() []TrashedBy {
 		TrashedByPurpose,
 		TrashedByParent,
 	}
+}
+
+type Eventstoforward struct {
+	Offset    int32
+	Uuid      string
+	Payload   []byte
+	Metadata  []byte
+	Acked     bool
+	CreatedAt pgtype.Timestamptz
 }
 
 type Folder struct {

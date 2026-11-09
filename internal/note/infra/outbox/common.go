@@ -5,10 +5,12 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/config"
 )
 
+const ForwarderTopic = "note_outbox_forwarder"
+
 func NewSchemaAdapter(
 	cfg *config.DomainEvent,
-) *sql.DefaultPostgreSQLSchema {
-	return &sql.DefaultPostgreSQLSchema{
+) *sql.PostgreSQLQueueSchema {
+	return &sql.PostgreSQLQueueSchema{
 		GenerateMessagesTableName: func(_ string) string {
 			return cfg.OutboxTableName
 		},
@@ -16,3 +18,16 @@ func NewSchemaAdapter(
 }
 
 var ProvideSchemaAdapter = NewSchemaAdapter
+
+func NewOffsetsAdapter(
+	cfg *config.DomainEvent,
+) *sql.PostgreSQLQueueOffsetsAdapter {
+	return &sql.PostgreSQLQueueOffsetsAdapter{
+		DeleteOnAck: true,
+		GenerateMessagesTableName: func(_ string) string {
+			return cfg.OutboxTableName
+		},
+	}
+}
+
+var ProvideOffsetsAdapter = NewOffsetsAdapter

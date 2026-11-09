@@ -1,0 +1,364 @@
+podSecurityContext:
+  # -- Require the container to run as a non-root user
+  runAsNonRoot: true
+  # @schema
+  # type: integer
+  # minimum: 0
+  # @schema
+  # -- Numeric user ID; image files must be readable and executable by this user
+  runAsUser: 1000
+  # @schema
+  # type: integer
+  # minimum: 0
+  # @schema
+  # -- Numeric primary group ID
+  runAsGroup: 1000
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Group owning supported writable volumes
+  fsGroup: 1000
+containerSecurityContext:
+  # -- Mount the container root filesystem read-only
+  readOnlyRootFilesystem: true
+# @schema
+# type: string
+# @schema
+# -- Override chart name
+nameOverride: ''
+# @schema
+# type: string
+# @schema
+# -- Override release name
+fullnameOverride: ''
+image:
+  # @schema
+  # type: string
+  # @schema
+  # -- Image repository
+  repository: ghcr.io/notopia-uit/document
+  # @schema
+  # type: string
+  # @schema
+  # -- Image version
+  tag: latest
+  # @schema
+  # type: string
+  # @schema
+  # -- Immutable image digest
+  digest: ''
+  # @schema
+  # type: string
+  # @schema
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
+# -- Image pull secrets
+imagePullSecrets: []
+# @schema
+# type: integer
+# minimum: 0
+# @schema
+# -- Number of replicas
+replicaCount: 1
+serviceAccount:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Create service account
+  create: true
+  # @schema
+  # type: string
+  # @schema
+  # -- Existing or created account name
+  name: ''
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  # -- Service account annotations
+  annotations: {}
+resources:
+  # @schema
+  # type: object
+  # additionalProperties:
+  #   anyOf:
+  #     - type: string
+  #     - type: number
+  # properties:
+  #   cpu:
+  #     anyOf:
+  #       - type: string
+  #       - type: number
+  #   memory:
+  #     anyOf:
+  #       - type: string
+  #       - type: number
+  # @schema
+  # -- Container resource requests
+  requests: { cpu: 50m, memory: 64Mi }
+  # @schema
+  # type: object
+  # additionalProperties:
+  #   anyOf:
+  #     - type: string
+  #     - type: number
+  # properties:
+  #   cpu:
+  #     anyOf:
+  #       - type: string
+  #       - type: number
+  #   memory:
+  #     anyOf:
+  #       - type: string
+  #         pattern: '^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$'
+  #       - type: integer
+  #         minimum: 0
+  # @schema
+  # -- Container resource limits; memory must be an integer quantity (e.g. 256Mi or 2Gi), not fractional
+  limits: { memory: 256Mi }
+# @schema
+# type: string
+# @schema
+# -- Application runtime
+runtime: node
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+# -- Plain environment
+env: {}
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
+# -- Additional environment entries
+extraEnv: []
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
+# -- External environment sources
+envFrom: []
+scaling:
+  # -- Enable Hocuspocus Redis integration; not sufficient for safe scale-out
+  enabled: false
+  # -- Existing Redis URL secret
+  redisUrlSecret: { name: '', key: url }
+route:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Create HTTPRoute
+  enabled: true
+  # @schema
+  # type: array
+  # items:
+  #   type: object
+  #   additionalProperties: true
+  # @schema
+  # -- Gateway parent references
+  parentRefs: []
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  # @schema
+  # -- Route hostnames
+  hostnames: []
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Forward health endpoints; false matches health without a backend, returning a gateway error
+  exposeHealth: true
+autoscaling:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Enable horizontal scaling
+  enabled: false
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Minimum replicas
+  minReplicas: 1
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- Maximum replicas
+  maxReplicas: 3
+  # @schema
+  # type: integer
+  # minimum: 1
+  # @schema
+  # -- CPU utilization target
+  targetCPUUtilizationPercentage: 80
+podDisruptionBudget:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Enable disruption budget
+  enabled: false
+  # @schema
+  # anyOf:
+  #   - type: integer
+  #     minimum: 0
+  #   - type: string
+  #     pattern: '^([0-9]|[1-9][0-9]|100)%$'
+  # @schema
+  # -- Minimum available replicas
+  minAvailable: 1
+otel:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Enable OpenTelemetry environment
+  enabled: true
+  # @schema
+  # type: string
+  # @schema
+  # -- Collector endpoint
+  endpoint: ''
+  # @schema
+  # type: string
+  # @schema
+  # -- Collector protocol
+  protocol: grpc
+  # @schema
+  # type: object
+  # additionalProperties: true
+  # @schema
+  # -- Additional resource attributes
+  resourceAttributes: {}
+hooks:
+  migrate:
+    # @schema
+    # type: integer
+    # minimum: 1
+    # @schema
+    # -- Migration deadline
+    activeDeadlineSeconds: 300
+    # @schema
+    # type: object
+    # additionalProperties: true
+    # properties:
+    #   limits:
+    #     type: object
+    #     additionalProperties: true
+    #     properties:
+    #       memory:
+    #         anyOf:
+    #           - type: string
+    #             pattern: '^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$'
+    #           - type: integer
+    #             minimum: 0
+    # @schema
+    # -- Migration resources, defaults to pod resources; memory limit must be an integer quantity
+    resources: {}
+  seed:
+    # @schema
+    # type: integer
+    # minimum: 1
+    # @schema
+    # -- Seed deadline
+    activeDeadlineSeconds: 300
+    # @schema
+    # type: object
+    # additionalProperties: true
+    # properties:
+    #   limits:
+    #     type: object
+    #     additionalProperties: true
+    #     properties:
+    #       memory:
+    #         anyOf:
+    #           - type: string
+    #             pattern: '^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$'
+    #           - type: integer
+    #             minimum: 0
+    # @schema
+    # -- Seed resources, defaults to pod resources; memory limit must be an integer quantity
+    resources: {}
+istio:
+  # @schema
+  # type: boolean
+  # @schema
+  # -- Enable Istio workload policy
+  enabled: true
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  # @schema
+  # -- Allowed SPIFFE principals
+  allowedPrincipals: []
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  # @schema
+  # -- Protected workload ports
+  ports: ['8082']
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+# -- Additional pod annotations
+podAnnotations: {}
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+# -- Additional pod labels
+podLabels: {}
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+# -- Node selector
+nodeSelector: {}
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
+# -- Pod tolerations
+tolerations: []
+# @schema
+# type: object
+# additionalProperties: true
+# @schema
+# -- Pod affinity
+affinity: {}
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
+# -- Additional volumes
+extraVolumes: []
+# @schema
+# type: array
+# items:
+#   type: object
+#   additionalProperties: true
+# @schema
+# -- Additional volume mounts
+extraVolumeMounts: []
+
+# -- Common library configuration
+notopia-common-chart: { global: {} }

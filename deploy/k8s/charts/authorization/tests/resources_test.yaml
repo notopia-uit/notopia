@@ -1,0 +1,48 @@
+suite: service resources
+set: { istio.enabled: false }
+templates:
+  - service.yaml
+  - httproute.yaml
+  - istio/authorizationpolicy.yaml
+  - job-seed.yaml
+  - hook-serviceaccount.yaml
+tests:
+  - it: exposes service ports
+    template: service.yaml
+    asserts:
+      - contains:
+          path: spec.ports
+          content: { name: grpc, port: 18089, targetPort: grpc, appProtocol: kubernetes.io/h2c }
+      - contains:
+          path: spec.ports
+          content: { name: health, port: 28089, targetPort: health, appProtocol: http }
+  - it: omits Istio security policy when disabled
+    template: istio/authorizationpolicy.yaml
+    set: { istio.enabled: false }
+    asserts:
+      - hasDocuments: { count: 0 }
+  - it: exposes health when enabled
+    template: httproute.yaml
+    set: { route.enabled: true }
+    asserts:
+      - equal: { path: 'spec.rules[0].backendRefs[0].port', value: 28089 }
+  - it: omits the route when health exposure is disabled
+    template: httproute.yaml
+    set: { route.enabled: true, route.exposeHealth: false }
+    asserts:
+      - hasDocuments: { count: 0 }
+  - it: configures seed hook
+    template: job-seed.yaml
+    asserts:
+      - equal: { path: 'metadata.annotations["helm.sh/hook"]', value: 'pre-install,pre-upgrade' }
+      - equal: { path: 'metadata.annotations["helm.sh/hook-weight"]', value: '5' }
+      - equal: { path: 'metadata.annotations["helm.sh/hook-delete-policy"]', value: before-hook-creation }
+      - equal: { path: 'spec.template.spec.containers[0].command', value: ['./authorization', seed] }
+      - equal: { path: spec.template.spec.serviceAccountName, value: RELEASE-NAME-authorization-hook }
+  - it: creates a tokenless account before the seed hook
+    template: hook-serviceaccount.yaml
+    asserts:
+      - equal: { path: 'metadata.annotations["helm.sh/hook"]', value: 'pre-install,pre-upgrade' }
+      - equal: { path: 'metadata.annotations["helm.sh/hook-weight"]', value: '-10' }
+      - equal: { path: 'metadata.annotations["helm.sh/hook-delete-policy"]', value: before-hook-creation }
+      - equal: { path: automountServiceAccountToken, value: false }

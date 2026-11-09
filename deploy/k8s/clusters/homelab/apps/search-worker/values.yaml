@@ -1,0 +1,14 @@
+image:
+  tag: ''
+otel:
+  endpoint: http://alloy-alloy.monitoring.svc:4317
+istio:
+  allowedPrincipals:
+  - cluster.local/ns/notopia/sa/notopia-edge-istio
+envFrom:
+- secretRef:
+    name: search-worker
+env:
+  NOTOPIA_SEARCH_WORKER_MEILI_HOST: http://meilisearch:7700
+  NOTOPIA_SEARCH_WORKER_MEILI_NOTE_SEARCH_KEY_UID: 00000000-0000-4000-8000-000000000001
+  NOTOPIA_SEARCH_WORKER_KAFKA_BROKERS: redpanda.redpanda.svc.cluster.local:9093

@@ -1,0 +1,8 @@
+Provide the external database secret before installing.
+The pre-install/pre-upgrade seed hook does not replace the mandatory external
+seed or maintenance procedure. Policy is loaded only at startup; the hook does
+not prevent mixed-version policy writers or make authorization fail closed.
+Follow the chart README before every install, upgrade, or rollback.
+After failure, keep traffic blocked and controllers suspended until manual
+version-matched recovery; Helm automatic rollback is unsafe for shared policy.
+The retained hook service account must be removed manually after uninstall.

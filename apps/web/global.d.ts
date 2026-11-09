@@ -3,6 +3,7 @@ declare namespace NodeJS {
     BETTER_AUTH_SECRET?: string;
     BETTER_AUTH_URL?: string;
     API_URL?: string;
+    DOCUMENT_WS_URL: string;
     MEILISEARCH_HOST?: string;
     AUTHENTIK_CLIENT_ID?: string;
     AUTHENTIK_CLIENT_SECRET?: string;

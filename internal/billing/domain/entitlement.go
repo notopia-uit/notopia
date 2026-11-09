@@ -9,14 +9,14 @@ import (
 type Entitlements struct {
 	WorkspaceID uuid.UUID
 	Plan        PlanTier
-	Status      Status
+	Status      SubscriptionStatus
 	AccessUntil *time.Time
 	Features    map[FeatureKey]bool
 	Limits      map[LimitKey]int64
 }
 
 func ResolveEntitlements(workspaceID uuid.UUID, sub *Subscription, plans map[PlanTier]*Plan, policy *BillingPolicy, now time.Time) Entitlements {
-	tier, status := PlanTierFree, StatusNone
+	tier, status := PlanTierFree, SubscriptionStatusNone
 	var until *time.Time
 	if sub != nil {
 		status = sub.Status()

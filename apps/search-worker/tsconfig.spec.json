@@ -12,6 +12,8 @@
   "include": [
     "vitest.config.mts",
     "src/**/*.spec.ts",
+    "seed/seed.ts",
+    "seed/otel.ts",
     "../../packages/lib-server/src/block-note/types.d.ts"
   ],
   "exclude": ["out-tsc/**/*"],

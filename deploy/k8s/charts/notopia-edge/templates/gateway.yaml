@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/gateway.networking.k8s.io/gateway_v1.json
+{{- if .Values.gateway.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ include "notopia-common.fullname" . }}
+  labels:
+    {{- include "notopia-common.labels" . | nindent 4 }}
+  {{- with .Values.gateway.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  gatewayClassName: {{ .Values.gateway.className | quote }}
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: {{ .Values.gateway.listenerPort }}
+      {{- with .Values.gateway.hostname }}
+      hostname: {{ . | quote }}
+      {{- end }}
+      allowedRoutes:
+        namespaces:
+          from: Same
+{{- end }}

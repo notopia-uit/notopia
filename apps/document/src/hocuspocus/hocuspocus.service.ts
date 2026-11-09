@@ -12,6 +12,7 @@ import { HocuspocusContext } from './hocuspocus-context';
 
 // Debounce id used by @hocuspocus/server 4.0.0 storeDocumentHooks
 const STORE_DEBOUNCE_ID_PREFIX = 'onStoreDocument-';
+const MAX_FLUSH_PASSES = 5;
 
 @Injectable()
 @Traceable()
@@ -112,6 +113,11 @@ export class HocuspocusService {
   /**
    * Runs the store pending in the Hocuspocus debounce now (or waits for the one running), so a
    * caller reading `documents.data` sees the latest edits. A document not loaded here is a no-op.
+   *
+   * Since @hocuspocus/server 4.1.2 a due store removes its debounce timer before it waits for the
+   * previous store to finish, so for a moment it is neither debounced nor the running one. We
+   * therefore repeat until the debouncer is idle, yielding a macrotask so that queued store can
+   * take the mutex. Bounded, so a document being typed into cannot hold the caller forever.
    */
   async flushStore(documentId: string): Promise<void> {
     const document = this.hocuspocus.hocuspocus.documents.get(documentId);
@@ -120,12 +126,18 @@ export class HocuspocusService {
     }
     const { debouncer } = this.hocuspocus.hocuspocus;
     const debounceId = `${STORE_DEBOUNCE_ID_PREFIX}${documentId}`;
-    if (debouncer.isDebounced(debounceId)) {
-      // executeNow awaits a running execution before starting the debounced one
-      await debouncer.executeNow(debounceId);
-      return;
+    for (let pass = 0; pass < MAX_FLUSH_PASSES; pass++) {
+      if (debouncer.isDebounced(debounceId)) {
+        // executeNow awaits a running execution before starting the debounced one
+        await debouncer.executeNow(debounceId);
+      } else {
+        await document.saveMutex.waitForUnlock();
+      }
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      if (!debouncer.isDebounced(debounceId) && !debouncer.isCurrentlyExecuting(debounceId)) {
+        return;
+      }
     }
-    await document.saveMutex.waitForUnlock();
   }
 
   /**

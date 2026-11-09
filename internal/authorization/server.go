@@ -10,6 +10,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/authorization/controller/health"
 	"github.com/notopia-uit/notopia/internal/authorization/policy"
+	"github.com/notopia-uit/notopia/pkg/common/cli"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
@@ -59,6 +60,8 @@ func NewServer(
 		appEnv: generalCfg.AppEnv,
 	}, nil
 }
+
+var _ cli.Runner = (*Server)(nil)
 
 var ProvideServer = NewServer
 

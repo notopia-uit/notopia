@@ -2,8 +2,22 @@
 http:
   middlewares:
     jwt:
+      chain:
+        middlewares:
+          - strip-forwarded-roles
+          - jwt-auth
+    jwt-admin:
+      chain:
+        middlewares:
+          - strip-forwarded-roles
+          - jwt-admin-auth
+    strip-forwarded-roles:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Roles: ''
+    jwt-auth:
       plugin:
-        jwt:
+        jwt: &jwt-config
           issuers:
             - issuer: http://authentik.notopia.localhost/application/o/api-web/
               jwks: http://authentik.notopia.localhost/application/o/api-web/jwks/
@@ -13,5 +27,11 @@ http:
             X-Forwarded-ID: sub
             X-Forwarded-Email: email
             X-Forwarded-Name: name
-            X-Forwarded-Roles: roles
-            X-Forwarded-Groups: groups
+            X-Forwarded-Groups: groups_json
+          removeMissingHeaders: true
+    jwt-admin-auth:
+      plugin:
+        jwt:
+          <<: *jwt-config
+          require:
+            groups: notopia-admins

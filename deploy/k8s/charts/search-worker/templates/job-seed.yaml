@@ -1,0 +1,11 @@
+{{- $root := merge (dict) . -}}
+{{- $values := deepCopy .Values -}}
+{{- $extra := default list $values.extraEnv -}}
+{{- if and (or (gt (int $values.replicaCount) 1) $values.autoscaling.enabled) (or (not $values.redis.urlSecret.name) (not $values.redis.urlSecret.key)) -}}{{ fail "search-worker scaling requires redis.urlSecret.name and key" }}{{- end -}}
+{{- if $values.redis.urlSecret.name -}}
+{{- if not $values.redis.urlSecret.key -}}{{ fail "redis.urlSecret.key is required" }}{{- end -}}
+{{- $extra = append $extra (dict "name" "NOTOPIA_SEARCH_WORKER_REDIS_URL" "valueFrom" (dict "secretKeyRef" $values.redis.urlSecret)) -}}
+{{- end -}}
+{{- $_ := set $values "extraEnv" $extra -}}
+{{- $_ := set $root "Values" $values -}}
+{{ include "notopia-common.hookJob" (dict "root" $root "name" "seed" "hook" "post-install,post-upgrade" "weight" 5 "command" (list "node" "seed.cjs")) }}

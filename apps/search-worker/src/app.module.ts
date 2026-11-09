@@ -1,5 +1,6 @@
 import { HttpException, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TerminusModule } from '@nestjs/terminus';
 import { createSchema } from '@notopia-uit/lib-server/block-note';
 import { Meilisearch } from 'meilisearch';
 import { OpenTelemetryModule } from 'nestjs-otel';
@@ -20,11 +21,13 @@ import {
   tombstoneConfig,
 } from './config.factory';
 import { validate } from './env.validation';
+import { HealthController, KafkaConsumerState } from './health';
 import { BLOCKNOTE_SCHEMA } from './token';
 import { MemoryTombstoneStore, RedisTombstoneStore, TombstoneStore } from './tombstone';
 
 @Module({
   imports: [
+    TerminusModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
@@ -109,8 +112,9 @@ import { MemoryTombstoneStore, RedisTombstoneStore, TombstoneStore } from './tom
       useFactory: createSchema,
     },
     AppService,
+    KafkaConsumerState,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
 })
 export class AppModule implements OnModuleInit {
   constructor(

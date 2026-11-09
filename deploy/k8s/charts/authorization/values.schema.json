@@ -1,0 +1,655 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "affinity": {
+      "additionalProperties": true,
+      "description": "Pod affinity",
+      "required": [],
+      "title": "affinity",
+      "type": "object"
+    },
+    "autoscaling": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Enable horizontal scaling",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "maxReplicas": {
+          "default": 3,
+          "description": "Maximum replicas",
+          "minimum": 1,
+          "title": "maxReplicas",
+          "type": "integer"
+        },
+        "minReplicas": {
+          "default": 1,
+          "description": "Minimum replicas",
+          "minimum": 1,
+          "title": "minReplicas",
+          "type": "integer"
+        },
+        "targetCPUUtilizationPercentage": {
+          "default": 80,
+          "description": "CPU utilization target",
+          "minimum": 1,
+          "title": "targetCPUUtilizationPercentage",
+          "type": "integer"
+        }
+      },
+      "required": [],
+      "title": "autoscaling",
+      "type": "object"
+    },
+    "containerSecurityContext": {
+      "additionalProperties": false,
+      "properties": {
+        "readOnlyRootFilesystem": {
+          "default": "true",
+          "description": "Mount the container root filesystem read-only",
+          "required": [],
+          "title": "readOnlyRootFilesystem"
+        }
+      },
+      "required": [],
+      "title": "containerSecurityContext",
+      "type": "object"
+    },
+    "database": {
+      "additionalProperties": false,
+      "properties": {
+        "urlSecret": {
+          "additionalProperties": false,
+          "description": "Existing database URI secret",
+          "properties": {
+            "key": {
+              "default": "uri",
+              "title": "key",
+              "type": "string"
+            },
+            "name": {
+              "default": "",
+              "title": "name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "key"
+          ],
+          "title": "urlSecret"
+        }
+      },
+      "required": [],
+      "title": "database",
+      "type": "object"
+    },
+    "env": {
+      "additionalProperties": true,
+      "description": "Plain environment",
+      "required": [],
+      "title": "env",
+      "type": "object"
+    },
+    "envFrom": {
+      "description": "External environment sources",
+      "items": {
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
+      },
+      "title": "envFrom",
+      "type": "array"
+    },
+    "extraEnv": {
+      "description": "Additional environment entries",
+      "items": {
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
+      },
+      "title": "extraEnv",
+      "type": "array"
+    },
+    "extraVolumeMounts": {
+      "description": "Additional volume mounts",
+      "items": {
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
+      },
+      "title": "extraVolumeMounts",
+      "type": "array"
+    },
+    "extraVolumes": {
+      "description": "Additional volumes",
+      "items": {
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
+      },
+      "title": "extraVolumes",
+      "type": "array"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "Override release name",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "hooks": {
+      "additionalProperties": false,
+      "properties": {
+        "migrate": {
+          "additionalProperties": false,
+          "properties": {
+            "activeDeadlineSeconds": {
+              "default": 300,
+              "description": "Migration deadline",
+              "minimum": 1,
+              "title": "activeDeadlineSeconds",
+              "type": "integer"
+            },
+            "resources": {
+              "additionalProperties": true,
+              "description": "Migration resources, defaults to pod resources; memory limit must be an integer quantity",
+              "properties": {
+                "limits": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "memory": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$",
+                          "type": "string"
+                        },
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      ],
+                      "required": []
+                    }
+                  },
+                  "required": [],
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "migrate",
+          "type": "object"
+        },
+        "seed": {
+          "additionalProperties": false,
+          "properties": {
+            "activeDeadlineSeconds": {
+              "default": 300,
+              "description": "Seed deadline",
+              "minimum": 1,
+              "title": "activeDeadlineSeconds",
+              "type": "integer"
+            },
+            "resources": {
+              "additionalProperties": true,
+              "description": "Seed resources, defaults to pod resources; memory limit must be an integer quantity",
+              "properties": {
+                "limits": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "memory": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$",
+                          "type": "string"
+                        },
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      ],
+                      "required": []
+                    }
+                  },
+                  "required": [],
+                  "type": "object"
+                }
+              },
+              "required": [],
+              "title": "resources",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "seed",
+          "type": "object"
+        }
+      },
+      "required": [
+        "migrate",
+        "seed"
+      ],
+      "title": "hooks",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "default": "",
+          "description": "Immutable image digest",
+          "title": "digest",
+          "type": "string"
+        },
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "description": "Image pull policy",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "ghcr.io/notopia-uit/authorization",
+          "description": "Image repository",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "latest",
+          "description": "Image version",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "Image pull secrets",
+      "items": {
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
+      },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "istio": {
+      "additionalProperties": false,
+      "properties": {
+        "allowedPrincipals": {
+          "description": "Allowed SPIFFE principals",
+          "items": {
+            "type": "string"
+          },
+          "title": "allowedPrincipals",
+          "type": "array"
+        },
+        "enabled": {
+          "default": true,
+          "description": "Enable Istio workload policy",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "ports": {
+          "description": "Protected workload ports",
+          "items": {
+            "type": "string"
+          },
+          "title": "ports",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "istio",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "Override chart name",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "additionalProperties": true,
+      "description": "Node selector",
+      "required": [],
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "notopia-common-chart": {
+      "additionalProperties": false,
+      "description": "Common library configuration",
+      "properties": {
+        "global": {
+          "additionalProperties": false,
+          "required": [],
+          "title": "global",
+          "type": "object"
+        }
+      },
+      "required": [
+        "global"
+      ],
+      "title": "notopia-common-chart"
+    },
+    "otel": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "description": "Enable OpenTelemetry environment",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "endpoint": {
+          "default": "",
+          "description": "Collector endpoint",
+          "title": "endpoint",
+          "type": "string"
+        },
+        "protocol": {
+          "default": "grpc",
+          "description": "Collector protocol",
+          "title": "protocol",
+          "type": "string"
+        },
+        "resourceAttributes": {
+          "additionalProperties": true,
+          "description": "Additional resource attributes",
+          "required": [],
+          "title": "resourceAttributes",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "otel",
+      "type": "object"
+    },
+    "podAnnotations": {
+      "additionalProperties": true,
+      "description": "Additional pod annotations",
+      "required": [],
+      "title": "podAnnotations",
+      "type": "object"
+    },
+    "podDisruptionBudget": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Enable disruption budget",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "minAvailable": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "pattern": "^([0-9]|[1-9][0-9]|100)%$",
+              "type": "string"
+            }
+          ],
+          "default": "1",
+          "description": "Minimum available replicas",
+          "required": [],
+          "title": "minAvailable"
+        }
+      },
+      "required": [],
+      "title": "podDisruptionBudget",
+      "type": "object"
+    },
+    "podLabels": {
+      "additionalProperties": true,
+      "description": "Additional pod labels",
+      "required": [],
+      "title": "podLabels",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "additionalProperties": false,
+      "properties": {
+        "fsGroup": {
+          "default": 1000,
+          "description": "Group owning supported writable volumes",
+          "minimum": 1,
+          "title": "fsGroup",
+          "type": "integer"
+        },
+        "runAsGroup": {
+          "default": 1000,
+          "description": "Numeric primary group ID",
+          "minimum": 0,
+          "title": "runAsGroup",
+          "type": "integer"
+        },
+        "runAsNonRoot": {
+          "default": "true",
+          "description": "Require the container to run as a non-root user",
+          "required": [],
+          "title": "runAsNonRoot"
+        },
+        "runAsUser": {
+          "default": 1000,
+          "description": "Numeric user ID; image files must be readable and executable by this user",
+          "minimum": 0,
+          "title": "runAsUser",
+          "type": "integer"
+        }
+      },
+      "required": [],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": 1,
+      "description": "Number of replicas",
+      "minimum": 0,
+      "title": "replicaCount",
+      "type": "integer"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "description": "Container resource limits; memory must be an integer quantity (e.g. 256Mi or 2Gi), not fractional",
+          "properties": {
+            "cpu": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "required": []
+            },
+            "memory": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9]+(Ki|Mi|Gi|Ti|K|M|G|T)?$",
+                  "type": "string"
+                },
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              ],
+              "required": []
+            }
+          },
+          "required": [],
+          "title": "limits",
+          "type": "object"
+        },
+        "requests": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "description": "Container resource requests",
+          "properties": {
+            "cpu": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "required": []
+            },
+            "memory": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "required": []
+            }
+          },
+          "required": [],
+          "title": "requests",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "resources",
+      "type": "object"
+    },
+    "route": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Create HTTPRoute",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "exposeHealth": {
+          "default": true,
+          "description": "Expose health endpoints",
+          "title": "exposeHealth",
+          "type": "boolean"
+        },
+        "hostnames": {
+          "description": "Route hostnames",
+          "items": {
+            "type": "string"
+          },
+          "title": "hostnames",
+          "type": "array"
+        },
+        "parentRefs": {
+          "description": "Gateway parent references",
+          "items": {
+            "additionalProperties": true,
+            "required": [],
+            "type": "object"
+          },
+          "title": "parentRefs",
+          "type": "array"
+        }
+      },
+      "required": [],
+      "title": "route",
+      "type": "object"
+    },
+    "runtime": {
+      "default": "go",
+      "description": "Application runtime",
+      "title": "runtime",
+      "type": "string"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "additionalProperties": true,
+          "description": "Service account annotations",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "create": {
+          "default": true,
+          "description": "Create service account",
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "description": "Existing or created account name",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "tolerations": {
+      "description": "Pod tolerations",
+      "items": {
+        "additionalProperties": true,
+        "required": [],
+        "type": "object"
+      },
+      "title": "tolerations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "podSecurityContext",
+    "containerSecurityContext",
+    "image",
+    "serviceAccount",
+    "resources",
+    "database",
+    "route",
+    "autoscaling",
+    "podDisruptionBudget",
+    "otel",
+    "hooks",
+    "istio"
+  ],
+  "type": "object"
+}

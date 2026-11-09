@@ -40,11 +40,11 @@ function setup({
   latest: Partial<RevisionEntity> | null;
 }) {
   const manager = {
-    findOne: vi.fn<(entity: unknown) => Promise<unknown>>(async (entity) =>
-      entity === DocumentEntity ? document : latest
+    findOne: vi.fn<(entity: unknown) => Promise<unknown>>((entity) =>
+      Promise.resolve(entity === DocumentEntity ? document : latest)
     ),
-    save: vi.fn<(...args: unknown[]) => Promise<void>>(async () => undefined),
-    update: vi.fn<(...args: unknown[]) => Promise<void>>(async () => undefined),
+    save: vi.fn<(...args: unknown[]) => Promise<void>>().mockResolvedValue(undefined),
+    update: vi.fn<(...args: unknown[]) => Promise<void>>().mockResolvedValue(undefined),
   };
   const dataSource = {
     transaction: (fn: (m: EntityManager) => Promise<unknown>) =>

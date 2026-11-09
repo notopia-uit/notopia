@@ -24,7 +24,6 @@ var ProviderSetQuery = wire.NewSet(
 )
 
 var ProviderSet = wire.NewSet(
-	ProvideHandlerProvider,
 	ProvideCasbinEnforcer,
 	ProviderSetCommand,
 	ProviderSetQuery,

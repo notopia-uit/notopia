@@ -4,12 +4,17 @@
   "projectType": "library",
   "tags": ["scope:library", "type:go"],
   "namedInputs": {
-    "default": ["{projectRoot}/**/*.go", "{projectRoot}/policy/*.conf", "{projectRoot}/policy/*.csv", "!{projectRoot}/_test.go"]
+    "default": [
+      "{projectRoot}/**/*.go",
+      "{projectRoot}/policy/*.conf",
+      "{projectRoot}/policy/*.csv",
+      "!{projectRoot}/_test.go"
+    ]
   },
   "targets": {
     "gen:mockery": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
+      "inputs": ["default", "mockeryVersion"],
       "options": {
         "command": "mockery",
         "cwd": "{projectRoot}"
