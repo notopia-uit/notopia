@@ -25,11 +25,13 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 		vim.bo[buffer].undofile = false
 
 		local function run_sops(args, input)
-			local result = vim.system(args, {
-				stdin = input,
-				text = true,
-				env = { SOPS_AGE_KEY_FILE = sops_keyfile },
-			}):wait()
+			local result = vim
+				.system(args, {
+					stdin = input,
+					text = true,
+					env = { SOPS_AGE_KEY_FILE = sops_keyfile },
+				})
+				:wait()
 			if result.code ~= 0 then
 				error("SOPS failed: " .. (result.stderr or "unknown error"))
 			end
@@ -67,8 +69,16 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 					error("Decrypt the SOPS buffer before editing or saving")
 				end
 				local ciphertext = run_sops({
-					"sops", "--config", project_root .. "/.sops.yaml", "encrypt",
-					"--filename-override", filename, "--input-type", "yaml", "--output-type", "yaml",
+					"sops",
+					"--config",
+					project_root .. "/.sops.yaml",
+					"encrypt",
+					"--filename-override",
+					filename,
+					"--input-type",
+					"yaml",
+					"--output-type",
+					"yaml",
 				}, contents())
 				local uv = vim.uv
 				local file, temporary = assert(uv.fs_mkstemp(filename .. ".XXXXXX"))
@@ -83,7 +93,9 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 					file = nil
 					assert(uv.fs_rename(temporary, filename))
 				end)
-				if file then uv.fs_close(file) end
+				if file then
+					uv.fs_close(file)
+				end
 				if not ok then
 					uv.fs_unlink(temporary)
 					error(err)

@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { UpgradeDialog } from './billing/upgrade-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
 import {
   Dialog,
@@ -214,6 +215,7 @@ export default function WorkspaceSideBar({
   onNavigate: (href: string) => void;
 }) {
   const { data: sessionData } = getAuthClient().useSession();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const { retry } = useQueryErrorHandler();
 
   const {
@@ -412,9 +414,9 @@ export default function WorkspaceSideBar({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setUpgradeOpen(true)}>
                     <Sparkles />
-                    Upgrade to Pro
+                    Explore plans
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
@@ -423,7 +425,9 @@ export default function WorkspaceSideBar({
                     <BadgeCheck />
                     Account
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => onNavigate(`/workspace/${currentWorkspaceId}/settings/billing`)}
+                  >
                     <CreditCard />
                     Billing
                   </DropdownMenuItem>
@@ -449,6 +453,12 @@ export default function WorkspaceSideBar({
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
+      <UpgradeDialog
+        key={currentWorkspaceId}
+        workspaceId={currentWorkspaceId}
+        open={upgradeOpen}
+        onOpenChange={setUpgradeOpen}
+      />
     </Sidebar>
   );
 }
