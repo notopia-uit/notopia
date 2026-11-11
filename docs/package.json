@@ -16,6 +16,6 @@
     "vitepress-plugin-diagrams": "1.3.1",
     "vitepress-sidebar": "1.41.0",
     "vitest": "catalog:",
-    "wait-on": "9.0.10"
+    "wait-on": "9.5.1"
   }
 }
