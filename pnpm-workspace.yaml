@@ -113,7 +113,7 @@ catalog:
   nestjs-pino: "^4.6.1"
   next: "^16.2.6"
   oidc-client-ts: "^3.5.0"
-  oxfmt: "^0.74.0"
+  oxfmt: "^0.78.0"
   oxlint: "^1.89.0"
   oxlint-tsgolint: "^7.0.2001"
   pg: "^8.23.1"
