@@ -51,23 +51,25 @@ describe('assistant admission across HTTP requests', () => {
     let streams = 0;
     let saved: AssistantTask;
     const tasks = {
-      create: async (
+      create: (
         owner: AssistantTask['owner'],
         promptId: string,
         messages: AssistantTask['messages']
       ) =>
-        (saved = {
-          id: 'task',
-          owner,
-          promptId,
-          messages,
-          deadline: Date.now() + 60000,
-          remainingSteps: 3,
-          pendingCalls: [],
-          state: 'running',
-          revision: 0,
-        }),
-      suspend: async (
+        Promise.resolve(
+          (saved = {
+            id: 'task',
+            owner,
+            promptId,
+            messages,
+            deadline: Date.now() + 60000,
+            remainingSteps: 3,
+            pendingCalls: [],
+            state: 'running',
+            revision: 0,
+          })
+        ),
+      suspend: (
         _id: string,
         _revision: number,
         messages: AssistantTask['messages'],
@@ -83,15 +85,16 @@ describe('assistant admission across HTTP requests', () => {
           state: 'awaiting-client',
           remainingSteps: saved.remainingSteps - steps,
         };
-        return { taskId: 'task', token: 'one-shot', expiresAt: saved.deadline };
+        return Promise.resolve({ taskId: 'task', token: 'one-shot', expiresAt: saved.deadline });
       },
-      claim: async () => {
-        if (saved.state !== 'awaiting-client') throw new Error('Not pending');
+      claim: () => {
+        if (saved.state !== 'awaiting-client') return Promise.reject(new Error('Not pending'));
         saved.state = 'running';
-        return saved;
+        return Promise.resolve(saved);
       },
-      finish: async (_owner: unknown, _id: string, outcome: AssistantTask['state']) => {
+      finish: (_owner: unknown, _id: string, outcome: AssistantTask['state']) => {
         saved.state = outcome;
+        return Promise.resolve();
       },
     };
     const service = new AiService(
@@ -104,35 +107,37 @@ describe('assistant admission across HTTP requests', () => {
         concurrentStreams: 2,
       },
       {
-        getNoteWorkspace: async () => ({ id: workspaceId }),
-        getNote: async () => ({ id: noteId, workspaceId }),
+        getNoteWorkspace: () => Promise.resolve({ id: workspaceId }),
+        getNote: () => Promise.resolve({ id: noteId, workspaceId }),
       } as any,
       {} as any,
       {
-        permissions: async () => ({ canRead: true, canWrite: true }),
-        canRead: async () => true,
+        permissions: () => Promise.resolve({ canRead: true, canWrite: true }),
+        canRead: () => Promise.resolve(true),
       } as any,
-      { monthlyCredits: async () => credits } as any,
+      { monthlyCredits: () => Promise.resolve(credits) } as any,
       {
         throttle: async () => {},
-        reserve: async () => {
-          if (credits !== 1) throw new Error('No credit');
+        reserve: () => {
+          if (credits !== 1) return Promise.reject(new Error('No credit'));
           credits--;
           streams++;
-          return {
+          return Promise.resolve({
             start: async () => {},
-            release: async () => {
+            release: () => {
               streams--;
+              return Promise.resolve();
             },
-          };
+          });
         },
-        acquireContinuationLease: async () => {
+        acquireContinuationLease: () => {
           streams++;
-          return {
-            release: async () => {
+          return Promise.resolve({
+            release: () => {
               streams--;
+              return Promise.resolve();
             },
-          };
+          });
         },
       } as any,
       tasks as any

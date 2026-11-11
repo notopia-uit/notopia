@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createAiTransport, fetchAi } from './ai-transport';
 
 vi.mock('./get-access-token-client-side', () => ({
-  fetchAccessTokenClientSide: async () => 'test-token',
+  fetchAccessTokenClientSide: () => Promise.resolve('test-token'),
 }));
 afterEach(() => vi.unstubAllGlobals());
 

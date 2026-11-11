@@ -22,9 +22,7 @@ describe('AI health', () => {
 
   it('reports not ready when Redis fails', async () => {
     const status = vi.fn();
-    const health = controller(async () => {
-      throw new Error('Redis unavailable');
-    });
+    const health = controller(() => Promise.reject(new Error('Redis unavailable')));
 
     await expect(health.ready({ status } as unknown as Response)).resolves.toEqual({
       status: 'down',

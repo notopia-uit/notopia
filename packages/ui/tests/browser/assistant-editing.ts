@@ -70,8 +70,8 @@ try {
     onData: (part) => runner.onData(part),
     sendAutomaticallyWhen: () => false,
     transport: {
-      reconnectToStream: async () => null,
-      sendMessages: async () => {
+      reconnectToStream: () => Promise.resolve(null),
+      sendMessages: () => {
         requests++;
         const input = JSON.stringify({
           operations: [{ type: 'update', id: 'base$', block: '<p>Streamed change</p>' }],
@@ -128,22 +128,24 @@ try {
                   { type: 'text-end', id: 'done-text' },
                   { type: 'finish', finishReason: 'stop' },
                 ];
-        return new ReadableStream({
-          async start(controller) {
-            for (const chunk of chunks) {
-              controller.enqueue(chunk);
-              await new Promise((r) => setTimeout(r, 5));
-            }
-            controller.close();
-          },
-        });
+        return Promise.resolve(
+          new ReadableStream({
+            async start(controller) {
+              for (const chunk of chunks) {
+                controller.enqueue(chunk);
+                await new Promise((r) => setTimeout(r, 5));
+              }
+              controller.close();
+            },
+          })
+        );
       },
     },
   });
   runner = new AssistantRunner({
     chat,
     session,
-    bridge: async (editor) => new AssistantAiBridge(editor),
+    bridge: (editor) => Promise.resolve(new AssistantAiBridge(editor)),
     cancel: async () => {},
     onChange: () => {},
   });

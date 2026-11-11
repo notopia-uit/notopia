@@ -51,9 +51,9 @@ describe('assistant stream handoff', () => {
   it('does not advertise editing tools to a viewer', async () => {
     let advertised: unknown;
     const viewerModel = new MockLanguageModelV3({
-      doStream: async (options) => {
+      doStream: (options) => {
         advertised = options.tools;
-        return {
+        return Promise.resolve({
           stream: simulateReadableStream({
             initialDelayInMs: null,
             chunkDelayInMs: null,
@@ -69,7 +69,7 @@ describe('assistant stream handoff', () => {
               },
             ],
           }),
-        };
+        });
       },
     });
     const stream = await streamAssistantTask({
@@ -79,12 +79,8 @@ describe('assistant stream handoff', () => {
       canEdit: false,
       maxOutputTokens: 100,
       signal: new AbortController().signal,
-      authorize: async () => {
-        throw new Error('Unexpected edit');
-      },
-      suspend: async () => {
-        throw new Error('Unexpected handoff');
-      },
+      authorize: () => Promise.reject(new Error('Unexpected edit')),
+      suspend: () => Promise.reject(new Error('Unexpected handoff')),
       finish: async () => {},
       release: async () => {},
     });
@@ -104,11 +100,11 @@ describe('assistant stream handoff', () => {
       tools: {},
       maxOutputTokens: 100,
       signal: new AbortController().signal,
-      authorize: async () => {
+      authorize: () => {
         authorized = true;
-        return noteId;
+        return Promise.resolve(noteId);
       },
-      suspend: async (messages, calls, target, steps) => {
+      suspend: (messages, calls, target, steps) => {
         expect(authorized).toBe(true);
         expect(calls).toEqual([
           { toolCallId: 'open', toolName: 'openNoteForEditing', input: { noteId } },
@@ -116,7 +112,7 @@ describe('assistant stream handoff', () => {
         expect(target).toBe(noteId);
         expect(steps).toBe(1);
         saved = messages;
-        return { taskId: task.id, token: 'token', expiresAt: task.deadline };
+        return Promise.resolve({ taskId: task.id, token: 'token', expiresAt: task.deadline });
       },
       finish: async () => {},
       release: async () => {},
@@ -138,14 +134,11 @@ describe('assistant stream handoff', () => {
       tools: {},
       maxOutputTokens: 100,
       signal: new AbortController().signal,
-      authorize: async () => {
-        throw new Error('Access denied');
-      },
-      suspend: async () => {
-        throw new Error('Must not suspend');
-      },
-      finish: async (value) => {
+      authorize: () => Promise.reject(new Error('Access denied')),
+      suspend: () => Promise.reject(new Error('Must not suspend')),
+      finish: (value) => {
         outcome = value;
+        return Promise.resolve();
       },
       release: async () => {},
     });

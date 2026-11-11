@@ -112,9 +112,7 @@ describe('AI stream lifecycle', () => {
   });
   it('masks provider errors and keeps the credit for a started generation', async () => {
     provider.model = new MockLanguageModelV3({
-      doStream: async () => {
-        throw new Error('secret provider credentials');
-      },
+      doStream: () => Promise.reject(new Error('secret provider credentials')),
     });
     const { service, reservation } = setup();
     const chunks = await collect(
@@ -128,9 +126,9 @@ describe('AI stream lifecycle', () => {
   it('refunds if the client disconnects before a generation starts', async () => {
     const { service, reservation, usage } = setup();
     const abort = new AbortController();
-    usage.reserve.mockImplementation(async () => {
+    usage.reserve.mockImplementation(() => {
       abort.abort();
-      return reservation;
+      return Promise.resolve(reservation);
     });
     await expect(service.streamBlockNoteChat(body, 'user', abort.signal)).rejects.toBeDefined();
     expect(reservation.start).not.toHaveBeenCalled();
@@ -138,16 +136,17 @@ describe('AI stream lifecycle', () => {
   });
   it('propagates a timeout to the provider and releases the active stream', async () => {
     provider.model = new MockLanguageModelV3({
-      doStream: async ({ abortSignal }) => ({
-        stream: new ReadableStream({
-          start(controller) {
-            controller.enqueue({ type: 'stream-start', warnings: [] });
-            abortSignal!.addEventListener('abort', () => controller.error(abortSignal!.reason), {
-              once: true,
-            });
-          },
+      doStream: ({ abortSignal }) =>
+        Promise.resolve({
+          stream: new ReadableStream({
+            start(controller) {
+              controller.enqueue({ type: 'stream-start', warnings: [] });
+              abortSignal!.addEventListener('abort', () => controller.error(abortSignal!.reason), {
+                once: true,
+              });
+            },
+          }),
         }),
-      }),
     });
     const { service, reservation } = setup();
     const abort = new AbortController();

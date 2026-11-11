@@ -239,19 +239,21 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
   );
 
   const handleSlashMenuSearch = useCallback(
-    async (query: string) => {
+    (query: string) => {
       const items = [
         ...(assistantChat ? [] : getAISlashMenuItems(editor)),
         ...getDefaultReactSlashMenuItems(editor),
       ];
       const q = query.trim().toLowerCase();
       if (!q) {
-        return items;
+        return Promise.resolve(items);
       }
-      return items.filter(
-        (item) =>
-          item.title.toLowerCase().includes(q) ||
-          item.aliases?.some((alias) => alias.toLowerCase().includes(q))
+      return Promise.resolve(
+        items.filter(
+          (item) =>
+            item.title.toLowerCase().includes(q) ||
+            item.aliases?.some((alias) => alias.toLowerCase().includes(q))
+        )
       );
     },
     [editor, assistantChat]

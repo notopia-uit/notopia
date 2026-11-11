@@ -10,14 +10,16 @@ describe('assistant browser orchestration', () => {
     let requests = 0;
     const chat = new Chat<UIMessage>({
       transport: {
-        reconnectToStream: async () => null,
-        sendMessages: async () => {
+        reconnectToStream: () => Promise.resolve(null),
+        sendMessages: () => {
           requests++;
-          return new ReadableStream({
-            start(controller) {
-              controller.close();
-            },
-          });
+          return Promise.resolve(
+            new ReadableStream({
+              start(controller) {
+                controller.close();
+              },
+            })
+          );
         },
       },
     });
@@ -26,9 +28,7 @@ describe('assistant browser orchestration', () => {
       session: new AssistantEditorSession<object>(() => {}),
       cancel: async () => {},
       onChange: () => {},
-      bridge: async () => {
-        throw new Error('No target');
-      },
+      bridge: () => Promise.reject(new Error('No target')),
     });
     await runner.dispose();
     runner.activate();
@@ -57,7 +57,7 @@ describe('assistant browser orchestration', () => {
       bridge: async () => {
         await loading;
         return {
-          prepare: async () => ({ documentState: {} }) as any,
+          prepare: () => Promise.resolve({ documentState: {} } as any),
           send: async () => {},
           review: () => {
             reviews++;
@@ -95,8 +95,8 @@ describe('assistant browser orchestration', () => {
     const chat = new Chat<UIMessage>({
       onData: (part) => runner.onData(part),
       transport: {
-        reconnectToStream: async () => null,
-        sendMessages: async () => {
+        reconnectToStream: () => Promise.resolve(null),
+        sendMessages: () => {
           calls++;
           const chunks: UIMessageChunk[] =
             calls === 1
@@ -124,12 +124,14 @@ describe('assistant browser orchestration', () => {
                   { type: 'start', messageId: 'done' },
                   { type: 'finish', finishReason: 'stop' },
                 ];
-          return new ReadableStream({
-            start(controller) {
-              chunks.forEach((chunk) => controller.enqueue(chunk));
-              controller.close();
-            },
-          });
+          return Promise.resolve(
+            new ReadableStream({
+              start(controller) {
+                chunks.forEach((chunk) => controller.enqueue(chunk));
+                controller.close();
+              },
+            })
+          );
         },
       },
     });
@@ -138,15 +140,16 @@ describe('assistant browser orchestration', () => {
       session,
       cancel: async () => {},
       onChange: () => {},
-      bridge: async () => ({
-        prepare: async () => ({ documentState: {} }) as any,
-        send: async (chat, _request, message, options) => {
-          await chat.sendMessage(message, options);
-        },
-        review: () => {},
-        accept: () => {},
-        reject: () => {},
-      }),
+      bridge: () =>
+        Promise.resolve({
+          prepare: () => Promise.resolve({ documentState: {} } as any),
+          send: async (chat, _request, message, options) => {
+            await chat.sendMessage(message, options);
+          },
+          review: () => {},
+          accept: () => {},
+          reject: () => {},
+        }),
     });
     const submission = runner.submit({
       id: 'prompt',
@@ -175,13 +178,12 @@ describe('assistant browser orchestration', () => {
     const runner = new AssistantRunner({
       chat: new Chat<UIMessage>({}),
       session,
-      cancel: async (id) => {
+      cancel: (id) => {
         cancelled.push(id);
+        return Promise.resolve();
       },
       onChange: () => {},
-      bridge: async () => {
-        throw new Error('Must not open');
-      },
+      bridge: () => Promise.reject(new Error('Must not open')),
     });
     runner.onData({
       type: 'data-assistant-task',
