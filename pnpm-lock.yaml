@@ -410,7 +410,7 @@ catalogs:
       version: 5.1.0
     ai:
       specifier: ^6.0.301
-      version: 6.0.329
+      version: 6.0.330
     autoprefixer:
       specifier: ^10.4.27
       version: 10.6.2
@@ -840,7 +840,7 @@ importers:
         version: 1.40.0
       ai:
         specifier: 'catalog:'
-        version: 6.0.329(zod@4.6.7)
+        version: 6.0.330(zod@4.6.7)
       express:
         specifier: 'catalog:'
         version: 5.3.0(supports-color@8.1.1)
@@ -1573,7 +1573,7 @@ importers:
         version: 25.0.0
       ai:
         specifier: 'catalog:'
-        version: 6.0.329(zod@4.6.7)
+        version: 6.0.330(zod@4.6.7)
       better-auth:
         specifier: 'catalog:'
         version: 1.7.20(@opentelemetry/api@1.10.0)(next@16.4.5(@babel/core@7.29.13(supports-color@8.1.1))(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(babel-plugin-macros@3.1.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.1))(pg@8.23.1)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vitest@5.1.0)(vue@3.5.45(typescript@6.0.3))
@@ -8663,12 +8663,6 @@ packages:
   agent-base@9.0.0:
     resolution: {integrity: sha512-TQf59BsZnytt8GdJKLPfUZ54g/iaUL2OWDSFCCvMOhsHduDQxO8xC4PNeyIkVcA5KwL2phPSv0douC0fgWzmnA==}
     engines: {node: '>= 20'}
-
-  ai@6.0.329:
-    resolution: {integrity: sha512-cqZ8GX2dn3u6LnSVgyQV7DJ1fVkNRmgZMS81YPKxIXMuX9zO7o83ScwB4pUNkUeF/Z9Hfs5hCiR6vFgtYp4O8Q==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
 
   ai@6.0.330:
     resolution: {integrity: sha512-YerKl8FTXmigKD7DaMOUCdOTUdC6S3h9SP7fWH16Z3wGfb2tndc1lQmzL5EQUEnGCmbCr8bKwt/ayOc0pbifJQ==}
@@ -17156,7 +17150,7 @@ snapshots:
       '@floating-ui/react': 0.27.20(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@handlewithcare/prosemirror-suggest-changes': 0.1.8(prosemirror-model@1.25.13)(prosemirror-state@1.4.4)(prosemirror-transform@1.12.5)(prosemirror-view@1.42.9)
       '@tiptap/core': 3.33.0(@tiptap/pm@3.33.0)
-      ai: 6.0.329(zod@4.6.7)
+      ai: 6.0.330(zod@4.6.7)
       lodash.isequal: 4.5.0
       lodash.merge: 4.6.2
       prosemirror-changeset: 2.4.6
@@ -24429,14 +24423,6 @@ snapshots:
   agent-base@7.1.4: {}
 
   agent-base@9.0.0: {}
-
-  ai@6.0.329(zod@4.6.7):
-    dependencies:
-      '@ai-sdk/gateway': 3.0.235(zod@4.6.7)
-      '@ai-sdk/provider': 3.0.19
-      '@ai-sdk/provider-utils': 4.0.66(zod@4.6.7)
-      '@opentelemetry/api': 1.10.0
-      zod: 4.6.7
 
   ai@6.0.330(zod@4.6.7):
     dependencies:
