@@ -8,7 +8,7 @@ MISE_EXPERIMENTAL = 1
 '_'.path.paths = ["./scripts/"]
 
 [tools]
-helm = "3.22.1"
+helm = "4.3.2"
 just = "1.59.0"
 "github:dadav/helm-schema" = "0.24.0"
 "github:norwoodj/helm-docs" = "1.14.2"
