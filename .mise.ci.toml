@@ -8,6 +8,7 @@ MISE_EXPERIMENTAL = 1
 '_'.path.paths = ["./scripts/"]
 
 [tools]
+actionlint = "1.7.12"
 helm = "3.22.1"
 just = "1.59.0"
 "github:dadav/helm-schema" = "0.24.0"
@@ -33,6 +34,7 @@ protoc-gen-go-grpc = "1.6.2"
 "github:pseudomuto/protoc-gen-doc" = "1.5.1"
 "npm:ts-proto" = "2.12.4"
 node = "26.13.0"
+shellcheck = "0.11.0"
 
 [shell_alias]
 nx = "pnpm exec nx"
