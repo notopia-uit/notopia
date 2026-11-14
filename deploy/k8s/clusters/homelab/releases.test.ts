@@ -157,10 +157,14 @@ test('service wiring', () => {
   const values = Object.fromEntries(
     services.map((name) => [name, readYaml(join(root, 'apps', name, 'values.yaml'))])
   );
-  for (const value of Object.values(values)) {
+  for (const [name, value] of Object.entries(values)) {
     assert.ok('tag' in value.image);
-    assert.equal(value.otel.endpoint, 'http://alloy-alloy.monitoring.svc:4317');
+    assert.equal(
+      value.otel.endpoint,
+      `http://alloy-alloy.monitoring.svc:${name === 'web' ? 4318 : 4317}`
+    );
   }
+  assert.equal(values.web.otel.protocol, 'http/protobuf');
   assert.ok(values.web.env.DOCUMENT_WS_URL.startsWith('wss://'));
   for (const name of ['note', 'billing', 'authorization'])
     assert.equal(values[name].database.urlSecret.name, `cnpg-${name}-app`);

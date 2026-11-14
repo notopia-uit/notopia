@@ -1,16 +1,13 @@
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 
-if (process.env.OTEL_SDK_DISABLED === 'true') {
-  process.env.OTEL_NODE_DISABLED_INSTRUMENTATIONS = 'all';
-} else {
-  if (!process.env.OTEL_NODE_ENABLED_INSTRUMENTATIONS) {
-    process.env.OTEL_NODE_ENABLED_INSTRUMENTATIONS = 'pino,runtime-node';
-  }
+const sdkDisabled = process.env.OTEL_SDK_DISABLED === 'true';
+if (!sdkDisabled && !process.env.OTEL_NODE_ENABLED_INSTRUMENTATIONS) {
+  process.env.OTEL_NODE_ENABLED_INSTRUMENTATIONS = 'pino,runtime-node';
 }
 
 export const otelSdk = new NodeSDK({
-  instrumentations: [getNodeAutoInstrumentations()],
+  instrumentations: sdkDisabled ? [] : [getNodeAutoInstrumentations()],
 });
 
 otelSdk.start();
