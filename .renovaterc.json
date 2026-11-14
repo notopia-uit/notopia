@@ -3,6 +3,12 @@
   "extends": ["github>notopia-uit/renovate-config", ":automergeBranch", ":automergePatch"],
   "packageRules": [
     {
+      "description": "Notopia Kubernetes image tags are owned by the release workflow",
+      "matchFileNames": ["deploy/k8s/**"],
+      "matchPackageNames": ["ghcr.io/notopia-uit/**"],
+      "enabled": false
+    },
+    {
       "groupName": "Nx Monorepo Toolkit",
       "matchPackageNames": ["nx", "/^@nx//", "/^nx$/", "/^npm:nx$/"],
       "automerge": false,
@@ -53,6 +59,14 @@
   ],
   "docker-compose": {
     "managerFilePatterns": ["/^deploy\\/compose\\/.+\\/.+\\.ya?ml$/"]
+  },
+  "flux": {
+    "enabled": true,
+    "managerFilePatterns": ["/^deploy\\/k8s\\/clusters\\/.+\\.ya?ml$/"]
+  },
+  "helm-values": {
+    "enabled": true,
+    "managerFilePatterns": ["/^deploy\\/k8s\\/clusters\\/.+\\/values\\.ya?ml$/"]
   },
   "schedule": ["* 1-18 * * 3,0"],
   "toolSettings": {
