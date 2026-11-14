@@ -60,7 +60,7 @@ catalog:
   "@opentelemetry/api": "~1.10.0"
   "@opentelemetry/auto-instrumentations-node": "~0.83.0"
   "@opentelemetry/sdk-node": "0.301.2"
-  "@redocly/cli": "~2.30.5"
+  "@redocly/cli": "~2.78.0"
   "@rsdoctor/rspack-plugin": "^1.6.4"
   "@rspack/cli": "^2.2.8"
   "@rspack/core": "^2.2.8"
