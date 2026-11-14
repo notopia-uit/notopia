@@ -3,6 +3,10 @@
 NestJS HTTP backend for BlockNote AI and workspace assistant chat. No database or Kafka;
 uses note, authorization and billing gRPC, Meilisearch, and Redis for shared accounting.
 
+Service overview and local setup: [`docs/src/services/ai/index.md`](../../docs/src/services/ai/index.md).
+OpenRouter and OpenCode model configuration:
+[`docs/src/services/ai/model-providers.md`](../../docs/src/services/ai/model-providers.md).
+
 ## Modules
 
 | Module | Role |

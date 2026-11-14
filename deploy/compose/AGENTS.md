@@ -60,10 +60,11 @@ All under `notopia.localhost`:
 | `redpanda.notopia.localhost` | Redpanda console |
 | `dbgate.notopia.localhost` | dbgate (DB browser) |
 
-#### AI testing
+#### AI infrastructure
 
 `services/ai.yaml` provides persistent `ai_redis` on localhost:6376 (AOF, noeviction).
 `apps/ai/.env` points to it. `infrastructure/ollama.yaml` provides optional CPU-only
 `ai_ollama` on localhost:11434, enabled by the `ai-local-llm` profile; models use a named
 volume. Do not enable it when a host model server already occupies that port.
-See [`AI_TESTING.md`](./AI_TESTING.md) for startup and model download commands.
+See the [AI service documentation](../../docs/src/services/ai/index.md) for startup,
+model provider configuration and verification commands.

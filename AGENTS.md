@@ -15,6 +15,7 @@ api/                            # OpenAPI spec (one dir per API surface)
 proto/                          # Protobuf definitions
   note/, authorization/, billing/
 apps/                           # JS/TS applications
+  ai/                           # AI chat and assistant service (NestJS, AI SDK) (nx: ai)
   document/                     # Document service (NestJS) (nx: document)
   search-worker/                # Search worker (NestJS) sync to meilisearch (nx: search-worker)
   web/                          # NextJS (nx: web)
@@ -111,6 +112,19 @@ pkg/                            # Go packages
 
 - Including Identity Provider (Authentik), API Gateway (Traefik), Object Storage (RustFS), and other services.
   Read [AGENTS.md](./deploy/compose/AGENTS.md) for details
+
+### AI
+
+- `apps/ai` serves workspace assistant chat and BlockNote AI using AI SDK v6 and an
+  OpenAI-compatible model endpoint. Configure providers through `NOTOPIA_AI_LLM_{BASE_URL,API_KEY,MODEL}`;
+  keep credentials in `apps/ai/.env.local`.
+- Note, authorization and billing gRPC enforce workspace access and AI allowance; Meilisearch
+  supplies committed note content. Dedicated Redis stores quota, throttling and assistant continuations.
+- Editing runs in the browser's authorized collaborative editor, with Accept/Discard review and a
+  separate Commit. Server tool calls must recheck access; do not trust model-supplied workspace IDs.
+- Read [`apps/ai/AGENTS.md`](./apps/ai/AGENTS.md) before changing the service and
+  [`apps/ai/HOW_TO_ADD_TOOLS.md`](./apps/ai/HOW_TO_ADD_TOOLS.md) before adding tools.
+  Service setup and OpenRouter/OpenCode configuration: [`docs/src/services/ai/`](./docs/src/services/ai/index.md).
 
 ## Nx
 
