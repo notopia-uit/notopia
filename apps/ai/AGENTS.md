@@ -92,6 +92,9 @@ AI SDK serializes them. The shared UI transport normalizes HTTP JSON into readab
 
 ## Configuration and checks
 
+AI uses service digit **6**: HTTP and health share port `8086`; dedicated Redis is
+published on `6376`. Keep defaults, `.env`, Dockerfile and Traefik aligned when changing ports.
+
 `NOTOPIA_AI_SERVICES_BILLING_GRPC_URL` joins existing note/authorization endpoints.
 Defaults: `NOTOPIA_AI_REQUESTS_PER_MINUTE=20`, `NOTOPIA_AI_CONCURRENT_STREAMS=2`,
 `NOTOPIA_AI_TIMEOUT_MS=120000`, `NOTOPIA_AI_MAX_OUTPUT_TOKENS=4096` (per model step),

@@ -24,7 +24,7 @@ export const appConfig = registerAs(APP_CONFIG, () =>
   appConfigSchema.parse({
     env: (process.env.NODE_ENV as AppConfig['env'] | undefined) ?? 'production',
     logLevel: (process.env.NOTOPIA_AI_LOG_LEVEL as AppConfig['logLevel'] | undefined) ?? 'warn',
-    port: parseInt(process.env.NOTOPIA_AI_PORT ?? '8085', 10),
+    port: parseInt(process.env.NOTOPIA_AI_PORT ?? '8086', 10),
   } satisfies AppConfig)
 );
 

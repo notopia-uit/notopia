@@ -6,5 +6,5 @@ WORKDIR /app
 RUN npm install -g pnpm@10.33.2
 COPY apps/ai/dist/ .
 RUN pnpm install --frozen-lockfile --prod
-EXPOSE 8085
+EXPOSE 8086
 CMD ["node", "main.cjs"]

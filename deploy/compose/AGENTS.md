@@ -62,6 +62,7 @@ All under `notopia.localhost`:
 
 #### AI infrastructure
 
+AI uses service digit **6**: HTTP and health share localhost:8086;
 `services/ai.yaml` provides persistent `ai_redis` on localhost:6376 (AOF, noeviction).
 `apps/ai/.env` points to it. `infrastructure/ollama.yaml` provides optional CPU-only
 `ai_ollama` on localhost:11434, enabled by the `ai-local-llm` profile; models use a named

@@ -22,4 +22,4 @@ http:
     ai:
       loadBalancer:
         servers:
-          - url: http://host.docker.internal:8085
+          - url: http://host.docker.internal:8086

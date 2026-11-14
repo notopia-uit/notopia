@@ -6,7 +6,9 @@ authorship:
 # AI service
 
 The AI service powers Notopia's workspace assistant and the AI commands inside the note
-editor. It runs as the NestJS application `apps/ai` (Nx project `ai`, local port `8085`).
+editor. It runs as the NestJS application `apps/ai` (Nx project `ai`, local port `8086`).
+AI uses service digit **6**: HTTP and health share `8086`, and its Redis host port is `6376`.
+AI has no PostgreSQL database. Container-internal Redis still listens on its standard `6379`.
 It connects a language model to Notopia's authorized note tools. The model provider supplies
 text generation; Notopia supplies workspace permissions, note access, editing and usage limits.
 
