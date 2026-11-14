@@ -268,8 +268,8 @@ catalogs:
       specifier: ^11.2.7
       version: 11.2.9
     '@nestjs/schedule':
-      specifier: 12.0.3
-      version: 12.0.3
+      specifier: 12.0.4
+      version: 12.0.4
     '@nestjs/schematics':
       specifier: ^11.1.0
       version: 11.1.0
@@ -962,7 +962,7 @@ importers:
         version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
       '@nestjs/schedule':
         specifier: 'catalog:'
-        version: 12.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)
+        version: 12.0.4(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)
       '@nestjs/terminus':
         specifier: 'catalog:'
         version: 12.1.0(@grpc/grpc-js@1.14.7)(@grpc/proto-loader@0.8.1)(@nestjs/axios@4.0.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2))(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.9)(@nestjs/typeorm@11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.2(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1)))(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.2(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))
@@ -4028,8 +4028,8 @@ packages:
       '@nestjs/common': ^11.2.7
       '@nestjs/core': ^11.2.7
 
-  '@nestjs/schedule@12.0.3':
-    resolution: {integrity: sha512-7G0HMYKXirWFoD72zY6ieSwwwe+AruJgHDR4BJ0pg0FseA0iR2q+e1c1T0Sv10uHNXT2xiPAFFnPa0yO4lY5eQ==}
+  '@nestjs/schedule@12.0.4':
+    resolution: {integrity: sha512-C797UxK2mOB8kTSwEfHmwy3Ut72qSLkS/BLFHR3jPW/NZKZkqGFpoX5Ga3QlLdeugCg6NxrXhvgOMxioHhFzXg==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
       '@nestjs/common': ^11.2.7
@@ -13058,6 +13058,7 @@ packages:
   postcss-selector-parser@7.2.0:
     resolution: {integrity: sha512-Khh/tERVBn0I1499dvBSHY0pWJloMJWUxDsOBM0CCDPAcVZ10Jl2L1qy1f19uEX22spa8Mv7DCdEQJc0cGwBhQ==}
     engines: {node: '>=4'}
+    deprecated: Double-escapes CSS Modules class names (#362). Use 7.2.1.
 
   postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
@@ -14614,6 +14615,7 @@ packages:
 
   tldts-core@7.4.20:
     resolution: {integrity: sha512-C630TWXZCZmLq0F2bW4QqwnaaxCQ/svpAqvJwnC4JvgEM5ohhBnGsEzTLSOXcN+xjz+kEaHS5uoWIw2klnqd0A==}
+    deprecated: Partial release, see https://github.com/remusao/tldts/issues/2735. Use >=7.4.22.
 
   tldts@7.4.19:
     resolution: {integrity: sha512-48dH6aSpQnpbzDUc4vIQZ1VjB8tkK+e8c1yx05/SZK+rkssgjEOlxDd/yU8/a4vGYQ9vRgJr9dwMq9TJ0b3X2Q==}
@@ -18498,7 +18500,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@nestjs/schedule@12.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)':
+  '@nestjs/schedule@12.0.4(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
