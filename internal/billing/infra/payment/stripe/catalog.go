@@ -10,8 +10,8 @@ import (
 
 func (p *Provider) ensureProduct(ctx context.Context, tier string) error {
 	params := &stripego.ProductCreateParams{
-		ID:       stripego.String(productID(tier)),
-		Name:     stripego.String("Notopia " + tier),
+		ID:       new(productID(tier)),
+		Name:     new("Notopia " + tier),
 		Metadata: map[string]string{"tier": tier},
 	}
 	params.SetIdempotencyKey("product:" + tier)
@@ -39,16 +39,16 @@ func (p *Provider) CreatePrice(ctx context.Context, in app.PriceInput) (string, 
 		return "", err
 	}
 	params := &stripego.PriceCreateParams{
-		Product:           stripego.String(productID(tier)),
-		Currency:          stripego.String(string(currency)),
-		UnitAmount:        stripego.Int64(in.Amount.Amount()),
-		LookupKey:         stripego.String(domain.PriceLookupKey(in.Plan, in.Interval)),
-		TransferLookupKey: stripego.Bool(true),
+		Product:           new(productID(tier)),
+		Currency:          new(string(currency)),
+		UnitAmount:        new(in.Amount.Amount()),
+		LookupKey:         new(domain.PriceLookupKey(in.Plan, in.Interval)),
+		TransferLookupKey: new(true),
 		Metadata:          map[string]string{"price_id": in.PriceID.String()},
 	}
 	if recurring {
 		params.Recurring = &stripego.PriceCreateRecurringParams{
-			Interval: stripego.String(interval),
+			Interval: new(interval),
 		}
 	}
 	params.SetIdempotencyKey("price:" + in.PriceID.String())
@@ -61,7 +61,7 @@ func (p *Provider) CreatePrice(ctx context.Context, in app.PriceInput) (string, 
 
 func (p *Provider) ArchivePrice(ctx context.Context, providerPriceID string) error {
 	_, err := p.sc.V1Prices.Update(ctx, providerPriceID, &stripego.PriceUpdateParams{
-		Active: stripego.Bool(false),
+		Active: new(false),
 	})
 	return providerErr("archive price", err)
 }
@@ -73,28 +73,35 @@ func (p *Provider) CreatePortalConfiguration(ctx context.Context, activePrices [
 	}
 	features := &stripego.BillingPortalConfigurationCreateFeaturesParams{
 		InvoiceHistory: &stripego.BillingPortalConfigurationCreateFeaturesInvoiceHistoryParams{
-			Enabled: stripego.Bool(true),
+			Enabled: new(true),
 		},
 		PaymentMethodUpdate: &stripego.BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParams{
-			Enabled: stripego.Bool(true),
+			Enabled: new(true),
 		},
 		SubscriptionCancel: &stripego.BillingPortalConfigurationCreateFeaturesSubscriptionCancelParams{
-			Enabled: stripego.Bool(true),
-			Mode:    stripego.String(string(stripego.BillingPortalConfigurationFeaturesSubscriptionCancelModeAtPeriodEnd)),
+			Enabled: new(true),
+			Mode:    new(string(stripego.BillingPortalConfigurationFeaturesSubscriptionCancelModeAtPeriodEnd)),
 		},
 		SubscriptionUpdate: &stripego.BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParams{
-			Enabled: stripego.Bool(len(products) > 0),
+			Enabled: new(len(products) > 0),
 			DefaultAllowedUpdates: []*string{
-				stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdatePrice),
+				new(string(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdatePrice)),
 			},
 			Products:          products,
-			ProrationBehavior: stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehaviorAlwaysInvoice),
+			ProrationBehavior: new(string(stripego.BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehaviorAlwaysInvoice)),
 			ScheduleAtPeriodEnd: &stripego.BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndParams{
 				Conditions: []*stripego.BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionParams{
-					{Type: stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeDecreasingItemAmount)},
-					{Type: stripego.String(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeShorteningInterval)},
+					{
+						Type: new(string(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeDecreasingItemAmount)),
+					},
+					{
+						Type: new(string(stripego.BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeShorteningInterval)),
+					},
 				},
 			},
+		},
+		CustomerUpdate: &stripego.BillingPortalConfigurationCreateFeaturesCustomerUpdateParams{
+			Enabled: new(true),
 		},
 	}
 	cfg, err := p.sc.V1BillingPortalConfigurations.Create(ctx, &stripego.BillingPortalConfigurationCreateParams{
