@@ -297,7 +297,7 @@
           "requireSemver": false
         },
         "changelog": {
-          "createRelease": "github",
+          "createRelease": false,
           "file": false
         },
         "docker": {

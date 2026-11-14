@@ -26,9 +26,16 @@ if [[ "$2" == ,* || "$2" == *, || "$2" == *,,* ]]; then
   exit 1
 fi
 IFS=, read -r -a projects <<<"$2"
+: "${RELEASE_TAGS_FILE:?Set RELEASE_TAGS_FILE to the manifest from bump-deploy-tags.sh}"
+mapfile -t tags <"$RELEASE_TAGS_FILE"
+if [[ "${#tags[@]}" != "${#projects[@]}" ]]; then
+  echo 'Release tag manifest does not match selected projects' >&2
+  exit 1
+fi
+tag_refspecs=()
 files=()
-releases=()
-for project in "${projects[@]}"; do
+for i in "${!projects[@]}"; do
+  project="${projects[$i]}"
   case "$project" in
   web | note | authorization | billing | document | search-worker) ;;
   *)
@@ -36,21 +43,30 @@ for project in "${projects[@]}"; do
     exit 1
     ;;
   esac
+  tag="${tags[$i]}"
+  git check-ref-format "refs/tags/$tag"
+  if [[ "$tag" != "$project@"* || "$(git rev-parse --verify "refs/tags/$tag^{commit}")" != "$head" ]]; then
+    echo "Invalid release tag manifest entry for $project: $tag" >&2
+    exit 1
+  fi
+  tag_refspecs+=("refs/tags/$tag:refs/tags/$tag")
   file="deploy/k8s/clusters/homelab/apps/$project/values.yaml"
   [[ -f "$file" ]] || continue
   if ! git diff --quiet -- "$file"; then
     files+=("$file")
-    releases+=("$project@$(yq -r '.image.tag' "$file")")
   fi
 done
 if [[ "${#files[@]}" == 0 ]]; then
   echo 'No deployment tag changes to commit'
-  exit 0
+else
+  git add -- "${files[@]}"
+  summary="$(
+    IFS=,
+    echo "${tags[*]}"
+  )"
+  git commit -m "chore(deploy): release $summary"
 fi
-git add -- "${files[@]}"
-summary="$(
-  IFS=,
-  echo "${releases[*]}"
-)"
-git commit -m "chore(deploy): release $summary"
-git -c push.followTags=false push origin HEAD:refs/heads/main
+git -c push.followTags=false push --atomic origin HEAD:refs/heads/main "${tag_refspecs[@]}"
+for tag in "${tags[@]}"; do
+  gh release create "$tag" --verify-tag --title "$tag" --generate-notes
+done

@@ -12,6 +12,7 @@ if [[ "$(git rev-parse HEAD)" != "$head" ]]; then
 fi
 [[ -n "$2" ]] || exit 0
 : "${RELEASE_TAGS_BEFORE:?Set RELEASE_TAGS_BEFORE to the tag snapshot taken before this release}"
+: "${RELEASE_TAGS_FILE:?Set RELEASE_TAGS_FILE to the output manifest for newly released tags}"
 [[ -f "$RELEASE_TAGS_BEFORE" ]] || {
   echo 'Missing pre-release tag snapshot' >&2
   exit 1
@@ -25,6 +26,7 @@ IFS=, read -r -a projects <<<"$2"
 declare -A seen=()
 files=()
 versions=()
+release_tags=()
 new_tags="$(LC_ALL=C comm -13 <(LC_ALL=C sort "$RELEASE_TAGS_BEFORE") <(git tag --list | LC_ALL=C sort))"
 head_tags="$(git tag --points-at "$head")"
 for project in "${projects[@]}"; do
@@ -55,6 +57,7 @@ for project in "${projects[@]}"; do
     echo "Invalid Docker tag for $project: $version" >&2
     exit 1
   fi
+  release_tags+=("${tags[0]}")
   file="deploy/k8s/clusters/homelab/apps/$project/values.yaml"
   if [[ ! -f "$file" ]]; then
     echo "::warning::No deployment values for $project at $file; skipping" >&2
@@ -67,6 +70,7 @@ for project in "${projects[@]}"; do
   versions+=("$version")
 done
 
+printf '%s\n' "${release_tags[@]}" >"$RELEASE_TAGS_FILE"
 for i in "${!files[@]}"; do
   VERSION="${versions[$i]}" yq -i '.image.tag = strenv(VERSION)' "${files[$i]}"
   echo "Updated ${files[$i]} to ${versions[$i]}"

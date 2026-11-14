@@ -298,6 +298,7 @@ jobs:
           snapshot="$RUNNER_TEMP/release-tags-before.txt"
           git tag --list > "$snapshot"
           echo "RELEASE_TAGS_BEFORE=$snapshot" >> "$GITHUB_ENV"
+          echo "RELEASE_TAGS_FILE=$RUNNER_TEMP/release-tags.txt" >> "$GITHUB_ENV"
           nx-cache-action -- \
             pnpm exec nx run-many --projects "$RELEASE_PROJECTS" \
               --target docker:build \
@@ -312,7 +313,7 @@ jobs:
           RELEASE_PROJECTS: ${{ steps.release-projects.outputs.RELEASE_PROJECTS }}
         run: bash scripts/bump-deploy-tags.sh "$RELEASE_HEAD" "$RELEASE_PROJECTS"
 
-      - name: Commit and push deployment tags
+      - name: Push deployment tags and announce releases
         if: ${{ github.ref == 'refs/heads/main' && steps.setup-vars.outputs.SHOULD_RELEASE == 'true' && steps.release-projects.outputs.RELEASE_PROJECTS != '' }}
         env:
           RELEASE_PROJECTS: ${{ steps.release-projects.outputs.RELEASE_PROJECTS }}
