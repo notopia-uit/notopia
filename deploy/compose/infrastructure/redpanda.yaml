@@ -29,6 +29,10 @@ services:
       - 19644:9644
     volumes:
       - redpanda_data:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD", "rpk", "cluster", "health"]
+      start_period: 5s
+      start_interval: 2s
 
   redpanda_console:
     image: redpandadata/console:v3.13.1
