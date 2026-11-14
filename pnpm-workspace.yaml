@@ -10,10 +10,10 @@ packages:
 autoInstallPeers: true
 catalogs:
   web-otel:
-    "@opentelemetry/api": "1.9.1"
+    "@opentelemetry/api": "1.10.0"
     "@opentelemetry/api-logs": "0.223.2"
-    "@opentelemetry/exporter-logs-otlp-proto": "0.223.2"
-    "@opentelemetry/instrumentation": "0.223.2"
+    "@opentelemetry/exporter-logs-otlp-proto": "0.301.2"
+    "@opentelemetry/instrumentation": "0.301.2"
     "@opentelemetry/resources": "2.12.1"
     "@opentelemetry/sdk-logs": "0.223.2"
     "@opentelemetry/sdk-metrics": "2.12.1"
