@@ -26,6 +26,11 @@ services:
     command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
     ports:
       - 6374:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 5s
+      start_interval: 1s
+    restart: unless-stopped
 
 volumes:
   document_postgresql_data:
