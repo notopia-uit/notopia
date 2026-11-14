@@ -231,6 +231,9 @@ jobs:
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
 
+      - name: Check chart versions
+        run: bash scripts/check-chart-versions.sh "$NX_BASE" "$NX_HEAD"
+
       - name: Publish Test Report
         uses: ctrf-io/github-test-reporter@v1
         if: always()
