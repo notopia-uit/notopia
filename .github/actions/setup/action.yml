@@ -1,0 +1,71 @@
+name: Setup Notopia
+description: Shared tools, dependencies, caches and Nx base/head SHAs
+inputs:
+  cache:
+    description: Enable dependency and tool caches
+    default: 'false'
+  go:
+    description: Install Go and download Go dependencies
+    default: 'true'
+  golangci:
+    description: Install golangci-lint
+    default: 'false'
+runs:
+  using: composite
+  steps:
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v4
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v6
+      with:
+        cache: ${{ inputs.cache == 'true' }}
+
+    - name: Setup Node
+      uses: actions/setup-node@v7
+      with:
+        node-version-file: ${{ env.MISE_OVERRIDE_CONFIG_FILENAMES }}
+
+    - name: Setup Go
+      if: ${{ inputs.go == 'true' }}
+      uses: actions/setup-go@v7
+      with:
+        go-version-file: .tool-versions
+        cache: ${{ inputs.cache == 'true' }}
+
+    - name: Setup golangci-lint
+      if: ${{ inputs.golangci == 'true' }}
+      uses: golangci/golangci-lint-action@v9
+      with:
+        install-only: true
+        version-file: .tool-versions
+        skip-save-cache: ${{ inputs.cache != 'true' }}
+
+    - name: Setup Mise
+      uses: jdx/mise-action@v5
+      with:
+        experimental: true
+        cache: ${{ inputs.cache == 'true' }}
+
+    - name: Setup Helm plugins
+      shell: bash
+      run: just helm-setup
+
+    - name: Cache Buf dependencies
+      uses: actions/cache@v6
+      with:
+        path: ~/.cache/buf
+        key: ${{ runner.os }}-buf-${{ hashFiles('**/buf.lock') }}
+        restore-keys: ${{ runner.os }}-buf-
+
+    - name: Derive SHAs for Nx Affected
+      uses: nrwl/nx-set-shas@v5
+
+    - name: Install Node Dependencies
+      shell: bash
+      run: pnpm install
+
+    - name: Install Go Dependencies
+      if: ${{ inputs.go == 'true' }}
+      shell: bash
+      run: go mod download

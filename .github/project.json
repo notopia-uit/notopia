@@ -1,0 +1,19 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "ci",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "default",
+        "{projectRoot}/workflows/**/*.yaml",
+        "{projectRoot}/actions/**/*.yaml",
+        { "runtime": "actionlint -version" }
+      ],
+      "options": {
+        "command": "actionlint"
+      }
+    }
+  }
+}

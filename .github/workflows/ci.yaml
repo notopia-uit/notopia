@@ -20,8 +20,7 @@ on:
       - "!.vscode/**/*"
       - "!.wakatime-project"
       - "!README.md"
-      - "!deploy/**/*"
-      - "deploy/k8s/charts/**"
+      - "!deploy/compose/**/*"
       - "!mise.toml"
       - "!**/*/AGENTS.md"
       - "!**/*/CLAUDE.md"
@@ -68,6 +67,16 @@ on:
         required: true
         default: false
         type: boolean
+      releaseAuthorization:
+        description: Release "authorization" container
+        required: true
+        default: false
+        type: boolean
+      releaseBilling:
+        description: Release "billing" container
+        required: true
+        default: false
+        type: boolean
       releaseDocument:
         description: Release "document" container
         required: true
@@ -75,6 +84,11 @@ on:
         type: boolean
       releaseSearchWorker:
         description: Release "search-worker" container
+        required: true
+        default: false
+        type: boolean
+      releaseAi:
+        description: Release "ai" container
         required: true
         default: false
         type: boolean
@@ -119,9 +133,6 @@ jobs:
     outputs:
       page-affected: ${{ steps.page-affected.outputs.affected }}
     steps:
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v4
-
       - name: Setup Variables
         id: setup-vars
         env:
@@ -131,8 +142,11 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           INPUT_RELEASE_WEB: ${{ github.event.inputs.releaseWeb }}
           INPUT_RELEASE_NOTE: ${{ github.event.inputs.releaseNote }}
+          INPUT_RELEASE_AUTHORIZATION: ${{ github.event.inputs.releaseAuthorization }}
+          INPUT_RELEASE_BILLING: ${{ github.event.inputs.releaseBilling }}
           INPUT_RELEASE_DOC: ${{ github.event.inputs.releaseDocument }}
           INPUT_RELEASE_SW: ${{ github.event.inputs.releaseSearchWorker }}
+          INPUT_RELEASE_AI: ${{ github.event.inputs.releaseAi }}
           INPUT_RELEASE_NPM: ${{ github.event.inputs.releaseNpm }}
           INPUT_RELEASE_ALL: ${{ github.event.inputs.releaseAll }}
         run: |
@@ -153,7 +167,7 @@ jobs:
 
           SHOULD_RELEASE=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" && "$REF_NAME" == "main" ]]; then
-            if [[ "$INPUT_RELEASE_ALL" == "true" || "$INPUT_RELEASE_WEB" == "true" || "$INPUT_RELEASE_NOTE" == "true" || "$INPUT_RELEASE_DOC" == "true" || "$INPUT_RELEASE_SW" == "true" || "$INPUT_RELEASE_NPM" == "true" ]]; then
+            if [[ "$INPUT_RELEASE_ALL" == "true" || "$INPUT_RELEASE_WEB" == "true" || "$INPUT_RELEASE_NOTE" == "true" || "$INPUT_RELEASE_AUTHORIZATION" == "true" || "$INPUT_RELEASE_BILLING" == "true" || "$INPUT_RELEASE_DOC" == "true" || "$INPUT_RELEASE_SW" == "true" || "$INPUT_RELEASE_AI" == "true" || "$INPUT_RELEASE_NPM" == "true" ]]; then
               SHOULD_RELEASE=true
             fi
           fi
@@ -177,72 +191,16 @@ jobs:
           git config --global user.name github-actions[bot]
           git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
-        if: ${{ steps.setup-vars.outputs.SHOULD_RELEASE == 'true' }}
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-        id: setup-buildx
-        if: ${{ steps.setup-vars.outputs.SHOULD_RELEASE == 'true' }}
-
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           filter: tree:0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
-
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version-file: ${{ env.MISE_OVERRIDE_CONFIG_FILENAMES }}
-
-      - name: Setup Go
-        uses: actions/setup-go@v7
-        with:
-          go-version-file: .tool-versions
-          cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
-
-      - name: Setup golangci-lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          install-only: true
-          version-file: .tool-versions
-          skip-save-cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'false' }}
-
-      - name: Setup Mise
-        uses: jdx/mise-action@v5
-        with:
-          experimental: true
-          cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
-
-      - name: Setup Helm plugins
-        run: just helm-setup
-
-      - name: Cache Buf dependencies
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/buf
-          key: ${{ runner.os }}-buf-${{ hashFiles('**/buf.lock') }}
-          restore-keys: ${{ runner.os }}-buf-
-
-      - name: Derive SHAs for Nx Affected
-        id: set-shas
-        uses: nrwl/nx-set-shas@v5
-
-      - name: Install Node Dependencies
-        run: pnpm install
-
-      - name: Install Go Dependencies
-        run: go mod download
+          cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE }}
+          golangci: "true"
 
       - name: Detect Page Affected
         id: page-affected
@@ -278,6 +236,9 @@ jobs:
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
 
+      - name: Check chart versions
+        run: node scripts/check-chart-versions.ts "$NX_BASE" "$NX_HEAD"
+
       - name: Publish Test Report
         uses: ctrf-io/github-test-reporter@v1
         if: always()
@@ -301,6 +262,70 @@ jobs:
             exit 1;
           fi
 
+      - name: Resolve release projects
+        id: release-projects
+        if: ${{ steps.setup-vars.outputs.SHOULD_RELEASE == 'true' }}
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_RELEASE_ALL: ${{ github.event.inputs.releaseAll }}
+          INPUT_RELEASE_WEB: ${{ github.event.inputs.releaseWeb }}
+          INPUT_RELEASE_NOTE: ${{ github.event.inputs.releaseNote }}
+          INPUT_RELEASE_AUTHORIZATION: ${{ github.event.inputs.releaseAuthorization }}
+          INPUT_RELEASE_BILLING: ${{ github.event.inputs.releaseBilling }}
+          INPUT_RELEASE_DOC: ${{ github.event.inputs.releaseDocument }}
+          INPUT_RELEASE_SW: ${{ github.event.inputs.releaseSearchWorker }}
+          INPUT_RELEASE_AI: ${{ github.event.inputs.releaseAi }}
+        run: |
+          projects="$(bash scripts/resolve-release-projects.sh)"
+          echo "RELEASE_PROJECTS=$projects" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        if: ${{ steps.release-projects.outputs.RELEASE_PROJECTS != '' }}
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        id: setup-buildx
+        if: ${{ steps.release-projects.outputs.RELEASE_PROJECTS != '' }}
+
+      - name: Release selected Docker images
+        if: ${{ steps.release-projects.outputs.RELEASE_PROJECTS != '' }}
+        env:
+          RELEASE_PROJECTS: ${{ steps.release-projects.outputs.RELEASE_PROJECTS }}
+          RELEASE_CONTAINER_TYPE: ${{ github.event.inputs.releaseContainerType }}
+          BUILDX_BUILDER: ${{ steps.setup-buildx.outputs.name }}
+          DOCKER_BUILDKIT: 1
+          NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ steps.setup-vars.outputs.NX_CACHE_ACTION_SKIP_UPLOAD_CACHE }}
+        run: |
+          echo "RELEASE_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          snapshot="$RUNNER_TEMP/release-tags-before.txt"
+          git tag --list > "$snapshot"
+          echo "RELEASE_TAGS_BEFORE=$snapshot" >> "$GITHUB_ENV"
+          echo "RELEASE_TAGS_FILE=$RUNNER_TEMP/release-tags.txt" >> "$GITHUB_ENV"
+          nx-cache-action -- \
+            pnpm exec nx run-many --projects "$RELEASE_PROJECTS" \
+              --target docker:build \
+              --parallel=${{ env.NX_PARALLEL }} \
+              --configuration production
+          pnpm exec nx release --projects "$RELEASE_PROJECTS" \
+            --dockerVersionScheme="$RELEASE_CONTAINER_TYPE" --yes
+
+      - name: Bump deployment tags
+        if: ${{ steps.release-projects.outputs.RELEASE_PROJECTS != '' }}
+        env:
+          RELEASE_PROJECTS: ${{ steps.release-projects.outputs.RELEASE_PROJECTS }}
+        run: bash scripts/bump-deploy-tags.sh "$RELEASE_HEAD" "$RELEASE_PROJECTS"
+
+      - name: Push deployment tags and announce releases
+        if: ${{ github.ref == 'refs/heads/main' && steps.setup-vars.outputs.SHOULD_RELEASE == 'true' && steps.release-projects.outputs.RELEASE_PROJECTS != '' }}
+        env:
+          RELEASE_PROJECTS: ${{ steps.release-projects.outputs.RELEASE_PROJECTS }}
+        run: bash scripts/push-deploy-tags.sh "$RELEASE_HEAD" "$RELEASE_PROJECTS"
+
       - name: Github NPM Token
         if: >-
           ${{
@@ -309,44 +334,13 @@ jobs:
           }}
         run: npm config set '//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}' --global
 
-      - name: Nx Release
-        if: ${{ steps.setup-vars.outputs.SHOULD_RELEASE == 'true' }}
-        env:
-          BUILDX_BUILDER: ${{ steps.setup-buildx.outputs.name }}
-          DOCKER_BUILDKIT: 1
-          NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ steps.setup-vars.outputs.NX_CACHE_ACTION_SKIP_UPLOAD_CACHE }}
-        run: |
-          # Hey we haven't handle build for npm...
-          echo 'Build Docker images'
-          nx-cache-action -- \
-          pnpm exec nx run-many \
-              ${{ (github.event.inputs.releaseAll || github.event.inputs.releaseWeb == 'true') && '--projects web' || '' }} \
-              ${{ (github.event.inputs.releaseAll || github.event.inputs.releaseNote == 'true') && '--projects note' || '' }} \
-              ${{ (github.event.inputs.releaseAll || github.event.inputs.releaseDocument == 'true') && '--projects document' || '' }} \
-              ${{ (github.event.inputs.releaseAll || github.event.inputs.releaseSearchWorker == 'true') && '--projects search-worker' || '' }} \
-            --target docker:build \
-            --parallel=${{env.NX_PARALLEL }} \
-            --configuration production
-
-          echo 'Built Docker images'
-          docker images -a
-
-          if [ "${{ github.event.inputs.releaseAll }}" = "true" ]; then
-            nx-cache-action -- \
-            pnpm exec nx release \
-              --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
-              --yes
-          else
-            nx-cache-action -- \
-            pnpm exec nx release \
-              --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
-              ${{ github.event.inputs.releaseWeb == 'true' && '--projects web' || '' }} \
-              ${{ github.event.inputs.releaseNote == 'true' && '--projects note' || '' }} \
-              ${{ github.event.inputs.releaseDocument == 'true' && '--projects document' || '' }} \
-              ${{ github.event.inputs.releaseSearchWorker == 'true' && '--projects search-worker' || '' }} \
-              ${{ github.event.inputs.releaseNpm == 'true' && '--groups npm' || '' }} \
-              --yes
-          fi
+      - name: Release NPM packages
+        if: >-
+          ${{
+            steps.setup-vars.outputs.SHOULD_RELEASE == 'true' &&
+            (github.event.inputs.releaseNpm == 'true' || github.event.inputs.releaseAll == 'true')
+          }}
+        run: pnpm exec nx release --groups npm --yes
 
       # - name: Dispatch Update Deploy
       #   uses: benc-uk/workflow-dispatch@v1
@@ -379,9 +373,6 @@ jobs:
         ports:
           - 8000:8000
     steps:
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v4
-
       - name: Setup Git User
         run: |
           git config --global user.name github-actions[bot]
@@ -392,30 +383,11 @@ jobs:
           fetch-depth: 0
           filter: tree:0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          cache: true
-
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version-file: ${{ env.MISE_OVERRIDE_CONFIG_FILENAMES }}
-
-      - name: Setup Go
-        uses: actions/setup-go@v7
-        with:
-          go-version-file: .tool-versions
-          cache: true
-
-      - name: Setup Mise
-        uses: jdx/mise-action@v5
-        with:
-          experimental: true
-          cache: true
-
-      - name: Derive SHAs for Nx Affected
-        uses: nrwl/nx-set-shas@v5
+          cache: "true"
+          go: "true"
 
       - name: Restore Docs diagrams Cache
         id: diagrams-cache
@@ -426,9 +398,6 @@ jobs:
           key: docs-diagrams-
           restore-keys: |
             docs-diagrams-
-
-      - name: Install Node Dependencies
-        run: pnpm install
 
       - name: Nx reset cache
         if: ${{ github.event.inputs.resetNxCache == 'true' }}
