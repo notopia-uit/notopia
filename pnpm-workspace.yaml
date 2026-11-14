@@ -8,6 +8,16 @@ packages:
   - "cmd/*"
   - "libs/*"
 autoInstallPeers: true
+catalogs:
+  web-otel:
+    "@opentelemetry/api": "1.9.1"
+    "@opentelemetry/api-logs": "0.223.2"
+    "@opentelemetry/exporter-logs-otlp-proto": "0.223.2"
+    "@opentelemetry/instrumentation": "0.223.2"
+    "@opentelemetry/resources": "2.12.1"
+    "@opentelemetry/sdk-logs": "0.223.2"
+    "@opentelemetry/sdk-metrics": "2.12.1"
+    "@opentelemetry/sdk-trace-base": "2.12.1"
 catalog:
   "@ai-sdk/openai-compatible": "^2.0.81"
   "@ai-sdk/react": "^3.0.303"
@@ -47,15 +57,9 @@ catalog:
   "@nestjs/typeorm": "^11.0.3"
   "@nestjs/websockets": "^11.2.7"
   "@openapitools/openapi-generator-cli": "2.31.1"
-  "@opentelemetry/api": "^1.9.1"
-  "@opentelemetry/auto-instrumentations-node": "~0.72.0"
-  "@opentelemetry/exporter-logs-otlp-proto": "0.215.0"
-  "@opentelemetry/resources": "~2.7.1"
-  "@opentelemetry/sdk-logs": "0.215.0"
-  "@opentelemetry/sdk-metrics": "~2.7.1"
-  "@opentelemetry/sdk-node": "0.215.0"
-  "@opentelemetry/sdk-trace-node": "~2.7.1"
-  "@opentelemetry/semantic-conventions": "~1.40.0"
+  "@opentelemetry/api": "~1.10.0"
+  "@opentelemetry/auto-instrumentations-node": "~0.83.0"
+  "@opentelemetry/sdk-node": "0.301.2"
   "@redocly/cli": "~2.30.5"
   "@rsdoctor/rspack-plugin": "^1.6.4"
   "@rspack/cli": "^2.2.8"
@@ -84,7 +88,7 @@ catalog:
   "@types/ws": "^8.18.1"
   # typescript: "^7.0.2"
   "@typescript/native": "npm:typescript@^7.0.2"
-  "@vercel/otel": "^2.1.2"
+  "@vercel/otel": "^2.3.0"
   "@vitejs/plugin-react": "^6.1.1"
   "@vitejs/plugin-react-swc": "4.3.3"
   "@vitest/coverage-v8": "^5.0.0"
@@ -109,8 +113,8 @@ catalog:
   marked: "^18.0.3"
   meilisearch: "0.58.0"
   nanoid: "^6.0.1"
-  nestjs-otel: "^8.0.2"
-  nestjs-pino: "^4.6.1"
+  nestjs-otel: "^8.1.1"
+  nestjs-pino: "^5.3.1"
   next: "^16.2.6"
   oidc-client-ts: "^3.5.0"
   oxfmt: "^0.74.0"
@@ -157,7 +161,7 @@ overrides:
 allowBuilds:
   "@openapitools/openapi-generator-cli": true
   "@parcel/watcher": true
-  '@quobix/vacuum': false
+  "@quobix/vacuum": false
   "@scarf/scarf": true
   "@suites/di.nestjs": true
   "@suites/doubles.vitest": true

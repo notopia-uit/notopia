@@ -1,7 +1,8 @@
 image:
   tag: ''
 otel:
-  endpoint: http://alloy-alloy.monitoring.svc:4317
+  endpoint: http://alloy-alloy.monitoring.svc:4318
+  protocol: http/protobuf
 istio:
   allowedPrincipals:
   - cluster.local/ns/istio-system/sa/default-istio
