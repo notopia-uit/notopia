@@ -52,7 +52,7 @@ job).
 
 ### 3. Chart version check
 
-`scripts/check-chart-versions.sh`, run in `main` after `Nx all`:
+`node scripts/check-chart-versions.ts`, run in `main` after `Nx all`:
 
 - for each `deploy/k8s/charts/<chart>/` changed against the base SHA (from `nx-set-shas`),
   `Chart.yaml` `version` must differ from the base and be a higher semver

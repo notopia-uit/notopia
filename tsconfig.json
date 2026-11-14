@@ -48,6 +48,9 @@
     },
     {
       "path": "./docs"
+    },
+    {
+      "path": "./scripts"
     }
   ]
 }

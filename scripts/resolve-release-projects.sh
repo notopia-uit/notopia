@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-projects=(web note authorization billing document search-worker)
-inputs=(INPUT_RELEASE_WEB INPUT_RELEASE_NOTE INPUT_RELEASE_AUTHORIZATION INPUT_RELEASE_BILLING INPUT_RELEASE_DOC INPUT_RELEASE_SW)
+projects=(web note authorization billing document search-worker ai)
+inputs=(INPUT_RELEASE_WEB INPUT_RELEASE_NOTE INPUT_RELEASE_AUTHORIZATION INPUT_RELEASE_BILLING INPUT_RELEASE_DOC INPUT_RELEASE_SW INPUT_RELEASE_AI)
 selected=()
 
 case "${EVENT_NAME:-workflow_dispatch}" in

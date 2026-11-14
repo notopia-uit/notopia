@@ -31,7 +31,7 @@ new_tags="$(LC_ALL=C comm -13 <(LC_ALL=C sort "$RELEASE_TAGS_BEFORE") <(git tag 
 head_tags="$(git tag --points-at "$head")"
 for project in "${projects[@]}"; do
   case "$project" in
-  web | note | authorization | billing | document | search-worker) ;;
+  web | note | authorization | billing | document | search-worker | ai) ;;
   *)
     echo "Unknown release project: $project" >&2
     exit 1

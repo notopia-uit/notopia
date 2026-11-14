@@ -291,7 +291,7 @@
         }
       },
       "docker": {
-        "projects": ["web", "note", "authorization", "billing", "document", "search-worker"],
+        "projects": ["web", "note", "authorization", "billing", "document", "search-worker", "ai"],
         "releaseTag": {
           "pattern": "{projectName}@{version}",
           "requireSemver": false

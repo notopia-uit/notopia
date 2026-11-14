@@ -87,6 +87,11 @@ on:
         required: true
         default: false
         type: boolean
+      releaseAi:
+        description: Release "ai" container
+        required: true
+        default: false
+        type: boolean
       releaseNpm:
         description: Release NPM packages
         required: true
@@ -141,6 +146,7 @@ jobs:
           INPUT_RELEASE_BILLING: ${{ github.event.inputs.releaseBilling }}
           INPUT_RELEASE_DOC: ${{ github.event.inputs.releaseDocument }}
           INPUT_RELEASE_SW: ${{ github.event.inputs.releaseSearchWorker }}
+          INPUT_RELEASE_AI: ${{ github.event.inputs.releaseAi }}
           INPUT_RELEASE_NPM: ${{ github.event.inputs.releaseNpm }}
           INPUT_RELEASE_ALL: ${{ github.event.inputs.releaseAll }}
         run: |
@@ -161,7 +167,7 @@ jobs:
 
           SHOULD_RELEASE=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" && "$REF_NAME" == "main" ]]; then
-            if [[ "$INPUT_RELEASE_ALL" == "true" || "$INPUT_RELEASE_WEB" == "true" || "$INPUT_RELEASE_NOTE" == "true" || "$INPUT_RELEASE_AUTHORIZATION" == "true" || "$INPUT_RELEASE_BILLING" == "true" || "$INPUT_RELEASE_DOC" == "true" || "$INPUT_RELEASE_SW" == "true" || "$INPUT_RELEASE_NPM" == "true" ]]; then
+            if [[ "$INPUT_RELEASE_ALL" == "true" || "$INPUT_RELEASE_WEB" == "true" || "$INPUT_RELEASE_NOTE" == "true" || "$INPUT_RELEASE_AUTHORIZATION" == "true" || "$INPUT_RELEASE_BILLING" == "true" || "$INPUT_RELEASE_DOC" == "true" || "$INPUT_RELEASE_SW" == "true" || "$INPUT_RELEASE_AI" == "true" || "$INPUT_RELEASE_NPM" == "true" ]]; then
               SHOULD_RELEASE=true
             fi
           fi
@@ -231,7 +237,7 @@ jobs:
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
 
       - name: Check chart versions
-        run: bash scripts/check-chart-versions.sh "$NX_BASE" "$NX_HEAD"
+        run: node scripts/check-chart-versions.ts "$NX_BASE" "$NX_HEAD"
 
       - name: Publish Test Report
         uses: ctrf-io/github-test-reporter@v1
@@ -268,6 +274,7 @@ jobs:
           INPUT_RELEASE_BILLING: ${{ github.event.inputs.releaseBilling }}
           INPUT_RELEASE_DOC: ${{ github.event.inputs.releaseDocument }}
           INPUT_RELEASE_SW: ${{ github.event.inputs.releaseSearchWorker }}
+          INPUT_RELEASE_AI: ${{ github.event.inputs.releaseAi }}
         run: |
           projects="$(bash scripts/resolve-release-projects.sh)"
           echo "RELEASE_PROJECTS=$projects" >> "$GITHUB_OUTPUT"
