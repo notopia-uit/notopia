@@ -56,7 +56,7 @@ catalog:
   "@nestjs/testing": "^11.2.7"
   "@nestjs/typeorm": "^11.0.3"
   "@nestjs/websockets": "^11.2.7"
-  "@openapitools/openapi-generator-cli": "2.31.1"
+  "@openapitools/openapi-generator-cli": "2.42.2"
   "@opentelemetry/api": "~1.10.0"
   "@opentelemetry/auto-instrumentations-node": "~0.83.0"
   "@opentelemetry/sdk-node": "0.301.2"
