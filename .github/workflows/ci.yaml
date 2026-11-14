@@ -20,8 +20,7 @@ on:
       - "!.vscode/**/*"
       - "!.wakatime-project"
       - "!README.md"
-      - "!deploy/**/*"
-      - "deploy/k8s/charts/**"
+      - "!deploy/compose/**/*"
       - "!mise.toml"
       - "!**/*/AGENTS.md"
       - "!**/*/CLAUDE.md"
@@ -119,9 +118,6 @@ jobs:
     outputs:
       page-affected: ${{ steps.page-affected.outputs.affected }}
     steps:
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v4
-
       - name: Setup Variables
         id: setup-vars
         env:
@@ -195,54 +191,11 @@ jobs:
           fetch-depth: 0
           filter: tree:0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
-
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version-file: ${{ env.MISE_OVERRIDE_CONFIG_FILENAMES }}
-
-      - name: Setup Go
-        uses: actions/setup-go@v7
-        with:
-          go-version-file: .tool-versions
-          cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
-
-      - name: Setup golangci-lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          install-only: true
-          version-file: .tool-versions
-          skip-save-cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'false' }}
-
-      - name: Setup Mise
-        uses: jdx/mise-action@v5
-        with:
-          experimental: true
-          cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
-
-      - name: Setup Helm plugins
-        run: just helm-setup
-
-      - name: Cache Buf dependencies
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/buf
-          key: ${{ runner.os }}-buf-${{ hashFiles('**/buf.lock') }}
-          restore-keys: ${{ runner.os }}-buf-
-
-      - name: Derive SHAs for Nx Affected
-        id: set-shas
-        uses: nrwl/nx-set-shas@v5
-
-      - name: Install Node Dependencies
-        run: pnpm install
-
-      - name: Install Go Dependencies
-        run: go mod download
+          cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE }}
+          golangci: "true"
 
       - name: Detect Page Affected
         id: page-affected
@@ -379,9 +332,6 @@ jobs:
         ports:
           - 8000:8000
     steps:
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v4
-
       - name: Setup Git User
         run: |
           git config --global user.name github-actions[bot]
@@ -392,30 +342,11 @@ jobs:
           fetch-depth: 0
           filter: tree:0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          cache: true
-
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version-file: ${{ env.MISE_OVERRIDE_CONFIG_FILENAMES }}
-
-      - name: Setup Go
-        uses: actions/setup-go@v7
-        with:
-          go-version-file: .tool-versions
-          cache: true
-
-      - name: Setup Mise
-        uses: jdx/mise-action@v5
-        with:
-          experimental: true
-          cache: true
-
-      - name: Derive SHAs for Nx Affected
-        uses: nrwl/nx-set-shas@v5
+          cache: "true"
+          go: "true"
 
       - name: Restore Docs diagrams Cache
         id: diagrams-cache
@@ -426,9 +357,6 @@ jobs:
           key: docs-diagrams-
           restore-keys: |
             docs-diagrams-
-
-      - name: Install Node Dependencies
-        run: pnpm install
 
       - name: Nx reset cache
         if: ${{ github.event.inputs.resetNxCache == 'true' }}
