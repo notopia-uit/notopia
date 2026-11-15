@@ -1375,8 +1375,8 @@ importers:
         specifier: 0.2.14
         version: 0.2.14(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2))
       vitepress-plugin-pagefind:
-        specifier: 0.4.26
-        version: 0.4.26(pagefind@1.5.2)(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2))
+        specifier: 0.4.27
+        version: 0.4.27(pagefind@1.5.2)(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2))
     devDependencies:
       get-port:
         specifier: 7.2.0
@@ -15212,8 +15212,8 @@ packages:
       vite: '>= 4.0.0'
       vitepress: '>= 1.0.0'
 
-  vitepress-plugin-pagefind@0.4.26:
-    resolution: {integrity: sha512-nq54lTL51lqdPiLpSBFkAK44K44pWaKA0uORUmNdaFGZqw5GoTUxaN3b6sPn1AHUFE+Le64/cb7hTzLSJj+CGQ==}
+  vitepress-plugin-pagefind@0.4.27:
+    resolution: {integrity: sha512-s46uaZ7gsyXRZLeameVMfe37qScc+XmyzAKr6IHqzUVB7LtEXkH69u2E/aM8BCEjiQCdIZ2ORKqm4NVL4eUiQA==}
     peerDependencies:
       pagefind: ^1.1.0
       vitepress: ^1.0.0-0 || ^2.0.0-0
@@ -31694,7 +31694,7 @@ snapshots:
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@8.1.1))(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitepress: 2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
 
-  vitepress-plugin-pagefind@0.4.26(pagefind@1.5.2)(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2)):
+  vitepress-plugin-pagefind@0.4.27(pagefind@1.5.2)(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2)):
     dependencies:
       '@sugarat/theme-shared': 0.1.0
       '@vueuse/core': 15.0.0(vue@3.5.45(@typescript/typescript6@6.0.2))
