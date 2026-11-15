@@ -263,10 +263,10 @@ catalogs:
       version: 0.0.6
     '@nestjs/microservices':
       specifier: ^11.2.7
-      version: 11.2.9
+      version: 11.2.10
     '@nestjs/platform-express':
       specifier: ^11.2.7
-      version: 11.2.9
+      version: 11.2.10
     '@nestjs/schedule':
       specifier: 12.0.4
       version: 12.0.4
@@ -278,7 +278,7 @@ catalogs:
       version: 12.1.0
     '@nestjs/testing':
       specifier: ^11.2.7
-      version: 11.2.9
+      version: 11.2.10
     '@nestjs/typeorm':
       specifier: ^11.0.3
       version: 11.0.3
@@ -609,10 +609,10 @@ importers:
         version: 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/core':
         specifier: ^11.2.7
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
+        version: 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
       meilisearch:
         specifier: 'catalog:'
         version: 0.58.0
@@ -637,7 +637,7 @@ importers:
         version: 11.1.0(@typescript/typescript6@6.0.2)
       '@nestjs/testing':
         specifier: 'catalog:'
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)
+        version: 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)
       '@nx/docker':
         specifier: 24.0.6
         version: 24.0.6(nx@24.0.6(@swc-node/register@1.12.1(@swc/core@1.16.22(@swc/helpers@0.5.24))(@swc/types@0.1.28)(@typescript/typescript6@6.0.2)(supports-color@8.1.1))(@swc/core@1.16.22(@swc/helpers@0.5.24)))
@@ -793,7 +793,7 @@ importers:
         version: 0.99.0(@typescript/typescript6@6.0.2)(magicast@0.5.5)
       '@openapitools/openapi-generator-cli':
         specifier: 'catalog:'
-        version: 2.31.1(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
+        version: 2.31.1(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       '@redocly/cli':
         specifier: 'catalog:'
         version: 2.30.6(@opentelemetry/api@1.9.1)(core-js@3.51.0)(supports-color@8.1.1)
@@ -820,13 +820,13 @@ importers:
         version: 4.0.4(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.2.7
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/microservices':
         specifier: 'catalog:'
-        version: 11.2.9(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.10(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
+        version: 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
       '@notopia-uit/pb':
         specifier: 'workspace:'
         version: link:../../packages/pb
@@ -881,7 +881,7 @@ importers:
     devDependencies:
       '@nestjs/testing':
         specifier: 'catalog:'
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)
+        version: 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)
       '@types/express':
         specifier: 'catalog:'
         version: 5.0.6
@@ -950,22 +950,22 @@ importers:
         version: 4.0.4(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.2.7
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/locks':
         specifier: 'catalog:'
         version: 0.0.6(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/microservices':
         specifier: 'catalog:'
-        version: 11.2.9(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.10(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
+        version: 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
       '@nestjs/schedule':
         specifier: 'catalog:'
         version: 12.0.4(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)
       '@nestjs/terminus':
         specifier: 'catalog:'
-        version: 12.1.0(@grpc/grpc-js@1.14.7)(@grpc/proto-loader@0.8.1)(@nestjs/axios@4.0.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2))(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.9)(@nestjs/typeorm@11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1)))(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))
+        version: 12.1.0(@grpc/grpc-js@1.14.7)(@grpc/proto-loader@0.8.1)(@nestjs/axios@4.0.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2))(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.10)(@nestjs/typeorm@11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1)))(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))
       '@nestjs/typeorm':
         specifier: 'catalog:'
         version: 11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))
@@ -1071,7 +1071,7 @@ importers:
         version: 1.3.0
       '@nestjs/testing':
         specifier: 'catalog:'
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)
+        version: 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)
       '@suites/di.nestjs':
         specifier: 'catalog:'
         version: 3.1.0(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(reflect-metadata@0.2.2)
@@ -1128,16 +1128,16 @@ importers:
         version: 4.0.4(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.2.7
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/microservices':
         specifier: 'catalog:'
-        version: 11.2.9(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.10(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
+        version: 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
       '@nestjs/terminus':
         specifier: 'catalog:'
-        version: 12.1.0(@grpc/grpc-js@1.14.7)(@grpc/proto-loader@0.8.1)(@nestjs/axios@4.0.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2))(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.9)(@nestjs/typeorm@11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1)))(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))
+        version: 12.1.0(@grpc/grpc-js@1.14.7)(@grpc/proto-loader@0.8.1)(@nestjs/axios@4.0.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2))(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.10)(@nestjs/typeorm@11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1)))(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))
       '@notopia-uit/api-share-gen':
         specifier: 'workspace:'
         version: link:../../packages/api-share-gen
@@ -1207,7 +1207,7 @@ importers:
         version: 1.3.0
       '@nestjs/testing':
         specifier: 'catalog:'
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)
+        version: 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)
       '@types/express':
         specifier: 'catalog:'
         version: 5.0.6
@@ -1404,10 +1404,10 @@ importers:
         version: 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/core':
         specifier: ^11.2.7
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
+        version: 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
       '@swc/helpers':
         specifier: 'catalog:'
         version: 0.5.24
@@ -1484,7 +1484,7 @@ importers:
         version: 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/core':
         specifier: ^11.2.7
-        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/locks':
         specifier: 'catalog:'
         version: 0.0.6(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -1511,7 +1511,7 @@ importers:
         version: 1.14.7
       '@nestjs/microservices':
         specifier: 'catalog:'
-        version: 11.2.9(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.2.10(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -3980,8 +3980,8 @@ packages:
       reflect-metadata: ^0.1.13 || ^0.2.0
       rxjs: ^7.1.0
 
-  '@nestjs/microservices@11.2.9':
-    resolution: {integrity: sha512-RZMg4uH3RNMPYtBrh4BFkxc1UQs0O3dXGD5OCgzReX1CY+nilbYS+8eVcRtYgNLiFtSWCKyxMlGQbMEEAg4lLA==}
+  '@nestjs/microservices@11.2.10':
+    resolution: {integrity: sha512-e0MigliY3awm5qwa72IXxgDkxWSfsGC8t7jZLOy5GeeUbSb84YJVI0+khkVIE1Kc1yFdOTuF8tDIYpkI9dVJWQ==}
     peerDependencies:
       '@grpc/grpc-js': '*'
       '@nestjs/common': ^11.2.7
@@ -4016,8 +4016,8 @@ packages:
       nats:
         optional: true
 
-  '@nestjs/platform-express@11.2.9':
-    resolution: {integrity: sha512-mL9n54HYQhuQr6DJaGDQTjmiI6lWcrhgTa6U++7xrQySSf5qn2FwTyJcm3N9yfb8kea/KHYvFDf+As+0+vnaQw==}
+  '@nestjs/platform-express@11.2.10':
+    resolution: {integrity: sha512-piXubUA2wyq/iEj4yN4rRF13uZcyzKVq6D/Z5RoBFdgvn0MB0qRfqF2ZXvPj4aepyDDykGXL45m0kRnxZyx2lQ==}
     peerDependencies:
       '@nestjs/common': ^11.2.7
       '@nestjs/core': ^11.2.7
@@ -4090,8 +4090,8 @@ packages:
       typeorm:
         optional: true
 
-  '@nestjs/testing@11.2.9':
-    resolution: {integrity: sha512-7FNQh/nAzTpMh1YJzfiojqh6oATjAgdoKvFKFXPVx84g2pOB6wSe8T+PziUoUArudj4gA++67m+4qHmnx/zNwA==}
+  '@nestjs/testing@11.2.10':
+    resolution: {integrity: sha512-7rp2Zs+T5pP55yGDXDBcIP+IBYxI4CglnTi5TXfzfrp1Qr9a15rwov6VVog6OtuP8BYcGvCgvEzb1kqtHoXjfg==}
     peerDependencies:
       '@nestjs/common': ^11.2.7
       '@nestjs/core': ^11.2.7
@@ -18435,7 +18435,7 @@ snapshots:
       lodash: 4.18.1
       rxjs: 7.8.2
 
-  '@nestjs/core@11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
+  '@nestjs/core@11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       fast-safe-stringify: 2.1.1
@@ -18446,20 +18446,20 @@ snapshots:
       tslib: 2.8.1
       uid: 2.0.2
     optionalDependencies:
-      '@nestjs/microservices': 11.2.9(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/platform-express': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
+      '@nestjs/microservices': 11.2.10(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express': 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
 
   '@nestjs/locks@0.0.6(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
 
-  '@nestjs/microservices@11.2.9(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
+  '@nestjs/microservices@11.2.10(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       iterare: 1.2.1
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
@@ -18469,10 +18469,10 @@ snapshots:
       ioredis: 5.11.1(supports-color@8.1.1)
       kafkajs: 2.2.4
 
-  '@nestjs/platform-express@11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)':
+  '@nestjs/platform-express@11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       cors: 2.8.6
       express: 5.2.1(supports-color@8.1.1)
       multer: 2.5.0
@@ -18484,7 +18484,7 @@ snapshots:
   '@nestjs/schedule@12.0.4(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       cron: 4.4.0
 
   '@nestjs/schematics@11.1.0(@typescript/typescript6@6.0.2)':
@@ -18498,33 +18498,33 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@nestjs/terminus@12.1.0(@grpc/grpc-js@1.14.7)(@grpc/proto-loader@0.8.1)(@nestjs/axios@4.0.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2))(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.9)(@nestjs/typeorm@11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1)))(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))':
+  '@nestjs/terminus@12.1.0(@grpc/grpc-js@1.14.7)(@grpc/proto-loader@0.8.1)(@nestjs/axios@4.0.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2))(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.10)(@nestjs/typeorm@11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1)))(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
     optionalDependencies:
       '@grpc/grpc-js': 1.14.7
       '@grpc/proto-loader': 0.8.1
       '@nestjs/axios': 4.0.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
-      '@nestjs/microservices': 11.2.9(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/microservices': 11.2.10(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/typeorm': 11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))
       typeorm: 1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1)
 
-  '@nestjs/testing@11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)':
+  '@nestjs/testing@11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       tslib: 2.8.1
     optionalDependencies:
-      '@nestjs/microservices': 11.2.9(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/platform-express': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
+      '@nestjs/microservices': 11.2.10(@grpc/grpc-js@1.14.7)(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express': 11.2.10(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(supports-color@8.1.1)
 
   '@nestjs/typeorm@11.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1))':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
       typeorm: 1.1.3(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.23.1)(supports-color@8.1.1)
@@ -18788,7 +18788,7 @@ snapshots:
       tslib: 2.9.1
     optionalDependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
     transitivePeerDependencies:
@@ -19116,12 +19116,12 @@ snapshots:
       - '@swc-node/register'
       - '@swc/core'
 
-  '@openapitools/openapi-generator-cli@2.31.1(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)':
+  '@openapitools/openapi-generator-cli@2.31.1(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)':
     dependencies:
       '@inquirer/select': 1.3.3
       '@nestjs/axios': 4.0.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nuxtjs/opencollective': 0.3.2
       axios: 1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       chalk: 4.1.2
@@ -28431,7 +28431,7 @@ snapshots:
   nestjs-otel@8.1.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(rxjs@7.8.2):
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@opentelemetry/api': 1.10.0
       '@opentelemetry/host-metrics': 0.38.3(@opentelemetry/api@1.10.0)
       rxjs: 7.8.2
@@ -28439,7 +28439,7 @@ snapshots:
   nestjs-pino@5.3.1(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(pino-http@11.0.0)(pino@10.4.0)(rxjs@7.8.2):
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.9)(@nestjs/platform-express@11.2.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.9(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.10)(@nestjs/platform-express@11.2.10)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       pino: 10.4.0
       pino-http: 11.0.0
       rxjs: 7.8.2
