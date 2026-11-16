@@ -489,8 +489,8 @@ These exist purely because we bundle the editor cluster; keep them:
 
 - `stub.js` — `NormalModuleReplacementPlugin(/file-type$/, …)` stubs `file-type` (ESM-only, pulled by a
   bundled dep).
-- `inquire-shim.js` — `NormalModuleReplacementPlugin(/@protobufjs\/inquire/, …)` shims a dynamic
-  `require(expr)` so it doesn't warn/break when bundled (`@bufbuild/protobuf` neighborhood).
+- ~~`inquire-shim.js`~~ — removed 2026-11. `@protobufjs/inquire` is no longer in the dependency tree
+  (protobufjs 7.6+/8.x dropped it), and the bundle was byte-identical with and without the shim.
 - `IgnorePlugin` + the `lazyImports` set — drops optional peer deps (`mysql`, `oracledb`, `ioredis`,
   `class-validator`, etc.) that bundled CJS libs (`typeorm`, `@nestjs/*`) reference behind feature flags.
 - `jsdom` is **not** in `keepBundled` (it externalizes by default) — §4.2.
@@ -514,9 +514,9 @@ that double-emits a ~64 MB inline source map into `main.cjs` (§5.a). Use only `
 - Nx externals logic: `@nx/rspack/src/plugins/utils/apply-base-config.js` (`config.externals = externals`
   overwrite; the `externalDependencies` branches).
 - Related already-merged OTel work (don't redo): `fix(otel): connect Go traces, emit gin/grpc metrics, and
-enable web OTLP logs`; `fix(document,search-worker): externalize npm deps so OTel can instrument them`;
+  enable web OTLP logs`; `fix(document,search-worker): externalize npm deps so OTel can instrument them`;
   `chore: move type express to dev deps in nestjs`; `chore(lib,ui,pb): use peerDependencies for host-provided
-singletons`.
+  singletons`.
 
 ---
 
@@ -525,7 +525,7 @@ singletons`.
 - **Proposal: stop bundling, swc transpile-only (`@nx/js:swc`).** NestJS backends are normally not bundled.
   Output your compiled `src/` (a few hundred KB), keep **all** `node_modules` external. Every package then
   loads as authored — no interop landmines, no `keepBundled` list, every instrumentation patches natively, and
-  you can delete `stub.js` / `inquire-shim.js` / `IgnorePlugin`. Cost: a real build migration (touch
+  you can delete `stub.js` / `IgnorePlugin`. Cost: a real build migration (touch
   `project.json` build target, Dockerfile, the TypeORM migrations path, `mise.toml`, `out-tsc`/`dist`
   assumptions). The runtime `node_modules` is already handled by `generatePackageJson` + prune. **This is the
   cleanest long-term answer** if/when someone wants to invest the migration; the current rspack design is the
