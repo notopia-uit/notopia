@@ -74,7 +74,7 @@ in `finally` before future requests, including failed requests.
 
 ## Running and verifying
 
-Use the normal local stack and AI configuration in `deploy/compose/AI_TESTING.md`. A model
+Use the [AI service setup guide](../src/services/ai/index.md#local-setup). A model
 supporting tool calls, authenticated note access, billing allowance, and AI Redis are required.
 OpenRouter's free model allowance does not replace workspace billing credits. API and document
 WebSocket URLs are supplied by the web app, with `ws`/`wss` derived from the API origin.
