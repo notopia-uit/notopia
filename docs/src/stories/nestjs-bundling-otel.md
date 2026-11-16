@@ -6,6 +6,8 @@ authorship:
 # Bundling the NestJS apps (document / search-worker): OpenTelemetry logs, CJS, and the externals split
 
 > **Update 2026-10:** see [`nestjs-bundling-otel-2026-10-blocknote-055.md`](./nestjs-bundling-otel-2026-10-blocknote-055.md).
+>
+> **Update 2026-11:** `inquire-shim.js` removed, see [Changelog](#changelog).
 > blocknote 0.55 still ships a broken `.cjs` (hack still needed). Transitive deps of the `keepBundled` cluster
 > are now bundled too (`contextInfo.issuer` rule, §10 below is outdated), and the Docker image was fixed and
 > verified. The §8 `nx run` probe masks resolution failures; use the container probe there instead.
@@ -489,8 +491,9 @@ These exist purely because we bundle the editor cluster; keep them:
 
 - `stub.js` — `NormalModuleReplacementPlugin(/file-type$/, …)` stubs `file-type` (ESM-only, pulled by a
   bundled dep).
-- ~~`inquire-shim.js`~~ — removed 2026-11. `@protobufjs/inquire` is no longer in the dependency tree
-  (protobufjs 7.6+/8.x dropped it), and the bundle was byte-identical with and without the shim.
+- `inquire-shim.js` — `NormalModuleReplacementPlugin(/@protobufjs\/inquire/, …)` shims a dynamic
+  `require(expr)` so it doesn't warn/break when bundled (`@bufbuild/protobuf` neighborhood).
+  **Removed 2026-11**, see [Changelog](#changelog).
 - `IgnorePlugin` + the `lazyImports` set — drops optional peer deps (`mysql`, `oracledb`, `ioredis`,
   `class-validator`, etc.) that bundled CJS libs (`typeorm`, `@nestjs/*`) reference behind feature flags.
 - `jsdom` is **not** in `keepBundled` (it externalizes by default) — §4.2.
@@ -514,9 +517,9 @@ that double-emits a ~64 MB inline source map into `main.cjs` (§5.a). Use only `
 - Nx externals logic: `@nx/rspack/src/plugins/utils/apply-base-config.js` (`config.externals = externals`
   overwrite; the `externalDependencies` branches).
 - Related already-merged OTel work (don't redo): `fix(otel): connect Go traces, emit gin/grpc metrics, and
-  enable web OTLP logs`; `fix(document,search-worker): externalize npm deps so OTel can instrument them`;
+enable web OTLP logs`; `fix(document,search-worker): externalize npm deps so OTel can instrument them`;
   `chore: move type express to dev deps in nestjs`; `chore(lib,ui,pb): use peerDependencies for host-provided
-  singletons`.
+singletons`.
 
 ---
 
@@ -525,7 +528,7 @@ that double-emits a ~64 MB inline source map into `main.cjs` (§5.a). Use only `
 - **Proposal: stop bundling, swc transpile-only (`@nx/js:swc`).** NestJS backends are normally not bundled.
   Output your compiled `src/` (a few hundred KB), keep **all** `node_modules` external. Every package then
   loads as authored — no interop landmines, no `keepBundled` list, every instrumentation patches natively, and
-  you can delete `stub.js` / `IgnorePlugin`. Cost: a real build migration (touch
+  you can delete `stub.js` / `inquire-shim.js` / `IgnorePlugin`. Cost: a real build migration (touch
   `project.json` build target, Dockerfile, the TypeORM migrations path, `mise.toml`, `out-tsc`/`dist`
   assumptions). The runtime `node_modules` is already handled by `generatePackageJson` + prune. **This is the
   cleanest long-term answer** if/when someone wants to invest the migration; the current rspack design is the
@@ -542,3 +545,37 @@ that double-emits a ~64 MB inline source map into `main.cjs` (§5.a). Use only `
 ```
 
 ```
+
+---
+
+## Changelog
+
+### 2026-11: removed `inquire-shim.js`
+
+**Previously.** §10.1 listed `apps/document/inquire-shim.js` as required scaffolding: a
+`NormalModuleReplacementPlugin(/@protobufjs\/inquire/, …)` that swapped protobufjs's `inquire` helper
+(`eval("require")`, which rspack turns into an empty context module) for a static map of `fs`, `path`,
+`long` and `buffer`. It existed so that `Root.loadSync` could read `.proto` files from inside the bundle.
+The three rspack configs also carried a comment that bundling `@bufbuild/protobuf` "keeps inquire-shim
+valid".
+
+**What changed.**
+
+- `@protobufjs/inquire` is gone from the dependency tree. protobufjs 7.6.6 (pulled by
+  `@grpc/proto-loader`) and 8.x (direct, upgraded 8.4 → 8.8 in the same cycle) no longer depend on it;
+  8.6.1's changelog says "Remove inquire submodule". The replacement regex therefore matched nothing.
+- `Root.loadSync` never runs anyway. We pass ts-proto's `packageDefinition` to Nest, so no `.proto`
+  file is read at runtime ([`nestjs-grpc-proto-loader.md`](./nestjs-grpc-proto-loader.md)).
+- The "keeps inquire-shim valid" comment confused two libraries. `@bufbuild/protobuf` is the ts-proto
+  wire runtime; `inquire` belonged to protobufjs.
+
+**Verification.** `document` was built with and without the shim (after the protobufjs 8.8 upgrade):
+`main.cjs` and `migrate.cjs` were byte-identical. A baseline on the old deps (protobufjs 8.4.2) had zero
+`inquire` references in `main.cjs`. The only output difference: `long` dropped from the generated
+`dist/package.json`, because Nx had inferred it solely from the shim's `require('long')`. Nothing in
+`document` or `@notopia-uit/pb` imports `long`, and protobufjs still installs it as its own dependency.
+
+**Result.** Deleted `apps/document/inquire-shim.js` and its plugin entry, and dropped the comment from
+the `ai`, `document` and `search-worker` rspack configs. `stub.js` and the `IgnorePlugin` set from §10.1
+are unchanged. `docs/src/stories/tmp/nestjs-rspack.md` suspects they are unused too, but they have not
+been verified.
