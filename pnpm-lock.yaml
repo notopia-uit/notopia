@@ -311,7 +311,7 @@ catalogs:
       version: 2.18.0
     '@streamdown/cjk':
       specifier: ^1.0.4
-      version: 1.0.4
+      version: 1.0.5
     '@streamdown/code':
       specifier: ^2.0.0
       version: 2.0.0
@@ -1550,7 +1550,7 @@ importers:
         version: 0.3.1(@types/react@19.3.0)(react@19.3.1)
       '@streamdown/cjk':
         specifier: 'catalog:'
-        version: 1.0.4(@types/mdast@4.0.4)(micromark-util-types@2.0.3)(micromark@4.0.3(supports-color@8.1.1))(react@19.3.1)(supports-color@8.1.1)(unified@11.0.5)
+        version: 1.0.5(@types/mdast@4.0.4)(micromark-util-types@2.0.3)(micromark@4.0.3(supports-color@8.1.1))(react@19.3.1)(supports-color@8.1.1)(unified@11.0.5)
       '@streamdown/code':
         specifier: 'catalog:'
         version: 2.0.0(react@19.3.1)
@@ -7109,8 +7109,8 @@ packages:
     resolution: {integrity: sha512-JZlVFE6/dYpP9tQmV0/ADfn32L9uFarHWxfcRhReKUnljz1ZiUM5zpX+PH8h5CJs6lao3TuFqnPm9IJJCEkE2w==}
     engines: {node: '>=10.8'}
 
-  '@streamdown/cjk@1.0.4':
-    resolution: {integrity: sha512-l5IVxqNhQDj9bDTu6h1sqxeEjZI7pW1uZ6Yu79l+9DqfmOkfGF0AJ0+y8oFi1hrFdscGqhXVNGjSgFJgh6Xh3A==}
+  '@streamdown/cjk@1.0.5':
+    resolution: {integrity: sha512-ScrHOYy0uO3ry34mRsW6sfBOJz0j8evoj72c0W2rscFiALEJQMXwyKYMeajkk1fUl7oemVGNThf3nrSL8OFBSg==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
@@ -22316,7 +22316,7 @@ snapshots:
       '@stoplight/yaml-ast-parser': 0.0.50
       tslib: 2.9.1
 
-  '@streamdown/cjk@1.0.4(@types/mdast@4.0.4)(micromark-util-types@2.0.3)(micromark@4.0.3(supports-color@8.1.1))(react@19.3.1)(supports-color@8.1.1)(unified@11.0.5)':
+  '@streamdown/cjk@1.0.5(@types/mdast@4.0.4)(micromark-util-types@2.0.3)(micromark@4.0.3(supports-color@8.1.1))(react@19.3.1)(supports-color@8.1.1)(unified@11.0.5)':
     dependencies:
       mdast-util-gfm-autolink-literal: 2.1.0
       react: 19.3.1
