@@ -4,6 +4,7 @@ properties:
   paidAmount:
     type: integer
     format: int64
+    description: Amount paid for this payment, in the quote currency
     examples: [49000]
   amount:
     type: integer
@@ -13,9 +14,11 @@ properties:
   coverageSeconds:
     type: integer
     format: int64
+    description: Length of the payment's invoice coverage in seconds
     examples: [2592000]
   unusedSeconds:
     type: integer
     format: int64
+    description: Unused portion of the payment's invoice coverage in seconds
     examples: [1296000]
 required: [paidAmount, amount, coverageSeconds, unusedSeconds]

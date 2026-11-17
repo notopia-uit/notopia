@@ -360,13 +360,16 @@ type RefundStatus string
 
 // RefundQuote defines model for RefundQuote.
 type RefundQuote struct {
-	// Amount Examples: 24500
+	// Amount Examples: 29500
 	Amount int64 `json:"amount"`
 
 	// Currency Examples: vnd
 	Currency string `json:"currency"`
 
-	// Payments One line per paid invoice payment of the current period
+	// Payments Refund breakdown by eligible paid invoice payment whose invoice coverage overlaps the current subscription period. A payment's coverage may differ from the current period, for example after a plan change.
+	//
+	//
+	// Examples: [{"amount":24500,"coverageSeconds":2592000,"paidAmount":49000,"unusedSeconds":1296000},{"amount":5000,"coverageSeconds":1296000,"paidAmount":10000,"unusedSeconds":648000}]
 	Payments []RefundQuotePayment `json:"payments"`
 
 	// PeriodSeconds Examples: 2592000
@@ -383,13 +386,19 @@ type RefundQuotePayment struct {
 	// Examples: 24500
 	Amount int64 `json:"amount"`
 
-	// CoverageSeconds Examples: 2592000
+	// CoverageSeconds Length of the payment's invoice coverage in seconds
+	//
+	// Examples: 2592000
 	CoverageSeconds int64 `json:"coverageSeconds"`
 
-	// PaidAmount Examples: 49000
+	// PaidAmount Amount paid for this payment, in the quote currency
+	//
+	// Examples: 49000
 	PaidAmount int64 `json:"paidAmount"`
 
-	// UnusedSeconds Examples: 1296000
+	// UnusedSeconds Unused portion of the payment's invoice coverage in seconds
+	//
+	// Examples: 1296000
 	UnusedSeconds int64 `json:"unusedSeconds"`
 }
 

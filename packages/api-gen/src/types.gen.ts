@@ -626,12 +626,21 @@ export type BillingRedirectUrl = {
 };
 
 export type BillingRefundQuotePayment = {
+    /**
+     * Amount paid for this payment, in the quote currency
+     */
     paidAmount: bigint;
     /**
      * Refund for this payment
      */
     amount: bigint;
+    /**
+     * Length of the payment's invoice coverage in seconds
+     */
     coverageSeconds: bigint;
+    /**
+     * Unused portion of the payment's invoice coverage in seconds
+     */
     unusedSeconds: bigint;
 };
 
@@ -641,7 +650,8 @@ export type BillingRefundQuote = {
     unusedSeconds: bigint;
     periodSeconds: bigint;
     /**
-     * One line per paid invoice payment of the current period
+     * Refund breakdown by eligible paid invoice payment whose invoice coverage overlaps the current subscription period. A payment's coverage may differ from the current period, for example after a plan change.
+     *
      */
     payments: Array<BillingRefundQuotePayment>;
 };
