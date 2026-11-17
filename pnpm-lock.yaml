@@ -317,7 +317,7 @@ catalogs:
       version: 2.0.1
     '@streamdown/math':
       specifier: ^1.0.3
-      version: 1.0.3
+      version: 1.0.4
     '@streamdown/mermaid':
       specifier: ^1.0.3
       version: 1.0.3
@@ -1556,7 +1556,7 @@ importers:
         version: 2.0.1(react@19.3.1)
       '@streamdown/math':
         specifier: 'catalog:'
-        version: 1.0.3(react@19.3.1)(supports-color@8.1.1)
+        version: 1.0.4(react@19.3.1)(supports-color@8.1.1)
       '@streamdown/mermaid':
         specifier: 'catalog:'
         version: 1.0.3(react@19.3.1)
@@ -7120,8 +7120,8 @@ packages:
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
-  '@streamdown/math@1.0.3':
-    resolution: {integrity: sha512-TOTRlPYs4LBNT8GaIWNCEVrcGVQsVcfc8WZ/x/0IyO+Rvsu6W+nF+YCS4Pl3JTVWQK8QX7LbWUChSilwlyzPZw==}
+  '@streamdown/math@1.0.4':
+    resolution: {integrity: sha512-+gdewMT9ZewPsGlIaS7EKCMkLe2UZXaYgXbGpofwoHl3wDVR0KIrF1BxX0mcC/pyU7sYXi1S9NxP/tawhV6XwA==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
@@ -22335,7 +22335,7 @@ snapshots:
       react: 19.3.1
       shiki: 4.6.0
 
-  '@streamdown/math@1.0.3(react@19.3.1)(supports-color@8.1.1)':
+  '@streamdown/math@1.0.4(react@19.3.1)(supports-color@8.1.1)':
     dependencies:
       katex: 0.16.47
       react: 19.3.1
