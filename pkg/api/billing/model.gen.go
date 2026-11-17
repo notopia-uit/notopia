@@ -199,7 +199,7 @@ type Entitlements struct {
 	// AccessUntil Examples: 2026-11-11T00:00:00Z
 	AccessUntil nullable.Nullable[time.Time] `json:"accessUntil,omitempty"`
 
-	// Features Feature flags by key (auto_commit, workspace_graph).
+	// Features Feature flags available to a plan.
 	//
 	// Examples: {"auto_commit":true,"workspace_graph":true}
 	Features Features `json:"features"`
@@ -239,15 +239,26 @@ type Error struct {
 	MoreInfo *string `json:"more_info,omitempty"`
 }
 
-// Features Feature flags by key (auto_commit, workspace_graph).
+// Features Feature flags available to a plan.
 //
 // Examples: {"auto_commit":true,"workspace_graph":true}
-type Features map[string]bool
+type Features struct {
+	AutoCommit     *bool `json:"auto_commit,omitempty"`
+	WorkspaceGraph *bool `json:"workspace_graph,omitempty"`
+}
 
 // Limits Limits by key. -1 means unlimited.
 //
 // Examples: {"members":10,"revision_history_days":30}
-type Limits map[string]int64
+type Limits struct {
+	AiCreditsMonthly             *int64 `json:"ai_credits_monthly,omitempty"`
+	AutoCommitMinIntervalSeconds *int64 `json:"auto_commit_min_interval_seconds,omitempty"`
+	Members                      *int64 `json:"members,omitempty"`
+	NoteGraphMaxDepth            *int64 `json:"note_graph_max_depth,omitempty"`
+	PublishedNotes               *int64 `json:"published_notes,omitempty"`
+	RevisionHistoryDays          *int64 `json:"revision_history_days,omitempty"`
+	TrashRetentionDays           *int64 `json:"trash_retention_days,omitempty"`
+}
 
 // Payer defines model for Payer.
 type Payer struct {
@@ -266,7 +277,7 @@ type Payer struct {
 
 // Plan defines model for Plan.
 type Plan struct {
-	// Features Feature flags by key (auto_commit, workspace_graph).
+	// Features Feature flags available to a plan.
 	//
 	// Examples: {"auto_commit":true,"workspace_graph":true}
 	Features Features `json:"features"`
@@ -422,7 +433,7 @@ type SubscriptionStatus string
 
 // UpdatePlanRequest defines model for UpdatePlanRequest.
 type UpdatePlanRequest struct {
-	// Features Feature flags by key (auto_commit, workspace_graph).
+	// Features Feature flags available to a plan.
 	//
 	// Examples: {"auto_commit":true,"workspace_graph":true}
 	Features *Features `json:"features,omitempty"`

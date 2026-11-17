@@ -10,8 +10,8 @@ import (
 
 type UpdatePlan struct {
 	Tier     PlanTier
-	Features map[string]bool
-	Limits   map[string]int64
+	Features Features
+	Limits   Limits
 	UserID   string
 }
 
@@ -28,14 +28,8 @@ type UpdatePlanCmd commonhandler.Cmd[UpdatePlan]
 var _ UpdatePlanCmd = (*UpdatePlanHandler)(nil)
 
 func (h *UpdatePlanHandler) Handle(ctx context.Context, cmd *UpdatePlan) error {
-	features, err := parseFeatures(cmd.Features)
-	if err != nil {
-		return err
-	}
-	limits, err := parseLimits(cmd.Limits)
-	if err != nil {
-		return err
-	}
+	features := toDomainFeatureUpdates(cmd.Features)
+	limits := toDomainLimitUpdates(cmd.Limits)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		plan, err := r.Plan().Get(ctx, toDomainPlanTier(cmd.Tier), true)
 		if err != nil {

@@ -98,20 +98,17 @@ func toRefundStatusDTO(s app.RefundStatus) (billing.RefundStatus, error) {
 	return "", errs.NewInternal(fmt.Sprintf("invalid refund status: %v", s), nil)
 }
 
-func toFeatures(m map[string]bool) billing.Features {
-	out := billing.Features{}
-	for k, v := range m {
-		out[k] = v
-	}
-	return out
+func toFeatures(in app.Features) billing.Features {
+	return billing.Features{AutoCommit: in.AutoCommit, WorkspaceGraph: in.WorkspaceGraph}
 }
 
-func toLimits(m map[string]int64) billing.Limits {
-	out := billing.Limits{}
-	for k, v := range m {
-		out[k] = v
+func toLimits(in app.Limits) billing.Limits {
+	return billing.Limits{
+		Members: in.Members, PublishedNotes: in.PublishedNotes,
+		NoteGraphMaxDepth: in.NoteGraphMaxDepth, AutoCommitMinIntervalSeconds: in.AutoCommitMinIntervalSeconds,
+		RevisionHistoryDays: in.RevisionHistoryDays, TrashRetentionDays: in.TrashRetentionDays,
+		AiCreditsMonthly: in.AICreditsMonthly,
 	}
-	return out
 }
 
 func toEntitlements(e app.Entitlements) (billing.Entitlements, error) {

@@ -78,7 +78,9 @@ func (s *ServiceServer) ListPlans(ctx context.Context, _ *pb.ListPlansRequest) (
 		if err != nil {
 			return nil, err
 		}
-		out.Plans = append(out.Plans, &pb.BillingPlan{Tier: tier, Features: v.Plan.Features, Limits: v.Plan.Limits})
+		out.Plans = append(out.Plans, &pb.BillingPlan{
+			Tier: tier, Features: toPBFeatures(v.Plan.Features), Limits: toPBLimits(v.Plan.Limits),
+		})
 	}
 	return out, nil
 }

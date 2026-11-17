@@ -400,14 +400,25 @@ export const zBillingPlanTier = z.enum([
 ]);
 
 /**
- * Feature flags by key (auto_commit, workspace_graph).
+ * Feature flags available to a plan.
  */
-export const zBillingFeatures = z.record(z.string(), z.boolean());
+export const zBillingFeatures = z.object({
+    auto_commit: z.boolean().optional(),
+    workspace_graph: z.boolean().optional()
+});
 
 /**
  * Limits by key. -1 means unlimited.
  */
-export const zBillingLimits = z.record(z.string(), z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }));
+export const zBillingLimits = z.object({
+    members: z.coerce.bigint().gte(BigInt(-1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    published_notes: z.coerce.bigint().gte(BigInt(-1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    note_graph_max_depth: z.coerce.bigint().gte(BigInt(-1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    auto_commit_min_interval_seconds: z.coerce.bigint().gte(BigInt(-1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    revision_history_days: z.coerce.bigint().gte(BigInt(-1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    trash_retention_days: z.coerce.bigint().gte(BigInt(-1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    ai_credits_monthly: z.coerce.bigint().gte(BigInt(-1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional()
+});
 
 export const zBillingBillingInterval = z.enum([
     'month',
@@ -1208,7 +1219,7 @@ export const zCreateCheckoutSessionPath = z.object({
 });
 
 /**
- * Redirect the browser to this URL
+ * Checkout session URL. Redirect the browser to this URL to complete the purchase.
  */
 export const zCreateCheckoutSessionResponse = zBillingRedirectUrl;
 
@@ -1217,7 +1228,7 @@ export const zCreatePortalSessionPath = z.object({
 });
 
 /**
- * Redirect the browser to this URL
+ * Customer Portal session URL. Redirect the browser to this URL to manage existing billing.
  */
 export const zCreatePortalSessionResponse = zBillingRedirectUrl;
 
@@ -1244,7 +1255,7 @@ export const zClaimPayerPath = z.object({
 });
 
 /**
- * Redirect the browser to this URL
+ * Checkout session URL. Redirect the browser to this URL to set up a payment method.
  */
 export const zClaimPayerResponse = zBillingRedirectUrl;
 

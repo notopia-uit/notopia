@@ -152,11 +152,25 @@ func (s RefundStatus) String() string {
 	return "unspecified"
 }
 
-// Feature and limit keys are plain strings here: both wires (proto map, OpenAPI object) key them by string.
+type Features struct {
+	AutoCommit     *bool
+	WorkspaceGraph *bool
+}
+
+type Limits struct {
+	Members                      *int64
+	PublishedNotes               *int64
+	NoteGraphMaxDepth            *int64
+	AutoCommitMinIntervalSeconds *int64
+	RevisionHistoryDays          *int64
+	TrashRetentionDays           *int64
+	AICreditsMonthly             *int64
+}
+
 type Plan struct {
 	Tier     PlanTier
-	Features map[string]bool
-	Limits   map[string]int64
+	Features Features
+	Limits   Limits
 }
 
 type Price struct {
@@ -186,8 +200,8 @@ type Entitlements struct {
 	Plan        PlanTier
 	Status      SubscriptionStatus
 	AccessUntil *time.Time
-	Features    map[string]bool
-	Limits      map[string]int64
+	Features    Features
+	Limits      Limits
 }
 
 type Refund struct {

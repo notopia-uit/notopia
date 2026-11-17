@@ -10,8 +10,8 @@ const setup = (entitlements: unknown) => {
     listPlans: vi.fn().mockReturnValue(
       of({
         plans: [
-          { tier: 2, limits: { ai_credits_monthly: 200 } },
-          { tier: 3, limits: { ai_credits_monthly: 2000 } },
+          { tier: 2, limits: { aiCreditsMonthly: 200 } },
+          { tier: 3, limits: { aiCreditsMonthly: 2000 } },
         ],
       })
     ),
@@ -22,10 +22,10 @@ const setup = (entitlements: unknown) => {
 };
 describe('AI billing integration', () => {
   it('fetches current entitlements on every check', async () => {
-    const { client, service } = setup({ workspaceId, limits: { ai_credits_monthly: 200 } });
+    const { client, service } = setup({ workspaceId, limits: { aiCreditsMonthly: 200 } });
     expect(await service.monthlyCredits(workspaceId)).toBe(200);
     client.getWorkspaceEntitlements.mockReturnValue(
-      of({ entitlements: { workspaceId, limits: { ai_credits_monthly: 0 } } })
+      of({ entitlements: { workspaceId, limits: { aiCreditsMonthly: 0 } } })
     );
     expect(await service.monthlyCredits(workspaceId)).toBe(0);
     expect(client.getWorkspaceEntitlements).toHaveBeenCalledTimes(2);
@@ -33,8 +33,8 @@ describe('AI billing integration', () => {
   it.each([
     undefined,
     { workspaceId: 'another' },
-    { workspaceId, limits: { ai_credits_monthly: -2 } },
-    { workspaceId, limits: { ai_credits_monthly: '9007199254740993' } },
+    { workspaceId, limits: { aiCreditsMonthly: -2 } },
+    { workspaceId, limits: { aiCreditsMonthly: '9007199254740993' } },
   ])('rejects invalid entitlements %#', async (value) => {
     await expect(setup(value).service.monthlyCredits(workspaceId)).rejects.toMatchObject({
       status: 503,
@@ -43,7 +43,7 @@ describe('AI billing integration', () => {
   it('treats a missing quota as zero and -1 as unlimited', async () => {
     expect(await setup({ workspaceId }).service.monthlyCredits(workspaceId)).toBe(0);
     expect(
-      await setup({ workspaceId, limits: { ai_credits_monthly: -1 } }).service.monthlyCredits(
+      await setup({ workspaceId, limits: { aiCreditsMonthly: -1 } }).service.monthlyCredits(
         workspaceId
       )
     ).toBe(-1);
@@ -64,13 +64,13 @@ describe('AI billing integration', () => {
   it('skips a tier the billing service does not offer', async () => {
     const { client, service } = setup({});
     client.listPlans.mockReturnValue(
-      of({ plans: [{ tier: 3, limits: { ai_credits_monthly: 2000 } }] })
+      of({ plans: [{ tier: 3, limits: { aiCreditsMonthly: 2000 } }] })
     );
     expect(await service.requiredPlan(0)).toBe('pro');
   });
   it.each([
     { label: 'no plans', plans: [] },
-    { label: 'no higher plan', plans: [{ tier: 2, limits: { ai_credits_monthly: 200 } }] },
+    { label: 'no higher plan', plans: [{ tier: 2, limits: { aiCreditsMonthly: 200 } }] },
   ])('fails closed when there is $label', async ({ plans }) => {
     const { client, service } = setup({});
     client.listPlans.mockReturnValue(of({ plans }));
@@ -78,8 +78,8 @@ describe('AI billing integration', () => {
   });
   it.each([
     { tier: 2, limits: {} },
-    { tier: 2, limits: { ai_credits_monthly: -2 } },
-    { tier: 2, limits: { ai_credits_monthly: '9007199254740993' } },
+    { tier: 2, limits: { aiCreditsMonthly: -2 } },
+    { tier: 2, limits: { aiCreditsMonthly: '9007199254740993' } },
   ])('rejects an unrecognised plan limit %#', async (plan) => {
     const { client, service } = setup({});
     client.listPlans.mockReturnValue(of({ plans: [plan] }));

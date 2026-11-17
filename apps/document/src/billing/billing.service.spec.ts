@@ -1,16 +1,16 @@
 import { PlanTier as PlanTierPb } from '@notopia-uit/pb/billing';
 
 import { toEntitlements, toLimits } from './billing.service';
-import { PlanFeature, PlanLimit, PlanTier } from './plan';
+import { PlanTier } from './plan';
 
 describe('billing mappers', () => {
-  it('maps known keys and drops unknown ones', () => {
+  it('maps typed feature and limit fields', () => {
     const result = toEntitlements({
       workspaceId: 'w',
       plan: PlanTierPb.PLAN_TIER_PLUS,
       status: 0,
-      features: { [PlanFeature.AutoCommit]: true, mystery: true },
-      limits: { [PlanLimit.RevisionHistoryDays]: 30, mystery: 1 },
+      features: { autoCommit: true, workspaceGraph: true },
+      limits: { revisionHistoryDays: 30, members: 10 },
     });
     expect(result).toEqual({
       plan: PlanTier.Plus,
@@ -20,7 +20,7 @@ describe('billing mappers', () => {
   });
 
   it('converts Long-like limits to number', () => {
-    expect(toLimits({ [PlanLimit.RevisionHistoryDays]: { toNumber: () => 7 } })).toEqual({
+    expect(toLimits({ revisionHistoryDays: { toNumber: () => 7 } as unknown as number })).toEqual({
       revision_history_days: 7,
     });
   });

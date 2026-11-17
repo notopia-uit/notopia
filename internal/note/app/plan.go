@@ -60,15 +60,6 @@ func (f PlanFeature) String() string {
 	}
 }
 
-func ParsePlanFeature(s string) (PlanFeature, bool) {
-	switch s {
-	case PlanFeatureWorkspaceGraph.String():
-		return PlanFeatureWorkspaceGraph, true
-	default:
-		return PlanFeatureUnspecified, false
-	}
-}
-
 type PlanLimit uint8
 
 const (
@@ -102,19 +93,6 @@ func (l PlanLimit) String() string {
 		return "unspecified"
 	default:
 		return "unknown"
-	}
-}
-
-func ParsePlanLimit(s string) (PlanLimit, bool) {
-	switch s {
-	case PlanLimitMembers.String():
-		return PlanLimitMembers, true
-	case PlanLimitNoteGraphMaxDepth.String():
-		return PlanLimitNoteGraphMaxDepth, true
-	case PlanLimitTrashRetentionDays.String():
-		return PlanLimitTrashRetentionDays, true
-	default:
-		return PlanLimitUnspecified, false
 	}
 }
 
