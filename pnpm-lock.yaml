@@ -1366,8 +1366,8 @@ importers:
         specifier: 1.2.3
         version: 1.2.3(mermaid@11.17.2)(vue@3.5.45(@typescript/typescript6@6.0.2))
       vitepress-openapi:
-        specifier: 0.2.14
-        version: 0.2.14(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2))
+        specifier: 0.2.16
+        version: 0.2.16(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2))
       vitepress-plugin-pagefind:
         specifier: 0.4.27
         version: 0.4.27(pagefind@1.6.0)(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2))
@@ -9428,6 +9428,9 @@ packages:
     resolution: {integrity: sha512-X7sjQzceUhu1u7Y/ylrRZFU2FS6LRiFVp6rKLPg23y3x3c3DOKAwuXGDp+PAGjh6CSnCjYeAul8pcT8bAl+lSA==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
 
+  cssfilter@0.0.10:
+    resolution: {integrity: sha512-FAaLDaplstoRsDR8XGYH51znUN0UY7nMc6Z9/fvE8EXGwvJE9hu7W2vHwx1+bd6gCYnln9nLbzxFTrcO9YQDZw==}
+
   cssstyle@6.2.0:
     resolution: {integrity: sha512-Fm5NvhYathRnXNVndkUsCCuR63DCLVVwGOOwQw782coXFi5HhkXdu289l59HlXZBawsyNccXfWRYvLzcDCdDig==}
     engines: {node: '>=20'}
@@ -15044,12 +15047,12 @@ packages:
       '@mermaid-js/mermaid-zenuml':
         optional: true
 
-  vitepress-openapi@0.2.14:
-    resolution: {integrity: sha512-B4PNWBi3+i21mM8nAu5JpIddbyWmMdssjnrQ0FKrQqt+UlLeGpQ7+nf0nWV0xfgK4JXnfATiGFvYNTyp8iZhWg==}
+  vitepress-openapi@0.2.16:
+    resolution: {integrity: sha512-Glp062ywCp+3gBdTwf9j6rG1YOzxhWu34tiIkB9fIELRkTxEIBAe1jNT9Watz+GqWin8gCwgV61M5tVkJTCSUw==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24.0.0}
     peerDependencies:
       vitepress: '>=1.0.0'
-      vue: ^3.0.0
+      vue: ^3.5.0
     peerDependenciesMeta:
       vitepress:
         optional: true
@@ -15386,6 +15389,11 @@ packages:
 
   xmlchars@2.2.0:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
+
+  xss@1.0.17:
+    resolution: {integrity: sha512-+SEr5IDSgTBnhT6bnnf0mVRHT91+HU517zkahLNhkWLz8retCgeR1YDT4OknLiExA5+chn2Wy7z3KyjvnD8A2w==}
+    engines: {node: '>= 0.10.0'}
+    hasBin: true
 
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
@@ -24675,6 +24683,8 @@ snapshots:
       mdn-data: 2.27.1
       source-map-js: 1.2.2
 
+  cssfilter@0.0.10: {}
+
   cssstyle@6.2.0:
     dependencies:
       '@asamuzakjp/css-color': 5.1.11
@@ -31324,7 +31334,7 @@ snapshots:
       mermaid: 11.17.2
       vue: 3.5.45(@typescript/typescript6@6.0.2)
 
-  vitepress-openapi@0.2.14(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2)):
+  vitepress-openapi@0.2.16(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2)):
     dependencies:
       '@lucide/vue': 1.70.0(vue@3.5.45(@typescript/typescript6@6.0.2))
       '@vueuse/core': 14.4.0(vue@3.5.45(@typescript/typescript6@6.0.2))
@@ -31333,6 +31343,7 @@ snapshots:
       markdown-it-link-attributes: 4.0.1
       reka-ui: 2.11.0(vue@3.5.45(@typescript/typescript6@6.0.2))
       vue: 3.5.45(@typescript/typescript6@6.0.2)
+      xss: 1.0.17
     optionalDependencies:
       vitepress: 2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
 
@@ -31749,6 +31760,11 @@ snapshots:
   xml-naming@0.3.0: {}
 
   xmlchars@2.2.0: {}
+
+  xss@1.0.17:
+    dependencies:
+      commander: 2.20.3
+      cssfilter: 0.0.10
 
   xtend@4.0.2: {}
 
