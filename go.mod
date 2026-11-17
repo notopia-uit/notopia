@@ -15,7 +15,7 @@ require (
 	github.com/bep/debounce v1.2.1
 	github.com/casbin/casbin/v3 v3.11.0
 	github.com/casbin/gorm-adapter/v3 v3.41.0
-	github.com/creasty/defaults v1.8.0
+	github.com/creasty/defaults v1.11.0
 	github.com/dnwe/otelsarama v0.0.0-20240308230250-9388d9d40bc0
 	github.com/exaring/otelpgx v0.11.1
 	github.com/getkin/kin-openapi v0.147.0
