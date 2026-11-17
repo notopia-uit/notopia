@@ -37,7 +37,7 @@ require (
 	github.com/oapi-codegen/runtime v1.9.0
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/pressly/goose/v3 v3.30.1
-	github.com/redis/go-redis/v9 v9.22.0
+	github.com/redis/go-redis/v9 v9.23.0
 	github.com/rs/zerolog v1.35.1
 	github.com/samber/slog-gin v1.21.1
 	github.com/samber/slog-multi v1.8.0
@@ -195,7 +195,7 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.47.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.47.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.11.1 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
+	go.uber.org/atomic v1.12.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	go.yaml.in/yaml/v4 v4.0.0 // indirect
