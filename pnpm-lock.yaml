@@ -314,7 +314,7 @@ catalogs:
       version: 1.0.5
     '@streamdown/code':
       specifier: ^2.0.0
-      version: 2.0.0
+      version: 2.0.1
     '@streamdown/math':
       specifier: ^1.0.3
       version: 1.0.3
@@ -1553,7 +1553,7 @@ importers:
         version: 1.0.5(@types/mdast@4.0.4)(micromark-util-types@2.0.3)(micromark@4.0.3(supports-color@8.1.1))(react@19.3.1)(supports-color@8.1.1)(unified@11.0.5)
       '@streamdown/code':
         specifier: 'catalog:'
-        version: 2.0.0(react@19.3.1)
+        version: 2.0.1(react@19.3.1)
       '@streamdown/math':
         specifier: 'catalog:'
         version: 1.0.3(react@19.3.1)(supports-color@8.1.1)
@@ -7114,8 +7114,8 @@ packages:
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
-  '@streamdown/code@2.0.0':
-    resolution: {integrity: sha512-sSyX/9gOOcivbP7204+sfAam+gotxjUNV+T4EuN3aa6i5x1LaqtB6Ln/Mxzd1XGvm0vNApO4oKLZs+7gzFI1kQ==}
+  '@streamdown/code@2.0.1':
+    resolution: {integrity: sha512-7CVujSN7++vwC7ipvWYpMf8WFZjaNtDHd6RGnC0yNsbRQ11nOkfpr+fZOhJmI+kxWk+K9F5Bcjm4b5jLEbsnDQ==}
     engines: {node: '>=20'}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
@@ -22330,7 +22330,7 @@ snapshots:
       - supports-color
       - unified
 
-  '@streamdown/code@2.0.0(react@19.3.1)':
+  '@streamdown/code@2.0.1(react@19.3.1)':
     dependencies:
       react: 19.3.1
       shiki: 4.6.0
