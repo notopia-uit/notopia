@@ -7,7 +7,8 @@ patch:
         - openid
   tags:
     - BillingAdmin
-  summary: Update plan features and limits (admin)
+  summary: Update plan
+  description: Requires billing administrator access. Updates the selected plan's features and limits.
   operationId: adminUpdatePlan
   parameters:
     - $ref: ../components/parameters/tierPath.yaml

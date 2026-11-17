@@ -7,13 +7,14 @@ post:
         - openid
   tags:
     - WorkspaceBilling
-  summary: Become the payer by completing a setup Checkout (owner only)
+  summary: Claim payer role
+  description: Requires workspace billing-management permission. Returns a URL to redirect the browser to Stripe Checkout to set up a payment method and become the workspace payer.
   operationId: claimPayer
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
   responses:
     200:
-      description: Redirect the browser to this URL
+      description: Checkout session URL. Redirect the browser to this URL to set up a payment method.
       content:
         application/json:
           schema:

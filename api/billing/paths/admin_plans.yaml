@@ -7,7 +7,8 @@ get:
         - openid
   tags:
     - BillingAdmin
-  summary: List plans (admin)
+  summary: List plans
+  description: Requires billing administrator access. Returns plan features, limits, and active prices.
   operationId: adminListPlans
   responses:
     200:

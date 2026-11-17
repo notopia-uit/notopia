@@ -7,7 +7,8 @@ get:
         - openid
   tags:
     - WorkspaceBilling
-  summary: Get workspace entitlements (member)
+  summary: Get workspace entitlements
+  description: Available to workspace members. Returns the entitlements granted to the workspace by its current plan.
   operationId: getWorkspaceEntitlements
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml

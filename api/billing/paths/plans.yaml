@@ -3,7 +3,8 @@ get:
   security: []
   tags:
     - Plan
-  summary: List plans with features, limits and active prices
+  summary: List plans
+  description: Returns plan features, limits, and active prices available for purchase.
   operationId: listPlans
   responses:
     200:

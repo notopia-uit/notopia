@@ -7,7 +7,8 @@ post:
         - openid
   tags:
     - WorkspaceBilling
-  summary: Start Stripe Checkout for a plan price (owner only)
+  summary: Create checkout session
+  description: Requires workspace billing-management permission. Returns a URL to redirect the browser to Stripe Checkout to purchase the selected active price.
   operationId: createCheckoutSession
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
@@ -19,7 +20,7 @@ post:
           $ref: ../components/schemas/CheckoutSessionRequest.yaml
   responses:
     200:
-      description: Redirect the browser to this URL
+      description: Checkout session URL. Redirect the browser to this URL to complete the purchase.
       content:
         application/json:
           schema:
