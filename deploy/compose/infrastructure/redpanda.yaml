@@ -35,7 +35,7 @@ services:
       start_interval: 2s
 
   redpanda_console:
-    image: redpandadata/console:v3.13.1
+    image: redpandadata/console:v3.15.0
     container_name: notopia-redpanda_console
     environment:
       CONFIG_FILEPATH: /etc/redpanda/config.yaml
