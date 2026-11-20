@@ -19,14 +19,22 @@ export default {
     const { isDark } = useData();
     const initMermaid = () => {
       const mermaidRenderer = createMermaidRenderer({
-        theme: isDark.value ? 'dark' : 'null',
+        theme: isDark.value ? 'redux-dark-color' : 'redux-color',
         startOnLoad: false,
         sequence: {
+          showSequenceNumbers: true,
           useMaxWidth: true,
         },
       });
       mermaidRenderer.setToolbar({
         showLanguageLabel: false,
+        downloadFormat: 'svg',
+        desktop: {
+          download: 'enabled',
+        },
+        mobile: {
+          download: 'enabled',
+        },
       });
     };
     nextTick(initMermaid);
