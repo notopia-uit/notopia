@@ -1,3 +1,7 @@
+---
+order: 1
+---
+
 # Kubernetes deployment limitations
 
 Chart rendering and unit tests do not establish that deployments, upgrades, or identity boundaries
