@@ -322,14 +322,14 @@ catalogs:
       specifier: ^1.0.3
       version: 1.0.4
     '@suites/di.nestjs':
-      specifier: ~3.1.0
-      version: 3.1.0
+      specifier: ~4.0.0
+      version: 4.0.3
     '@suites/doubles.vitest':
-      specifier: ~3.1.0
-      version: 3.1.0
+      specifier: ~4.1.0
+      version: 4.1.3
     '@suites/unit':
-      specifier: ~3.1.0
-      version: 3.1.1
+      specifier: ~4.1.0
+      version: 4.1.3
     '@swc-node/register':
       specifier: 1.12.1
       version: 1.12.1
@@ -1068,13 +1068,13 @@ importers:
         version: 11.2.11(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.9)(@nestjs/microservices@11.2.11)(@nestjs/platform-express@11.2.11)
       '@suites/di.nestjs':
         specifier: 'catalog:'
-        version: 3.1.0(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(reflect-metadata@0.2.2)
+        version: 4.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(reflect-metadata@0.2.2)
       '@suites/doubles.vitest':
         specifier: 'catalog:'
-        version: 3.1.0(@vitest/spy@5.1.1)(vitest@5.1.1)
+        version: 4.1.3(@vitest/spy@5.1.1)(vitest@5.1.1)
       '@suites/unit':
         specifier: 'catalog:'
-        version: 3.1.1
+        version: 4.1.3
       '@swc-node/register':
         specifier: 'catalog:'
         version: 1.12.1(@swc/core@1.16.22(@swc/helpers@0.5.24))(@swc/types@0.1.28)(@typescript/typescript6@6.0.2)(supports-color@8.1.1)
@@ -7133,38 +7133,39 @@ packages:
   '@sugarat/theme-shared@0.1.0':
     resolution: {integrity: sha512-UKAFNOkj5C6kK4NDRMWF7m5+QoHC7e/h1sQwrXy8Jjn/iK/GwACegL4NOKxDdcSUlGRgRD5uUwuTHM6xZEzO9A==}
 
-  '@suites/core.unit@3.1.0':
-    resolution: {integrity: sha512-2aG83BiIuOOVwu8Joisi4soSMI2isYBR8wJXWq+jInWOFCtQq+6cFwhXmpqRheMX0aKk7kb14HpclclMvpK3nQ==}
-    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+  '@suites/core.unit@4.1.3':
+    resolution: {integrity: sha512-oks3moMWRTWZ394AlBgJMyPU3SDFvdhvtFzHmAnVq5HB9y0v6PYLiXJu/WHpVHWibbgwo25F4kXFNKNEr1X6YA==}
+    engines: {node: ^22.22.2 || ^24.15.0 || ^26.0.0}
 
-  '@suites/di.nestjs@3.1.0':
-    resolution: {integrity: sha512-SKPdfqZRqjDKRfte8Id1xvmhCNOSSnDSFS68Qcw04IirnUEAAm/wjJBv3Bo8tH/YjzlZkAjzpapZTiWePSM9qg==}
-    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+  '@suites/di.nestjs@4.0.3':
+    resolution: {integrity: sha512-ria91/viZptew8TGv6hJEcO4BgKnglWkcNA4HKbZfN1ZnJVqeWPo1xh/6CDAVuYCu9vRvnb0rOSC3ZoVjkozoA==}
+    engines: {node: ^22.22.2 || ^24.15.0 || ^26.0.0}
     peerDependencies:
       '@nestjs/common': ^11.2.7
       reflect-metadata: <1.0.0
 
-  '@suites/doubles.vitest@3.1.0':
-    resolution: {integrity: sha512-SToF97cTcDjaMbzyUh+pLj33e/dHo2fqoPCcU0OXG2OX+hu+WACruS2xDwj5l/UruA3ckBJmtvVgOvpo1TKbUg==}
-    engines: {node: ^18.12.0 || >=20.0.0}
+  '@suites/doubles.vitest@4.1.3':
+    resolution: {integrity: sha512-uJ9dEDpOyVUf1GacyF6+jzmUrsH+l9Dh10iRGetvufwXuj3UNg5aOdOcr7lTIWVhgzZUO9WMovawNeRZ7aIyLg==}
+    engines: {node: ^22.22.2 || ^24.15.0 || ^26.0.0}
     peerDependencies:
       '@vitest/spy': '>= 1.0'
       vitest: '>= 1.0'
 
-  '@suites/types.common@3.1.0':
-    resolution: {integrity: sha512-4OW/FKP78HZiUjSeAq6ix/lj2s4vEU4IqFr09LLmQC77v1Rv5vEW1LZLxrRVlP2jeWsxuVka6WX2k7k3HJDu9A==}
-    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+  '@suites/types.common@4.0.2':
+    resolution: {integrity: sha512-z4mF2AK0Daf/YCfranmJqiRGNze1vmVbJXuD5rDZnT8MdPbQ/9dDWRrcp6qchiS36BGA8+rcfYqvQKHrAOjSgg==}
+    engines: {node: ^22.22.2 || ^24.15.0 || ^26.0.0}
 
-  '@suites/types.di@3.1.0':
-    resolution: {integrity: sha512-ng/so6i2dbvSUyCAN/UhLO0N/72B08XycXBCUGmE6CK2OgzNGPjTjcIN1moljyUzZQBYHvYSdUju2aZ6Fh2tOA==}
-    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+  '@suites/types.di@4.1.2':
+    resolution: {integrity: sha512-Gq7gAM0HPqJXTMjB2EClpqg/dpOWI6tTKNUFBMkqQBG+1UgpJkqxOpA6IhWp9o3VROaCRc5y35x6tcme/xLvYg==}
+    engines: {node: ^22.22.2 || ^24.15.0 || ^26.0.0}
 
-  '@suites/types.doubles@3.1.0':
-    resolution: {integrity: sha512-VhEtcgUPYe1L0xLie2VrqO8b+EPCdVnU30qS//nQA9UtRYA3dRqENNGI6ktmfKAvUKC9ToJdwE/B/TohZt290A==}
+  '@suites/types.doubles@4.0.2':
+    resolution: {integrity: sha512-/fV95V6EZojcZoTXscuMbgbwIoieNXdGD6x3omTRwpaP+sjLSwpxrQjqTB1YepML5kEmZaor+ZeVOxwkpVDufQ==}
+    engines: {node: ^22.22.2 || ^24.15.0 || ^26.0.0}
 
-  '@suites/unit@3.1.1':
-    resolution: {integrity: sha512-gHnAj4Xx5ckFjpo8jhHyriiqdpDXjFmwBTDht1T/czhTv1P3U2rZdEtwyWQISkgJFvxQjC6hfS7GftAKYgehjA==}
-    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+  '@suites/unit@4.1.3':
+    resolution: {integrity: sha512-QEjx1se4/qK5wxxl17D5TaplSSljVYSeHZuvkG8c1SUb0jUjspwpfT4IHTYoF6HVOtI9JB9VR4bpV1vToQAryQ==}
+    engines: {node: ^22.22.2 || ^24.15.0 || ^26.0.0}
 
   '@swc-node/core@1.15.0':
     resolution: {integrity: sha512-WAerrrl087WgenB92XG4Th2t0NQFfMNLYSe0sW2cEMMqM/LQmP4rozsDJl0vuzTrbewjpKQryxFXI+aYig/dBg==}
@@ -22351,44 +22352,44 @@ snapshots:
       cross-spawn: 7.0.6
       gray-matter: 4.0.3
 
-  '@suites/core.unit@3.1.0':
+  '@suites/core.unit@4.1.3':
     dependencies:
-      '@suites/types.common': 3.1.0
-      '@suites/types.di': 3.1.0
-      '@suites/types.doubles': 3.1.0
+      '@suites/types.common': 4.0.2
+      '@suites/types.di': 4.1.2
+      '@suites/types.doubles': 4.0.2
 
-  '@suites/di.nestjs@3.1.0(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(reflect-metadata@0.2.2)':
+  '@suites/di.nestjs@4.0.3(@nestjs/common@11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(reflect-metadata@0.2.2)':
     dependencies:
       '@nestjs/common': 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@suites/types.common': 3.1.0
-      '@suites/types.di': 3.1.0
+      '@suites/types.common': 4.0.2
+      '@suites/types.di': 4.1.2
       reflect-metadata: 0.2.2
 
-  '@suites/doubles.vitest@3.1.0(@vitest/spy@5.1.1)(vitest@5.1.1)':
+  '@suites/doubles.vitest@4.1.3(@vitest/spy@5.1.1)(vitest@5.1.1)':
     dependencies:
-      '@suites/core.unit': 3.1.0
-      '@suites/types.common': 3.1.0
-      '@suites/types.di': 3.1.0
-      '@suites/types.doubles': 3.1.0
+      '@suites/core.unit': 4.1.3
+      '@suites/types.common': 4.0.2
+      '@suites/types.di': 4.1.2
+      '@suites/types.doubles': 4.0.2
       '@vitest/spy': 5.1.1
       vitest: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(@vitest/ui@5.1.1)(jsdom@29.1.1(@noble/hashes@2.4.0))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@8.1.1))(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  '@suites/types.common@3.1.0': {}
+  '@suites/types.common@4.0.2': {}
 
-  '@suites/types.di@3.1.0':
+  '@suites/types.di@4.1.2':
     dependencies:
-      '@suites/types.common': 3.1.0
+      '@suites/types.common': 4.0.2
 
-  '@suites/types.doubles@3.1.0':
+  '@suites/types.doubles@4.0.2':
     dependencies:
-      '@suites/types.common': 3.1.0
+      '@suites/types.common': 4.0.2
 
-  '@suites/unit@3.1.1':
+  '@suites/unit@4.1.3':
     dependencies:
-      '@suites/core.unit': 3.1.0
-      '@suites/types.common': 3.1.0
-      '@suites/types.di': 3.1.0
-      '@suites/types.doubles': 3.1.0
+      '@suites/core.unit': 4.1.3
+      '@suites/types.common': 4.0.2
+      '@suites/types.di': 4.1.2
+      '@suites/types.doubles': 4.0.2
 
   '@swc-node/core@1.15.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(@swc/types@0.1.28)':
     dependencies:
