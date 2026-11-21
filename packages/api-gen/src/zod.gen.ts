@@ -165,6 +165,46 @@ export const zDocumentRevisionWithContent = zDocumentRevision.and(z.object({
     content: zDocumentDocumentContent
 }));
 
+export const zNoteName = z.string().min(1).max(255);
+
+export const zNoteIcon = z.string().nullable();
+
+export const zNoteParentId = z.uuid().nullable();
+
+export const zNoteWorkspaceId = z.uuid();
+
+export const zNoteCreateFolderRequest = z.object({
+    name: zNoteName,
+    icon: zNoteIcon,
+    parentId: zNoteParentId,
+    workspaceId: zNoteWorkspaceId
+});
+
+export const zNoteId = z.uuid().readonly();
+
+export const zNoteError = z.object({
+    code: z.string(),
+    message: z.string(),
+    more_info: z.string().optional()
+});
+
+/**
+ * Can be empty string when creating but will be set to "Untitled Note" internally
+ */
+export const zNoteName2 = z.string().min(1).max(255);
+
+export const zNoteIcon2 = z.string().nullable();
+
+export const zNoteFolderId = z.uuid();
+
+export const zNoteCreateNoteRequest = z.object({
+    name: zNoteName2,
+    icon: zNoteIcon2,
+    folderId: zNoteFolderId
+});
+
+export const zNoteId2 = z.uuid().readonly();
+
 export const zNoteTrashedBy = z.enum(['purpose', 'parent']);
 
 export const zNoteFolder = z.object({
@@ -180,16 +220,6 @@ export const zNoteFolder = z.object({
     }).readonly().nullable()
 });
 
-export const zNoteId = z.uuid().readonly();
-
-export const zNoteError = z.object({
-    code: z.string(),
-    message: z.string(),
-    more_info: z.string().optional()
-});
-
-export const zNoteName = z.string().min(1).max(255);
-
 export const zNoteNote = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
@@ -202,8 +232,6 @@ export const zNoteNote = z.object({
         at: z.iso.datetime()
     }).readonly().nullable()
 });
-
-export const zNoteId2 = z.uuid().readonly();
 
 export const zNoteGraph = z.object({
     nodes: z.array(z.object({
@@ -218,17 +246,10 @@ export const zNoteGraph = z.object({
     }))
 });
 
-/**
- * Can be empty string when creating but will be set to "Untitled Note" internally
- */
-export const zNoteName2 = z.string().min(1).max(255);
-
-export const zNoteIcon = z.string().nullable();
-
 export const zNoteNoteLink = z.object({
     id: zNoteId2,
     name: zNoteName2,
-    icon: zNoteIcon
+    icon: zNoteIcon2
 });
 
 export const zNoteSlug = z.string();
@@ -237,6 +258,13 @@ export const zNoteWorkspace = z.object({
     id: z.uuid().readonly(),
     slug: z.string(),
     name: z.string().min(1).max(255)
+});
+
+export const zNoteName3 = z.string().min(1).max(255);
+
+export const zNoteCreateWorkspaceRequest = z.object({
+    name: zNoteName3,
+    slug: zNoteSlug
 });
 
 export const zNoteId3 = z.uuid().readonly();
@@ -289,8 +317,6 @@ export const zNoteWorkspaceMembersUpdatedEvent = z.object({
         workspaceId: zNoteId3
     })
 });
-
-export const zNoteName3 = z.string().min(1).max(255);
 
 export const zNoteWorkspaceRenamedEvent = z.object({
     id: z.uuid(),
@@ -364,14 +390,12 @@ export const zNoteTrashedFolder = z.object({
     trashed: zNoteTrashed
 });
 
-export const zNoteIcon2 = z.string().nullable();
-
 export const zNoteUpdatedAt = z.iso.datetime().readonly();
 
 export const zNoteWorkspaceTreeNote = z.object({
     id: zNoteId2,
     name: zNoteName2,
-    icon: zNoteIcon,
+    icon: zNoteIcon2,
     updatedAt: zNoteUpdatedAt
 });
 
@@ -380,7 +404,7 @@ export const zNoteUpdatedAt2 = z.iso.datetime().readonly();
 export const zNoteWorkspaceTreeFolder = z.object({
     id: zNoteId,
     name: zNoteName,
-    icon: zNoteIcon2,
+    icon: zNoteIcon,
     notes: z.array(zNoteWorkspaceTreeNote),
     children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolder)),
     updatedAt: zNoteUpdatedAt2
@@ -615,7 +639,7 @@ export const zNoteNoteWritable = z.object({
 
 export const zNoteNoteLinkWritable = z.object({
     name: zNoteName2,
-    icon: zNoteIcon
+    icon: zNoteIcon2
 });
 
 export const zNoteWorkspaceWritable = z.object({
@@ -684,12 +708,12 @@ export const zNoteTrashedFolderWritable = z.object({
 
 export const zNoteWorkspaceTreeNoteWritable = z.object({
     name: zNoteName2,
-    icon: zNoteIcon
+    icon: zNoteIcon2
 });
 
 export const zNoteWorkspaceTreeFolderWritable = z.object({
     name: zNoteName,
-    icon: zNoteIcon2,
+    icon: zNoteIcon,
     notes: z.array(zNoteWorkspaceTreeNoteWritable),
     children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolderWritable))
 });
@@ -808,7 +832,7 @@ export const zRenameRevisionPath = z.object({
  */
 export const zRenameRevisionResponse = z.void();
 
-export const zCreateFolderBody = zNoteFolderWritable;
+export const zCreateFolderBody = zNoteCreateFolderRequest;
 
 /**
  * Folder successfully created
@@ -839,7 +863,7 @@ export const zRenameFolderPath = z.object({
  */
 export const zRenameFolderResponse = z.void();
 
-export const zCreateNoteBody = zNoteNoteWritable;
+export const zCreateNoteBody = zNoteCreateNoteRequest;
 
 /**
  * Note successfully created
@@ -944,7 +968,7 @@ export const zCheckWorkspaceSlugExistsPath = z.object({
     workspaceSlug: zNoteSlug
 });
 
-export const zCreateWorkspaceBody = zNoteWorkspaceWritable;
+export const zCreateWorkspaceBody = zNoteCreateWorkspaceRequest;
 
 /**
  * Workspace successfully created

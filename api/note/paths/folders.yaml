@@ -14,7 +14,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: ../components/schemas/Folder.yaml
+          $ref: ../components/schemas/CreateFolderRequest.yaml
   responses:
     201:
       description: Folder successfully created

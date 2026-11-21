@@ -262,6 +262,44 @@ func (e GetWorkspaceTreeParamsSortUpdatedAt) Valid() bool {
 	}
 }
 
+// CreateFolderRequest defines model for CreateFolderRequest.
+type CreateFolderRequest struct {
+	// Icon Examples: 📁
+	Icon nullable.Nullable[Icon] `json:"icon"`
+
+	// Name Examples: Work Notes
+	Name Name `json:"name"`
+
+	// ParentId Examples: cc7a2e47-6267-4c60-8d36-257f849777e4
+	ParentId nullable.Nullable[ParentId] `json:"parentId"`
+
+	// WorkspaceId Examples: 00000000-0000-4000-8000-000000000110
+	WorkspaceId WorkspaceId `json:"workspaceId"`
+}
+
+// CreateNoteRequest defines model for CreateNoteRequest.
+type CreateNoteRequest struct {
+	// FolderId Examples: 123e4567-e89b-12d3-a456-426614174000
+	FolderId FolderId `json:"folderId"`
+
+	// Icon Examples: 📓
+	Icon nullable.Nullable[Icon2] `json:"icon"`
+
+	// Name Can be empty string when creating but will be set to "Untitled Note" internally
+	//
+	// Examples: PowerUp.ps1
+	Name Name2 `json:"name"`
+}
+
+// CreateWorkspaceRequest defines model for CreateWorkspaceRequest.
+type CreateWorkspaceRequest struct {
+	// Name Examples: Notopia
+	Name Name3 `json:"name"`
+
+	// Slug Examples: notopia
+	Slug Slug `json:"slug"`
+}
+
 // Error defines model for Error.
 type Error struct {
 	// Code Error code
@@ -402,7 +440,7 @@ type NoteTrashed struct {
 // NoteLink defines model for NoteLink.
 type NoteLink struct {
 	// Icon Examples: 📓
-	Icon nullable.Nullable[Icon] `json:"icon"`
+	Icon nullable.Nullable[Icon2] `json:"icon"`
 
 	// Id Examples: 000c2575-1847-5293-8117-2415a2328ef8
 	Id *Id2 `json:"id,omitempty"`
@@ -694,7 +732,7 @@ type WorkspaceTreeFolder struct {
 	Children []WorkspaceTreeFolder `json:"children"`
 
 	// Icon Examples: 📁
-	Icon nullable.Nullable[Icon2] `json:"icon"`
+	Icon nullable.Nullable[Icon] `json:"icon"`
 
 	// Id Examples: 123e4567-e89b-12d3-a456-426614174000
 	Id *Id `json:"id,omitempty"`
@@ -710,7 +748,7 @@ type WorkspaceTreeFolder struct {
 // WorkspaceTreeNote defines model for WorkspaceTreeNote.
 type WorkspaceTreeNote struct {
 	// Icon Examples: 📓
-	Icon nullable.Nullable[Icon] `json:"icon"`
+	Icon nullable.Nullable[Icon2] `json:"icon"`
 
 	// Id Examples: 000c2575-1847-5293-8117-2415a2328ef8
 	Id *Id2 `json:"id,omitempty"`
@@ -724,10 +762,13 @@ type WorkspaceTreeNote struct {
 	UpdatedAt *UpdatedAt `json:"updatedAt,omitempty"`
 }
 
-// Icon Examples: 📓
+// FolderId Examples: 123e4567-e89b-12d3-a456-426614174000
+type FolderId = openapi_types.UUID
+
+// Icon Examples: 📁
 type Icon = string
 
-// Icon2 Examples: 📁
+// Icon2 Examples: 📓
 type Icon2 = string
 
 // Id Examples: 123e4567-e89b-12d3-a456-426614174000
@@ -760,6 +801,9 @@ type Name3 = string
 // Examples: User
 type Name4 = string
 
+// ParentId Examples: cc7a2e47-6267-4c60-8d36-257f849777e4
+type ParentId = openapi_types.UUID
+
 // Slug Examples: notopia
 type Slug = string
 
@@ -768,6 +812,9 @@ type UpdatedAt = time.Time
 
 // UpdatedAt2 Examples: 2024-06-01T12:00:00Z
 type UpdatedAt2 = time.Time
+
+// WorkspaceId Examples: 00000000-0000-4000-8000-000000000110
+type WorkspaceId = openapi_types.UUID
 
 // FolderIdPath Examples: 123e4567-e89b-12d3-a456-426614174000
 type FolderIdPath = Id
@@ -946,19 +993,19 @@ type WorkspaceTreeSort struct {
 }
 
 // CreateFolderJSONRequestBody defines body for CreateFolder for application/json ContentType.
-type CreateFolderJSONRequestBody = Folder
+type CreateFolderJSONRequestBody = CreateFolderRequest
 
 // RenameFolderJSONRequestBody defines body for RenameFolder for application/json ContentType.
 type RenameFolderJSONRequestBody RenameFolderJSONBody
 
 // CreateNoteJSONRequestBody defines body for CreateNote for application/json ContentType.
-type CreateNoteJSONRequestBody = Note
+type CreateNoteJSONRequestBody = CreateNoteRequest
 
 // RenameNoteJSONRequestBody defines body for RenameNote for application/json ContentType.
 type RenameNoteJSONRequestBody RenameNoteJSONBody
 
 // CreateWorkspaceJSONRequestBody defines body for CreateWorkspace for application/json ContentType.
-type CreateWorkspaceJSONRequestBody = Workspace
+type CreateWorkspaceJSONRequestBody = CreateWorkspaceRequest
 
 // ChangeWorkspaceSlugJSONRequestBody defines body for ChangeWorkspaceSlug for application/json ContentType.
 type ChangeWorkspaceSlugJSONRequestBody ChangeWorkspaceSlugJSONBody

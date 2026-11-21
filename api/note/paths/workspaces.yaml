@@ -14,7 +14,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: ../components/schemas/Workspace.yaml
+          $ref: ../components/schemas/CreateWorkspaceRequest.yaml
   responses:
     201:
       description: Workspace successfully created

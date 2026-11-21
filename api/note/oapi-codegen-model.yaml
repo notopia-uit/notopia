@@ -5,3 +5,4 @@ generate:
 output: ../../pkg/api/note/model.gen.go
 output-options:
   nullable-type: true
+  skip-prune: true

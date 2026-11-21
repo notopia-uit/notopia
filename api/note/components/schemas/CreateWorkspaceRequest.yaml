@@ -1,0 +1,10 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  name:
+    $ref: ./Workspace.yaml#/properties/name
+  slug:
+    $ref: ./Workspace.yaml#/properties/slug
+required:
+  - name
+  - slug

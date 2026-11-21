@@ -208,10 +208,6 @@ export type DocumentRevisionWithContent = DocumentRevision & {
     content: DocumentDocumentContent;
 };
 
-export const NoteTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
-
-export type NoteTrashedBy = typeof NoteTrashedBy[keyof typeof NoteTrashedBy];
-
 export type NoteFolder = {
     readonly id: string;
     name: string;
@@ -223,6 +219,21 @@ export type NoteFolder = {
         by: NoteTrashedBy;
         at: Date;
     } | null;
+};
+
+export type NoteName = string;
+
+export type NoteIcon = string | null;
+
+export type NoteParentId = string | null;
+
+export type NoteWorkspaceId = string;
+
+export type NoteCreateFolderRequest = {
+    name: NoteName;
+    icon: NoteIcon;
+    parentId: NoteParentId;
+    workspaceId: NoteWorkspaceId;
 };
 
 export type NoteId = string;
@@ -242,7 +253,26 @@ export type NoteError = {
     more_info?: string;
 };
 
-export type NoteName = string;
+/**
+ * Can be empty string when creating but will be set to "Untitled Note" internally
+ */
+export type NoteName2 = string;
+
+export type NoteIcon2 = string | null;
+
+export type NoteFolderId = string;
+
+export type NoteCreateNoteRequest = {
+    name: NoteName2;
+    icon: NoteIcon2;
+    folderId: NoteFolderId;
+};
+
+export type NoteId2 = string;
+
+export const NoteTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
+
+export type NoteTrashedBy = typeof NoteTrashedBy[keyof typeof NoteTrashedBy];
 
 export type NoteNote = {
     readonly id: string;
@@ -259,8 +289,6 @@ export type NoteNote = {
         at: Date;
     } | null;
 };
-
-export type NoteId2 = string;
 
 export type NoteGraph = {
     nodes: Array<{
@@ -290,17 +318,10 @@ export type NoteGraph = {
     }>;
 };
 
-/**
- * Can be empty string when creating but will be set to "Untitled Note" internally
- */
-export type NoteName2 = string;
-
-export type NoteIcon = string | null;
-
 export type NoteNoteLink = {
     id: NoteId2;
     name: NoteName2;
-    icon: NoteIcon;
+    icon: NoteIcon2;
 };
 
 export type NoteSlug = string;
@@ -309,6 +330,13 @@ export type NoteWorkspace = {
     readonly id: string;
     slug: string;
     name: string;
+};
+
+export type NoteName3 = string;
+
+export type NoteCreateWorkspaceRequest = {
+    name: NoteName3;
+    slug: NoteSlug;
 };
 
 export type NoteId3 = string;
@@ -366,8 +394,6 @@ export type NoteWorkspaceMembersUpdatedEvent = {
         workspaceId: NoteId3;
     };
 };
-
-export type NoteName3 = string;
 
 export type NoteWorkspaceRenamedEvent = {
     id: string;
@@ -444,21 +470,19 @@ export type NoteTrashedFolder = {
     trashed: NoteTrashed;
 };
 
-export type NoteIcon2 = string | null;
-
 export type NoteUpdatedAt = Date;
 
 export type NoteWorkspaceTreeNote = {
     id: NoteId2;
     name: NoteName2;
-    icon: NoteIcon;
+    icon: NoteIcon2;
     updatedAt: NoteUpdatedAt;
 };
 
 export type NoteWorkspaceTreeFolder = {
     id: NoteId;
     name: NoteName;
-    icon: NoteIcon2;
+    icon: NoteIcon;
     notes: Array<NoteWorkspaceTreeNote>;
     children: Array<NoteWorkspaceTreeFolder>;
     updatedAt: NoteUpdatedAt2;
@@ -734,7 +758,7 @@ export type NoteNoteWritable = {
 
 export type NoteNoteLinkWritable = {
     name: NoteName2;
-    icon: NoteIcon;
+    icon: NoteIcon2;
 };
 
 export type NoteWorkspaceWritable = {
@@ -806,12 +830,12 @@ export type NoteTrashedFolderWritable = {
 
 export type NoteWorkspaceTreeNoteWritable = {
     name: NoteName2;
-    icon: NoteIcon;
+    icon: NoteIcon2;
 };
 
 export type NoteWorkspaceTreeFolderWritable = {
     name: NoteName;
-    icon: NoteIcon2;
+    icon: NoteIcon;
     notes: Array<NoteWorkspaceTreeNoteWritable>;
     children: Array<NoteWorkspaceTreeFolderWritable>;
 };
@@ -1154,7 +1178,7 @@ export type RenameRevisionResponses = {
 export type RenameRevisionResponse = RenameRevisionResponses[keyof RenameRevisionResponses];
 
 export type CreateFolderData = {
-    body: NoteFolderWritable;
+    body: NoteCreateFolderRequest;
     path?: never;
     query?: never;
     url: '/note/folders';
@@ -1279,7 +1303,7 @@ export type RenameFolderResponses = {
 export type RenameFolderResponse = RenameFolderResponses[keyof RenameFolderResponses];
 
 export type CreateNoteData = {
-    body: NoteNoteWritable;
+    body: NoteCreateNoteRequest;
     path?: never;
     query?: never;
     url: '/note/notes';
@@ -1715,7 +1739,7 @@ export type CheckWorkspaceSlugExistsResponses = {
 };
 
 export type CreateWorkspaceData = {
-    body: NoteWorkspaceWritable;
+    body: NoteCreateWorkspaceRequest;
     path?: never;
     query?: never;
     url: '/note/workspaces';

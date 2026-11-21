@@ -99,6 +99,9 @@ paths:
     $ref: ./paths/search-users.yaml
 
 components:
+  schemas:
+    Folder:
+      $ref: ./components/schemas/Folder.yaml
   securitySchemes:
     OIDC:
       $ref: ../common/components/securitySchemes/OIDC.yaml

@@ -1,0 +1,16 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  name:
+    $ref: ./Folder.yaml#/properties/name
+  icon:
+    $ref: ./Folder.yaml#/properties/icon
+  parentId:
+    $ref: ./Folder.yaml#/properties/parentId
+  workspaceId:
+    $ref: ./Folder.yaml#/properties/workspaceId
+required:
+  - name
+  - icon
+  - parentId
+  - workspaceId
