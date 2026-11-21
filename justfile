@@ -48,8 +48,13 @@ seed-authorization:
 seed-search:
     nx run search-worker:seed
 
-seed-billing:
+migrate-note:
+    nx run note:goose:up
+
+migrate-billing:
     nx run billing:migrate
+
+seed-billing: migrate-billing
     nx run billing:seed
 
 fixtures: seed fixtures-authorization fixtures-note fixtures-document fixtures-search fixtures-billing
@@ -59,8 +64,7 @@ fixtures-note db-connection=note-db-connection: prepare-fixtures-note
       -f ./internal/notefixturegen/fixtures.sql \
       -f ./internal/notefixturegen/fixtures.gen.sql
 
-prepare-fixtures-note:
-    nx run note:goose:up
+prepare-fixtures-note: migrate-note
     go run ./cmd/notefixturegen/...
 
 fixtures-document: prepare-fixtures-document
