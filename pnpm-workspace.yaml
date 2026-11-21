@@ -93,7 +93,7 @@ catalog:
   "@vitejs/plugin-react-swc": "4.3.3"
   "@vitest/coverage-v8": "^5.0.0"
   "@vitest/ui": "^5.0.0"
-  ai: "^6.0.301"
+  ai: "^7.0.0"
   autoprefixer: "^10.4.27"
   better-auth: "~1.7.6"
   class-variance-authority: "^0.7.1"
