@@ -1,0 +1,22 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "ci",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "default",
+        "{projectRoot}/workflows/**/*.yaml",
+        "{projectRoot}/actions/**/*.yaml",
+        "{workspaceRoot}/.mise.ci.toml",
+        "{workspaceRoot}/mise.toml",
+        { "runtime": "actionlint -version" },
+        { "runtime": "shellcheck --version" }
+      ],
+      "options": {
+        "command": "actionlint"
+      }
+    }
+  }
+}

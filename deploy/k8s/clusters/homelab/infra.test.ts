@@ -44,7 +44,7 @@ test('infrastructure releases and values', () => {
     docs.filter((r) => r.kind === 'ConfigMap').map((r) => [r.metadata.name, r])
   );
   const secrets = docs.filter((r) => r.kind === 'Secret' && r.metadata?.namespace === 'notopia');
-  for (const service of ['note', 'billing', 'document']) {
+  for (const service of ['note', 'billing', 'document', 'ai']) {
     const release: any = releases.get(`valkey-${service}`);
     checkReleaseSecret(release, secrets, `valkey-${service}`, 'password');
     const values = parse((configs.get(release.spec.valuesFrom[0].name) as any).data['values.yaml']);

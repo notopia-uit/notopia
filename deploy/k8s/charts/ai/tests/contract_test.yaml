@@ -1,0 +1,32 @@
+suite: AI service contract
+templates:
+  - deployment.yaml
+  - service.yaml
+  - httproute.yaml
+tests:
+  - it: runs the AI server with separate health probes
+    template: deployment.yaml
+    asserts:
+      - equal: { path: 'spec.template.spec.containers[0].command', value: [node, main.cjs] }
+      - equal: { path: 'spec.template.spec.containers[0].ports[0].containerPort', value: 8086 }
+      - equal: { path: 'spec.template.spec.containers[0].startupProbe.httpGet.path', value: /ai/health/startup }
+      - equal: { path: 'spec.template.spec.containers[0].livenessProbe.httpGet.path', value: /ai/health/live }
+      - equal: { path: 'spec.template.spec.containers[0].readinessProbe.httpGet.path', value: /ai/health/ready }
+      - equal: { path: 'spec.template.spec.automountServiceAccountToken', value: false }
+  - it: routes streaming requests with a configurable timeout
+    template: httproute.yaml
+    set: { route.requestTimeout: 180s }
+    asserts:
+      - equal: { path: 'spec.rules[1].matches[0].path.value', value: /ai }
+      - equal: { path: 'spec.rules[1].timeouts.request', value: 180s }
+      - equal: { path: 'spec.rules[1].backendRefs[0].port', value: 8086 }
+  - it: does not forward health when disabled
+    template: httproute.yaml
+    set: { route.exposeHealth: false }
+    asserts:
+      - equal: { path: 'spec.rules[0].matches[0].path.value', value: /ai/health }
+      - notExists: { path: 'spec.rules[0].backendRefs' }
+  - it: exposes the HTTP port
+    template: service.yaml
+    asserts:
+      - equal: { path: 'spec.ports[0].port', value: 8086 }

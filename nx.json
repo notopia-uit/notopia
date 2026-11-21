@@ -276,7 +276,8 @@
     "groups": {
       "npm": {
         "releaseTag": {
-          "pattern": "notopia-packages@{version}"
+          "pattern": "notopia-packages@{version}",
+          "requireSemver": true
         },
         "projects": ["packages/*"],
         "projectsRelationship": "fixed",
@@ -284,19 +285,19 @@
           "conventionalCommits": true,
           "fallbackCurrentVersionResolver": "disk"
         },
-        "releaseTagPatternRequireSemver": true,
         "changelog": {
           "createRelease": "github",
           "file": false
         }
       },
-      "docker-go": {
-        "projects": ["note", "authorization", "document", "search-worker", "web"],
+      "docker": {
+        "projects": ["web", "note", "authorization", "billing", "document", "search-worker", "ai"],
         "releaseTag": {
-          "pattern": "{projectName}@{version}"
+          "pattern": "{projectName}@{version}",
+          "requireSemver": false
         },
         "changelog": {
-          "createRelease": "github",
+          "createRelease": false,
           "file": false
         },
         "docker": {
@@ -310,8 +311,7 @@
         "projectsRelationship": "independent",
         "version": {
           "conventionalCommits": false
-        },
-        "releaseTagPatternRequireSemver": false
+        }
       }
     }
   },

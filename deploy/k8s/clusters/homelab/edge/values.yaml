@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../../../charts/notopia-edge/values.schema.json
 security:
   externalBoundaryAcknowledged: false
 gateway:
@@ -26,6 +27,8 @@ istio:
     - /authorization/health/*
     - /billing/health/*
     - /document/health/*
+    - /ai/health/*
+    - /ai/health
   - paths:
     - /billing/webhooks/stripe
   - paths:

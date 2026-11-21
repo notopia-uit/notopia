@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/valkey-io/valkey-helm/main/valkey/values.schema.json
+fullnameOverride: valkey-ai
+deploymentStrategy: Recreate
+replica:
+  enabled: false
+dataStorage:
+  enabled: true
+  requestedSize: 1Gi
+valkeyConfig: |
+  maxmemory-policy noeviction
+  appendonly yes
+auth:
+  enabled: true
+  usersExistingSecret: valkey-ai
+  aclUsers:
+    default:
+      permissions: "~* &* +@all"
+      passwordKey: password

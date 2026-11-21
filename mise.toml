@@ -12,7 +12,8 @@ COMPOSE_FILE = "./deploy/compose/compose.yaml"
 '_'.path.paths = ["./scripts/", "./node_modules/.bin/"]
 
 [tools]
-helm = "3.22.1"
+actionlint = "1.7.12"
+helm = "4.3.2"
 "github:dadav/helm-schema" = "0.24.0"
 "github:norwoodj/helm-docs" = "1.14.2"
 "github:yannh/kubeconform" = "0.8.0"
@@ -37,6 +38,7 @@ protoc-gen-go-grpc = "1.6.2"
 "npm:ts-proto" = "2.22.0"
 go = "1.27.4"
 stripe = "latest"
+shellcheck = "0.11.0"
 node = "26.13.1"
 
 [shell_alias]

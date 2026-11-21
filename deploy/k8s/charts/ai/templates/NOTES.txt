@@ -1,0 +1,2 @@
+AI requires dedicated persistent standalone Redis 6.2+ with noeviction and backups.
+Keep the identity-header boundary enforced; route.exposeHealth=false is not an authorization control.

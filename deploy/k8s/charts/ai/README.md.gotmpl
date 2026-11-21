@@ -1,0 +1,11 @@
+{{ template "chart.header" . }}
+{{ template "chart.requirementsSection" . }}
+
+## Deployment safety
+
+AI needs a dedicated persistent standalone Redis 6.2+ with noeviction, AOF and backups. Supply `NOTOPIA_AI_REDIS_URL`, `NOTOPIA_AI_LLM_API_KEY` and `NOTOPIA_AI_MEILI_API_KEY` using existing Secrets. Configure the model base URL, model, gRPC and Meilisearch endpoints. Never use development credentials. AI has no PostgreSQL, Kafka, migration or seed dependency.
+
+The service trusts gateway-injected identity headers. Restrict direct access and independently establish the edge identity boundary before exposure. Health endpoints can be excluded from this route using `route.exposeHealth: false`; that is not an authorization control. The AI route timeout defaults to 150 seconds, above the application default of 120 seconds; raise it when changing `NOTOPIA_AI_TIMEOUT_MS`. Verify upstream and idle timeouts and incremental SSE delivery across every gateway before deployment.
+
+{{ template "chart.valuesSection" . }}
+{{ template "helm-docs.versionFooter" . }}

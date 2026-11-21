@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../../../../charts/authorization/values.schema.json
 image:
   tag: ''
 otel:

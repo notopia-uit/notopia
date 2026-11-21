@@ -16,6 +16,27 @@ Do not expose the edge until the independent identity-header boundary checks in
 
 ## Application release prerequisites
 
+AI and `valkey-ai` are suspended. Provision a dedicated `valkey-ai` Secret with
+`password` and an `ai` Secret with `NOTOPIA_AI_REDIS_URL`,
+`NOTOPIA_AI_LLM_API_KEY`, and `NOTOPIA_AI_MEILI_API_KEY` before resuming either
+dependent release. The Redis URL must contain credentials for `valkey-ai:6379`
+(properly URL-encoded); its password must match the Valkey Secret. The AI
+Meilisearch key must have the required note search/read permissions. Configure
+the model base URL and model in `apps/ai/values.yaml`; the checked-in values
+are nonfunctional placeholders. Do not use local development credentials.
+Add provisioned, SOPS-encrypted Secrets to `infra/secrets/kustomization.yaml`
+only after replacing every placeholder. Plaintext review drafts are supplied as
+`infra/secrets/ai.secret.sops.yaml` and `valkey-ai.secret.sops.yaml`; they are not
+provisioned credentials and are not included in the Kustomization.
+
+AI accounting requires standalone persistent Valkey with no eviction, AOF and
+operational backups; loss of state can lose usage history. Validate restore,
+storage and credentials before resuming. AI has no database or Kafka dependency.
+Its route request timeout is 150 seconds for the default 120-second AI deadline;
+increase it if the application timeout increases. Verify all front gateway and
+upstream request and idle timeouts and incremental SSE delivery in a
+representative cluster. Helm rendering alone does not verify streaming.
+
 The empty `image.tag` values are intentionally not deployable image selections:
 the chart falls back to its default app version, which has not been verified.
 Publish or independently verify an immutable image for each service and set its
@@ -70,13 +91,27 @@ reconciliation must not wait for all releases before the worker can run.
 
 ## Secrets
 
-Create production credentials through the relevant provider or a secure local
-process. Never put plaintext in Git, shell history, command-line arguments, or
-unprotected temporary files. The Secret manifests in `infra/secrets/` are SOPS
-encrypted with the root `.sops.yaml` rule, but contain only the placeholder
-`REPLACE_BEFORE_USE`, not credentials. They are intentionally absent from the
-Kustomization: encryption alone does not make a Secret ready to apply. CNPG
-manages its own Secrets and has no manifest here.
+The Secret manifests in `infra/secrets/` are temporarily **plaintext review
+drafts**, explicitly requested by the operator. Their `.sops.yaml` filenames
+reserve the existing paths for later encryption; the suffix does not mean the
+contents are encrypted. They use public Compose/app development defaults where
+available and `REPLACE_WITH_*` placeholders for provider credentials.
+Compose Redis has no password; the Valkey drafts instead use `notopiauit` while
+retaining Kubernetes authentication. AI's Redis URL uses that same password.
+Do not use these public development credentials in production.
+
+Keep the existing centralized layout for now: application and infrastructure
+Secrets remain together, and all are intentionally absent from the Kustomization
+(`resources: []`). No relocation or partial deployment wiring change is required.
+CNPG manages its own Secrets and remains unchanged; applications read its generated
+connection fields, including passwords, rather than these drafts.
+
+The repository encryption check intentionally rejects these drafts until they
+are encrypted. No encryption exception has been added. Before deployment,
+provision real credentials through the relevant provider or a secure local
+process, replace every placeholder, encrypt with the root `.sops.yaml` rule,
+and verify decryption. Never put real production plaintext in Git, shell history,
+command-line arguments, or unprotected temporary files.
 
 ### Provisioning with Neovim
 
@@ -93,7 +128,9 @@ nvim deploy/k8s/clusters/homelab/infra/secrets/valkey-note.secret.sops.yaml
    Use a trusted machine and terminal; disable terminal recording, clipboard
    managers and other capture, and protect against memory/swap exposure. Do not
    write, autosave, or copy a plaintext file at any point.
-2. Use `\d` to decrypt in the buffer. Replace every placeholder in `stringData`
+2. For an already encrypted file use `\d` to decrypt in the buffer; the current
+   plaintext review drafts do not need decryption. Replace development defaults
+   and every placeholder in `stringData`
    with the actual credential as a YAML string, using proper quoting. The
    worker's key is the Meilisearch master
    key; note's search key is obtained only after the worker seed succeeds as
@@ -112,7 +149,7 @@ nvim deploy/k8s/clusters/homelab/infra/secrets/valkey-note.secret.sops.yaml
    `infra/secrets/kustomization.yaml`. Keep affected releases suspended until
    their credentials and all other prerequisites are ready.
 
-For the Receiver, `receiver.secret.sops.yaml` is an encrypted placeholder
+For the Receiver, `receiver.secret.sops.yaml` is a plaintext review-only placeholder
 reference for `notopia-webhook-token` in `flux-system`, not a resource for this
 repository's infra Kustomization. Provision it using a secure SOPS editing
 workflow **in the homelab repository**, using its destination path, SOPS creation
