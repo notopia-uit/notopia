@@ -308,7 +308,7 @@ catalogs:
       version: 2.3.3
     '@scalar/cli':
       specifier: ^2.1.0
-      version: 2.18.0
+      version: 2.21.0
     '@streamdown/cjk':
       specifier: ^1.0.4
       version: 1.0.5
@@ -793,7 +793,7 @@ importers:
         version: 2.30.6(@opentelemetry/api@1.9.1)(core-js@3.51.0)(supports-color@8.1.1)
       '@scalar/cli':
         specifier: 'catalog:'
-        version: 2.18.0(@typescript/typescript6@6.0.2)(bare-buffer@3.7.1)(supports-color@8.1.1)
+        version: 2.21.0(@typescript/typescript6@6.0.2)(bare-buffer@3.7.1)(supports-color@8.1.1)
 
   apps/ai:
     dependencies:
@@ -5643,8 +5643,8 @@ packages:
   '@protobufjs/utf8@1.1.2':
     resolution: {integrity: sha512-b1UQwcEZ4yCnMCD8DAL1VlbvBJE9/IX4FTIp7BG1xYpf29SLazLSrqUkj4w7Y5y7cCVP6E5tcqqcI0xemPkHug==}
 
-  '@quobix/vacuum@0.30.1':
-    resolution: {integrity: sha512-e1y019NmMdVluUYJM98o5HQYtBghZERmmgqWWOQfKtUGo3ZJAmPQ2lQEwKY8aH45IOnund6eMinQwvUHNcyt7Q==}
+  '@quobix/vacuum@0.30.2':
+    resolution: {integrity: sha512-AINtDaWB4cAJn44ZX/uNkHd63B2rXzl4wjyB8xX5CmPEmV6E45rtqy+BKwFx7MvEU+ZELd66w0Um5Y6z/7h21w==}
     engines: {node: '>=24.16.0'}
     hasBin: true
 
@@ -6746,8 +6746,8 @@ packages:
     resolution: {integrity: sha512-ApQXZMGgAP1HzcNR81MZJxvupm4srnW8oTsC5djU+ZOgxydolG2G4gBZHB4jylqjmjcrRQLYHNIvlm89kGophg==}
     engines: {node: '>=22'}
 
-  '@scalar/cli@2.18.0':
-    resolution: {integrity: sha512-CQ6pSi3yS7MIkJd4gISCQrS2EgHOAe8JblCD5DYyPYL7/Jn7xlYH/8fg2K92cHsNBjXAvtgcsTUpltCqSgWRyQ==}
+  '@scalar/cli@2.21.0':
+    resolution: {integrity: sha512-KcavbNzf3r/Upxul/e1GjrQoiWtcQk2mxH49+UHELdFZRXK9KsTnJia/sPj4AUwlcC+iXnTvvbIE3FgIufXTvg==}
     engines: {node: '>=24'}
     hasBin: true
 
@@ -20075,7 +20075,7 @@ snapshots:
 
   '@protobufjs/utf8@1.1.2': {}
 
-  '@quobix/vacuum@0.30.1(supports-color@8.1.1)':
+  '@quobix/vacuum@0.30.2(supports-color@8.1.1)':
     dependencies:
       https-proxy-agent: 9.1.0(supports-color@8.1.1)
       tar: 7.5.22
@@ -21521,11 +21521,11 @@ snapshots:
       - tailwindcss
       - typescript
 
-  '@scalar/cli@2.18.0(@typescript/typescript6@6.0.2)(bare-buffer@3.7.1)(supports-color@8.1.1)':
+  '@scalar/cli@2.21.0(@typescript/typescript6@6.0.2)(bare-buffer@3.7.1)(supports-color@8.1.1)':
     dependencies:
       '@clack/prompts': 0.7.0
       '@hono/node-server': 2.1.1(hono@4.13.17)
-      '@quobix/vacuum': 0.30.1(supports-color@8.1.1)
+      '@quobix/vacuum': 0.30.2(supports-color@8.1.1)
       '@scalar/asyncapi-upgrader': 0.1.21
       '@scalar/asyncapi-validator': 0.1.21
       '@scalar/json-magic': 0.20.0
