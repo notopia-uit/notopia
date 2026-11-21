@@ -14,6 +14,19 @@ over gRPC and never cache them.
 - [Data](./data): database diagram
 - [Flows](./flows): checkout, webhooks, cancellation, crons
 
+## Plan features and limits
+
+The HTTP API exposes the known feature flags `auto_commit` and `workspace_graph`, and limits
+`members`, `published_notes`, `note_graph_max_depth`, `auto_commit_min_interval_seconds`,
+`revision_history_days`, `trash_retention_days`, and `ai_credits_monthly`. Limits are integers
+of at least `-1`; `-1` means unlimited. Plan updates are partial: omitted keys remain unchanged.
+Unknown keys are rejected.
+
+The billing gRPC API uses typed `Features` and `Limits` messages with optional scalar fields,
+so an absent value remains distinguishable from `false` or `0`. The change from string-keyed
+maps uses new protobuf field numbers: billing and its note, document, and AI consumers must be
+deployed together. Mixed versions do not exchange features or limits correctly.
+
 ## Architecture
 
 ```d2

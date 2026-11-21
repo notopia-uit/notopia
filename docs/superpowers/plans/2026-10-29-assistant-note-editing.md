@@ -38,18 +38,18 @@ Use `MockLanguageModelV3` already used in `apps/ai/tests/stream.spec.ts`. Add a 
 
 ## File responsibilities
 
-| Files | Responsibility |
-| --- | --- |
-| `apps/ai/src/ai/assistant-task.types.ts` | Server task states, continuation inputs, and stream data contract |
-| `apps/ai/src/usage/assistant-task.scripts.ts`, `assistant-task.service.ts` | Atomic one-shot task transitions and persisted authoritative history |
-| `apps/ai/src/usage/usage.service.ts`, `usage.scripts.ts`, `usage.module.ts` | Lease-only continuation admission using existing per-user limits |
-| `apps/ai/src/ai/chat-request.dto.ts`, `ai.controller.ts`, `ai.service.ts`, `ai.module.ts` | Parse, route, and orchestrate start/continue/cancel requests |
-| `apps/ai/src/ai/assistant-stream.ts`, `tools/open-note.ts` | Stream recording, target validation, handoff, total step budget |
-| `packages/ui/src/lib/assistant-protocol.ts`, `assistant-session.ts` | Typed protocol and target/session lifecycle independent of rendering |
-| `packages/ui/src/lib/assistant-ai.ts`, `assistant-transport.ts` | BlockNote shared-chat bridge and start/continue/cancel transport |
-| `packages/ui/src/components/assistant-note-editor.tsx`, `editor-core.tsx` | Synced authenticated target editor and supported AI review integration |
-| `packages/ui/src/hooks/use-assistant-chat.ts`, `components/assistant-view.tsx` | Chat lifecycle, tool dispatch, target panel, cancellation/errors |
-| Web assistant `page.tsx`, `assistant-boundary.tsx` | Supply API/WebSocket configuration from the app |
+| Files                                                                                     | Responsibility                                                         |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `apps/ai/src/ai/assistant-task.types.ts`                                                  | Server task states, continuation inputs, and stream data contract      |
+| `apps/ai/src/usage/assistant-task.scripts.ts`, `assistant-task.service.ts`                | Atomic one-shot task transitions and persisted authoritative history   |
+| `apps/ai/src/usage/usage.service.ts`, `usage.scripts.ts`, `usage.module.ts`               | Lease-only continuation admission using existing per-user limits       |
+| `apps/ai/src/ai/chat-request.dto.ts`, `ai.controller.ts`, `ai.service.ts`, `ai.module.ts` | Parse, route, and orchestrate start/continue/cancel requests           |
+| `apps/ai/src/ai/assistant-stream.ts`, `tools/open-note.ts`                                | Stream recording, target validation, handoff, total step budget        |
+| `packages/ui/src/lib/assistant-protocol.ts`, `assistant-session.ts`                       | Typed protocol and target/session lifecycle independent of rendering   |
+| `packages/ui/src/lib/assistant-ai.ts`, `assistant-transport.ts`                           | BlockNote shared-chat bridge and start/continue/cancel transport       |
+| `packages/ui/src/components/assistant-note-editor.tsx`, `editor-core.tsx`                 | Synced authenticated target editor and supported AI review integration |
+| `packages/ui/src/hooks/use-assistant-chat.ts`, `components/assistant-view.tsx`            | Chat lifecycle, tool dispatch, target panel, cancellation/errors       |
+| Web assistant `page.tsx`, `assistant-boundary.tsx`                                        | Supply API/WebSocket configuration from the app                        |
 
 Existing tests are under `apps/ai/tests/` and colocated UI `*.spec.ts`. Recheck current paths at execution because a separate test-colocation plan exists in the working tree.
 
@@ -58,6 +58,7 @@ Existing tests are under `apps/ai/tests/` and colocated UI `*.spec.ts`. Recheck 
 **Files:** Create task types, task service/scripts and `apps/ai/tests/assistant-task.spec.ts`; modify usage service/scripts/module and `apps/ai/tests/usage.spec.ts`.
 
 **Interfaces:**
+
 - `TaskOwner = { userId: string; workspaceId: string }`.
 - `AssistantTask` holds random task ID, owner, original prompt ID, server-recorded UI transcript, fixed deadline, remaining model steps, optional target note ID, expected client calls, state (`running | awaiting-client | completed | cancelled | failed`), and revision.
 - `AssistantTaskService.create(owner, promptId, messages, limits): Promise<AssistantTask>`; `suspend(taskId, revision, transcript, pendingCalls, targetNoteId, stepsUsed): Promise<{ taskId: string; token: string; expiresAt: number }>`; `claim(owner, taskId, token): Promise<AssistantTask>`; `finish(owner, taskId, outcome): Promise<void>`.
@@ -90,6 +91,7 @@ the implemented flow, deterministic evidence, and remaining live-stack verificat
 **Files:** Create `assistant-stream.ts`, `tools/open-note.ts`, `apps/ai/tests/assistant-stream.spec.ts`; modify AI DTO/controller/service/module, request/access/stream tests, and task types from Task 1.
 
 **Interfaces:**
+
 - Preserve existing ordinary chat/BlockNote requests. New workspace assistant starts opt in with `assistantMode: true`.
 - Continuation request to existing `POST /ai`: `{ action: 'continue', workspaceId, taskId, token, results, noteId?, documentState?, toolDefinitions? }`. Do not accept replacement messages or a new prompt on this branch. `results` must match the recorded pending tool calls by ID/name and allowed output schema.
 - Cancellation request to the same authenticated route: `{ action: 'cancel', workspaceId, taskId }`, returning 204 after owner-scoped termination. Parse this as a distinct branch, without requiring messages.
@@ -109,6 +111,7 @@ the implemented flow, deterministic evidence, and remaining live-stack verificat
 **Files:** Create UI `assistant-protocol.ts`, `assistant-session.ts`, `assistant-ai.ts`, `assistant-note-editor.tsx`, and their focused tests; modify `editor-core.tsx` only for optional shared-AI integration and cleanup callbacks.
 
 **Interfaces:**
+
 - `AssistantTarget = { noteId: string; name: string; sessionId: string }`.
 - `AssistantEditorSession` exposes `open(noteId: string, signal: AbortSignal): Promise<AssistantTarget>`, `getReadyEditor(sessionId: string): MyEditor`, `close(): Promise<void>`, and `cancel(): void`.
 - `AssistantNoteEditor` receives workspace/API/WebSocket configuration and the target, emits synced editor readiness/disposal/error, and owns exactly one keyed Hocuspocus room. Use client-side access-token retrieval and existing navigation/schema/user providers.
@@ -126,6 +129,7 @@ the implemented flow, deterministic evidence, and remaining live-stack verificat
 **Files:** Create `assistant-transport.ts`, `use-assistant-chat.ts` and focused tests; modify `assistant-view.tsx`, web assistant `page.tsx`/`assistant-boundary.tsx`; consume Tasks 1–3 contracts.
 
 **Interfaces:**
+
 - `useAssistantChat({ workspaceId, apiUrl, documentWsUrl })` owns one `Chat<UIMessage>`, the target session, task/continuation state, submit/stop/review/close actions, and observable UI state.
 - Transport sends ordinary user prompts as initial assistant requests and continuations using only validated results, fresh context, and the latest one-shot token. It delegates auth/error handling to existing `fetchAi` and access-token helpers.
 - Execute open calls once by task ID/toolCallId. Wait for the previous HTTP stream to finish and the note to sync before invoking the explicit continuation. Disable generic automatic tool-result resubmission to avoid duplicate requests and bypassing BlockNote setup.
@@ -140,7 +144,7 @@ the implemented flow, deterministic evidence, and remaining live-stack verificat
 
 ### Task 5: End-to-end evidence and explanatory documentation
 
-**Files:** Update AI/UI AGENTS, `apps/ai/HOW_TO_ADD_TOOLS.md`, `deploy/compose/AI_TESTING.md`; create `docs/ai/ASSISTANT_NOTE_EDITING.md`. Add narrow regression tests in preceding tasks' test files if integration reveals a missing case.
+**Files:** Update AI/UI AGENTS, `apps/ai/HOW_TO_ADD_TOOLS.md`, AI setup documentation (now `docs/src/services/ai/index.md`); create `docs/ai/ASSISTANT_NOTE_EDITING.md`. Add narrow regression tests in preceding tasks' test files if integration reveals a missing case.
 
 - [ ] Run the deterministic full flow: find an unopened note → open synced editor → edit → review/accept → commit. Inspect document content through the editor/provider and resulting commit state, not only assistant prose. Repeat reject with concurrent collaborator input, Stop during streamed mutation, failed open, viewer access, and navigation cleanup.
 - [ ] Run final affected suites once after final changes: `nx test ai --skip-nx-cache`, isolated real-Redis AI tests, `nx test packages/ui --skip-nx-cache`, AI/UI/web typechecks and lint, and `nx build ai` / `nx build web`. Repeat only checks invalidated by subsequent changes or concrete failures.

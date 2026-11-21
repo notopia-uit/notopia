@@ -7,13 +7,14 @@ post:
         - openid
   tags:
     - WorkspaceBilling
-  summary: Open Stripe Customer Portal (owner only)
+  summary: Create portal session
+  description: Requires workspace billing-management permission and an existing billing account. Returns a URL to redirect the browser to the Stripe Customer Portal to manage existing billing.
   operationId: createPortalSession
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
   responses:
     200:
-      description: Redirect the browser to this URL
+      description: Customer Portal session URL. Redirect the browser to this URL to manage existing billing.
       content:
         application/json:
           schema:

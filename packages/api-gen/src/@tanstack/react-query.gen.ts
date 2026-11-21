@@ -1008,7 +1008,9 @@ export const useSearchUsersQuery = (options: Options<SearchUsersData>) => useQue
 export const listPlansQueryKey = (options?: Options<ListPlansData>) => createQueryKey('listPlans', options);
 
 /**
- * List plans with features, limits and active prices
+ * List plans
+ *
+ * Returns plan features, limits, and active prices available for purchase.
  */
 export const listPlansOptions = (options?: Options<ListPlansData>) => queryOptions<ListPlansResponse, ListPlansError, ListPlansResponse, ReturnType<typeof listPlansQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -1024,14 +1026,18 @@ export const listPlansOptions = (options?: Options<ListPlansData>) => queryOptio
 });
 
 /**
- * List plans with features, limits and active prices
+ * List plans
+ *
+ * Returns plan features, limits, and active prices available for purchase.
  */
 export const useListPlansQuery = (options?: Options<ListPlansData>) => useQuery(listPlansOptions(options));
 
 export const getWorkspaceEntitlementsQueryKey = (options: Options<GetWorkspaceEntitlementsData>) => createQueryKey('getWorkspaceEntitlements', options);
 
 /**
- * Get workspace entitlements (member)
+ * Get workspace entitlements
+ *
+ * Available to workspace members. Returns the entitlements granted to the workspace by its current plan.
  */
 export const getWorkspaceEntitlementsOptions = (options: Options<GetWorkspaceEntitlementsData>) => queryOptions<GetWorkspaceEntitlementsResponse, GetWorkspaceEntitlementsError, GetWorkspaceEntitlementsResponse, ReturnType<typeof getWorkspaceEntitlementsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -1047,14 +1053,18 @@ export const getWorkspaceEntitlementsOptions = (options: Options<GetWorkspaceEnt
 });
 
 /**
- * Get workspace entitlements (member)
+ * Get workspace entitlements
+ *
+ * Available to workspace members. Returns the entitlements granted to the workspace by its current plan.
  */
 export const useGetWorkspaceEntitlementsQuery = (options: Options<GetWorkspaceEntitlementsData>) => useQuery(getWorkspaceEntitlementsOptions(options));
 
 export const getWorkspaceBillingQueryKey = (options: Options<GetWorkspaceBillingData>) => createQueryKey('getWorkspaceBilling', options);
 
 /**
- * Get workspace subscription, payer and refunds (owner only)
+ * Get workspace billing
+ *
+ * Requires workspace billing-management permission. Returns the workspace's subscription, payer, and refund information.
  */
 export const getWorkspaceBillingOptions = (options: Options<GetWorkspaceBillingData>) => queryOptions<GetWorkspaceBillingResponse, GetWorkspaceBillingError, GetWorkspaceBillingResponse, ReturnType<typeof getWorkspaceBillingQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -1070,12 +1080,16 @@ export const getWorkspaceBillingOptions = (options: Options<GetWorkspaceBillingD
 });
 
 /**
- * Get workspace subscription, payer and refunds (owner only)
+ * Get workspace billing
+ *
+ * Requires workspace billing-management permission. Returns the workspace's subscription, payer, and refund information.
  */
 export const useGetWorkspaceBillingQuery = (options: Options<GetWorkspaceBillingData>) => useQuery(getWorkspaceBillingOptions(options));
 
 /**
- * Start Stripe Checkout for a plan price (owner only)
+ * Create checkout session
+ *
+ * Requires workspace billing-management permission. Returns a URL to redirect the browser to Stripe Checkout to purchase the selected active price.
  */
 export const createCheckoutSessionMutation = (options?: Partial<Options<CreateCheckoutSessionData>>): UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> => {
     const mutationOptions: UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> = {
@@ -1092,12 +1106,16 @@ export const createCheckoutSessionMutation = (options?: Partial<Options<CreateCh
 };
 
 /**
- * Start Stripe Checkout for a plan price (owner only)
+ * Create checkout session
+ *
+ * Requires workspace billing-management permission. Returns a URL to redirect the browser to Stripe Checkout to purchase the selected active price.
  */
 export const useCreateCheckoutSessionMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>>, 'mutationFn'>>) => useMutation({ ...createCheckoutSessionMutation(), ...mutationOptions });
 
 /**
- * Open Stripe Customer Portal (owner only)
+ * Create portal session
+ *
+ * Requires workspace billing-management permission and an existing billing account. Returns a URL to redirect the browser to the Stripe Customer Portal to manage existing billing.
  */
 export const createPortalSessionMutation = (options?: Partial<Options<CreatePortalSessionData>>): UseMutationOptions<CreatePortalSessionResponse, CreatePortalSessionError, Options<CreatePortalSessionData>> => {
     const mutationOptions: UseMutationOptions<CreatePortalSessionResponse, CreatePortalSessionError, Options<CreatePortalSessionData>> = {
@@ -1114,14 +1132,18 @@ export const createPortalSessionMutation = (options?: Partial<Options<CreatePort
 };
 
 /**
- * Open Stripe Customer Portal (owner only)
+ * Create portal session
+ *
+ * Requires workspace billing-management permission and an existing billing account. Returns a URL to redirect the browser to the Stripe Customer Portal to manage existing billing.
  */
 export const useCreatePortalSessionMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CreatePortalSessionResponse, CreatePortalSessionError, Options<CreatePortalSessionData>>, 'mutationFn'>>) => useMutation({ ...createPortalSessionMutation(), ...mutationOptions });
 
 export const previewCancelNowQueryKey = (options: Options<PreviewCancelNowData>) => createQueryKey('previewCancelNow', options);
 
 /**
- * Preview the refund of cancelling now (owner only)
+ * Preview immediate cancellation
+ *
+ * Requires workspace billing-management permission. Returns the refund quote for cancelling the current subscription immediately.
  */
 export const previewCancelNowOptions = (options: Options<PreviewCancelNowData>) => queryOptions<PreviewCancelNowResponse, PreviewCancelNowError, PreviewCancelNowResponse, ReturnType<typeof previewCancelNowQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -1137,12 +1159,16 @@ export const previewCancelNowOptions = (options: Options<PreviewCancelNowData>) 
 });
 
 /**
- * Preview the refund of cancelling now (owner only)
+ * Preview immediate cancellation
+ *
+ * Requires workspace billing-management permission. Returns the refund quote for cancelling the current subscription immediately.
  */
 export const usePreviewCancelNowQuery = (options: Options<PreviewCancelNowData>) => useQuery(previewCancelNowOptions(options));
 
 /**
- * Cancel the subscription now with a prorated refund (owner only)
+ * Cancel subscription now
+ *
+ * Requires workspace billing-management permission. Cancels the current subscription immediately and requests a prorated refund when applicable.
  */
 export const cancelNowMutation = (options?: Partial<Options<CancelNowData>>): UseMutationOptions<CancelNowResponse, CancelNowError, Options<CancelNowData>> => {
     const mutationOptions: UseMutationOptions<CancelNowResponse, CancelNowError, Options<CancelNowData>> = {
@@ -1159,12 +1185,16 @@ export const cancelNowMutation = (options?: Partial<Options<CancelNowData>>): Us
 };
 
 /**
- * Cancel the subscription now with a prorated refund (owner only)
+ * Cancel subscription now
+ *
+ * Requires workspace billing-management permission. Cancels the current subscription immediately and requests a prorated refund when applicable.
  */
 export const useCancelNowMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CancelNowResponse, CancelNowError, Options<CancelNowData>>, 'mutationFn'>>) => useMutation({ ...cancelNowMutation(), ...mutationOptions });
 
 /**
- * Become the payer by completing a setup Checkout (owner only)
+ * Claim payer role
+ *
+ * Requires workspace billing-management permission. Returns a URL to redirect the browser to Stripe Checkout to set up a payment method and become the workspace payer.
  */
 export const claimPayerMutation = (options?: Partial<Options<ClaimPayerData>>): UseMutationOptions<ClaimPayerResponse, ClaimPayerError, Options<ClaimPayerData>> => {
     const mutationOptions: UseMutationOptions<ClaimPayerResponse, ClaimPayerError, Options<ClaimPayerData>> = {
@@ -1181,14 +1211,18 @@ export const claimPayerMutation = (options?: Partial<Options<ClaimPayerData>>): 
 };
 
 /**
- * Become the payer by completing a setup Checkout (owner only)
+ * Claim payer role
+ *
+ * Requires workspace billing-management permission. Returns a URL to redirect the browser to Stripe Checkout to set up a payment method and become the workspace payer.
  */
 export const useClaimPayerMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<ClaimPayerResponse, ClaimPayerError, Options<ClaimPayerData>>, 'mutationFn'>>) => useMutation({ ...claimPayerMutation(), ...mutationOptions });
 
 export const adminListPlansQueryKey = (options?: Options<AdminListPlansData>) => createQueryKey('adminListPlans', options);
 
 /**
- * List plans (admin)
+ * List plans
+ *
+ * Requires billing administrator access. Returns plan features, limits, and active prices.
  */
 export const adminListPlansOptions = (options?: Options<AdminListPlansData>) => queryOptions<AdminListPlansResponse, AdminListPlansError, AdminListPlansResponse, ReturnType<typeof adminListPlansQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -1204,12 +1238,16 @@ export const adminListPlansOptions = (options?: Options<AdminListPlansData>) => 
 });
 
 /**
- * List plans (admin)
+ * List plans
+ *
+ * Requires billing administrator access. Returns plan features, limits, and active prices.
  */
 export const useAdminListPlansQuery = (options?: Options<AdminListPlansData>) => useQuery(adminListPlansOptions(options));
 
 /**
- * Update plan features and limits (admin)
+ * Update plan
+ *
+ * Requires billing administrator access. Updates the selected plan's features and limits.
  */
 export const adminUpdatePlanMutation = (options?: Partial<Options<AdminUpdatePlanData>>): UseMutationOptions<AdminUpdatePlanResponse, AdminUpdatePlanError, Options<AdminUpdatePlanData>> => {
     const mutationOptions: UseMutationOptions<AdminUpdatePlanResponse, AdminUpdatePlanError, Options<AdminUpdatePlanData>> = {
@@ -1226,14 +1264,18 @@ export const adminUpdatePlanMutation = (options?: Partial<Options<AdminUpdatePla
 };
 
 /**
- * Update plan features and limits (admin)
+ * Update plan
+ *
+ * Requires billing administrator access. Updates the selected plan's features and limits.
  */
 export const useAdminUpdatePlanMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminUpdatePlanResponse, AdminUpdatePlanError, Options<AdminUpdatePlanData>>, 'mutationFn'>>) => useMutation({ ...adminUpdatePlanMutation(), ...mutationOptions });
 
 export const adminGetPolicyQueryKey = (options?: Options<AdminGetPolicyData>) => createQueryKey('adminGetPolicy', options);
 
 /**
- * Get billing policy (admin)
+ * Get billing policy
+ *
+ * Requires billing administrator access.
  */
 export const adminGetPolicyOptions = (options?: Options<AdminGetPolicyData>) => queryOptions<AdminGetPolicyResponse, AdminGetPolicyError, AdminGetPolicyResponse, ReturnType<typeof adminGetPolicyQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -1249,12 +1291,16 @@ export const adminGetPolicyOptions = (options?: Options<AdminGetPolicyData>) => 
 });
 
 /**
- * Get billing policy (admin)
+ * Get billing policy
+ *
+ * Requires billing administrator access.
  */
 export const useAdminGetPolicyQuery = (options?: Options<AdminGetPolicyData>) => useQuery(adminGetPolicyOptions(options));
 
 /**
- * Update billing policy (admin)
+ * Update billing policy
+ *
+ * Requires billing administrator access.
  */
 export const adminUpdatePolicyMutation = (options?: Partial<Options<AdminUpdatePolicyData>>): UseMutationOptions<AdminUpdatePolicyResponse, AdminUpdatePolicyError, Options<AdminUpdatePolicyData>> => {
     const mutationOptions: UseMutationOptions<AdminUpdatePolicyResponse, AdminUpdatePolicyError, Options<AdminUpdatePolicyData>> = {
@@ -1271,14 +1317,18 @@ export const adminUpdatePolicyMutation = (options?: Partial<Options<AdminUpdateP
 };
 
 /**
- * Update billing policy (admin)
+ * Update billing policy
+ *
+ * Requires billing administrator access.
  */
 export const useAdminUpdatePolicyMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminUpdatePolicyResponse, AdminUpdatePolicyError, Options<AdminUpdatePolicyData>>, 'mutationFn'>>) => useMutation({ ...adminUpdatePolicyMutation(), ...mutationOptions });
 
 export const adminListPricesQueryKey = (options?: Options<AdminListPricesData>) => createQueryKey('adminListPrices', options);
 
 /**
- * List all prices including archived (admin)
+ * List prices
+ *
+ * Requires billing administrator access. Returns all prices, including archived prices, newest first.
  */
 export const adminListPricesOptions = (options?: Options<AdminListPricesData>) => queryOptions<AdminListPricesResponse, AdminListPricesError, AdminListPricesResponse, ReturnType<typeof adminListPricesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -1294,12 +1344,16 @@ export const adminListPricesOptions = (options?: Options<AdminListPricesData>) =
 });
 
 /**
- * List all prices including archived (admin)
+ * List prices
+ *
+ * Requires billing administrator access. Returns all prices, including archived prices, newest first.
  */
 export const useAdminListPricesQuery = (options?: Options<AdminListPricesData>) => useQuery(adminListPricesOptions(options));
 
 /**
- * Create a price, replacing the active one for the same plan and interval (admin)
+ * Create price
+ *
+ * Requires billing administrator access. Replaces the active price for the same plan, billing interval, and currency; the previous price is archived.
  */
 export const adminCreatePriceMutation = (options?: Partial<Options<AdminCreatePriceData>>): UseMutationOptions<AdminCreatePriceResponse, AdminCreatePriceError, Options<AdminCreatePriceData>> => {
     const mutationOptions: UseMutationOptions<AdminCreatePriceResponse, AdminCreatePriceError, Options<AdminCreatePriceData>> = {
@@ -1316,12 +1370,16 @@ export const adminCreatePriceMutation = (options?: Partial<Options<AdminCreatePr
 };
 
 /**
- * Create a price, replacing the active one for the same plan and interval (admin)
+ * Create price
+ *
+ * Requires billing administrator access. Replaces the active price for the same plan, billing interval, and currency; the previous price is archived.
  */
 export const useAdminCreatePriceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminCreatePriceResponse, AdminCreatePriceError, Options<AdminCreatePriceData>>, 'mutationFn'>>) => useMutation({ ...adminCreatePriceMutation(), ...mutationOptions });
 
 /**
- * Archive a price (admin)
+ * Archive price
+ *
+ * Requires billing administrator access. Archived prices are no longer available for new checkouts.
  */
 export const adminArchivePriceMutation = (options?: Partial<Options<AdminArchivePriceData>>): UseMutationOptions<AdminArchivePriceResponse, AdminArchivePriceError, Options<AdminArchivePriceData>> => {
     const mutationOptions: UseMutationOptions<AdminArchivePriceResponse, AdminArchivePriceError, Options<AdminArchivePriceData>> = {
@@ -1338,12 +1396,14 @@ export const adminArchivePriceMutation = (options?: Partial<Options<AdminArchive
 };
 
 /**
- * Archive a price (admin)
+ * Archive price
+ *
+ * Requires billing administrator access. Archived prices are no longer available for new checkouts.
  */
 export const useAdminArchivePriceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminArchivePriceResponse, AdminArchivePriceError, Options<AdminArchivePriceData>>, 'mutationFn'>>) => useMutation({ ...adminArchivePriceMutation(), ...mutationOptions });
 
 /**
- * Stripe webhook endpoint (signature verified against the raw body)
+ * Stripe webhook endpoint
  */
 export const stripeWebhookMutation = (options?: Partial<Options<StripeWebhookData>>): UseMutationOptions<StripeWebhookResponse, StripeWebhookError, Options<StripeWebhookData>> => {
     const mutationOptions: UseMutationOptions<StripeWebhookResponse, StripeWebhookError, Options<StripeWebhookData>> = {
@@ -1360,6 +1420,6 @@ export const stripeWebhookMutation = (options?: Partial<Options<StripeWebhookDat
 };
 
 /**
- * Stripe webhook endpoint (signature verified against the raw body)
+ * Stripe webhook endpoint
  */
 export const useStripeWebhookMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<StripeWebhookResponse, StripeWebhookError, Options<StripeWebhookData>>, 'mutationFn'>>) => useMutation({ ...stripeWebhookMutation(), ...mutationOptions });

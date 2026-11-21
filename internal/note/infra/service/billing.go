@@ -99,22 +99,27 @@ func toAppPlanTier(tier pb.PlanTier) (app.PlanTier, error) {
 	}
 }
 
-func toAppFeatures(in map[string]bool) map[app.PlanFeature]bool {
-	out := make(map[app.PlanFeature]bool, len(in))
-	for k, v := range in {
-		if f, ok := app.ParsePlanFeature(k); ok {
-			out[f] = v
-		}
+func toAppFeatures(in *pb.Features) map[app.PlanFeature]bool {
+	out := map[app.PlanFeature]bool{}
+	if in != nil && in.WorkspaceGraph != nil {
+		out[app.PlanFeatureWorkspaceGraph] = *in.WorkspaceGraph
 	}
 	return out
 }
 
-func toAppLimits(in map[string]int64) map[app.PlanLimit]app.PlanQuota {
-	out := make(map[app.PlanLimit]app.PlanQuota, len(in))
-	for k, v := range in {
-		if l, ok := app.ParsePlanLimit(k); ok {
-			out[l] = app.PlanQuota(v)
-		}
+func toAppLimits(in *pb.Limits) map[app.PlanLimit]app.PlanQuota {
+	out := map[app.PlanLimit]app.PlanQuota{}
+	if in == nil {
+		return out
+	}
+	if in.Members != nil {
+		out[app.PlanLimitMembers] = app.PlanQuota(*in.Members)
+	}
+	if in.NoteGraphMaxDepth != nil {
+		out[app.PlanLimitNoteGraphMaxDepth] = app.PlanQuota(*in.NoteGraphMaxDepth)
+	}
+	if in.TrashRetentionDays != nil {
+		out[app.PlanLimitTrashRetentionDays] = app.PlanQuota(*in.TrashRetentionDays)
 	}
 	return out
 }

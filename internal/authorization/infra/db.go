@@ -22,7 +22,11 @@ func NewGORMDB(
 		slogGorm.WithTraceAll(),
 	)
 	db, err := gorm.Open(
-		postgres.Open(databaseCfg.GetDSN()),
+		postgres.New(postgres.Config{
+			// Bypass GORM's raw-DSN timezone regex, which also matches credentials.
+			DriverName: "pgx",
+			DSN:        databaseCfg.GetDSN(),
+		}),
 		&gorm.Config{
 			Logger: gormLogger,
 		},

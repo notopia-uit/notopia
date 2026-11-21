@@ -29,7 +29,7 @@ const __dirname = import.meta.dirname;
 //                                  require() throws (No "exports" main defined).
 //   - yjs / y-* / lib0             CRDT identity — one shared instance.
 //   - react / react-dom / scheduler / @floating-ui   blocknote's view deps.
-//   - @bufbuild/protobuf           type-registry singleton (keeps inquire-shim valid).
+//   - @bufbuild/protobuf           type-registry singleton.
 //   - @notopia-uit/*               workspace libs — they import @blocknote, so if
 //                                  left external their native require('@blocknote')
 //                                  would hit the same crash.

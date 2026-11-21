@@ -1,8 +1,14 @@
 # vim: ft=yaml.openapi
 type: object
-description: Feature flags by key (auto_commit, workspace_graph).
-additionalProperties:
-  type: boolean
+description: Feature flags available to a plan.
+additionalProperties: false
+properties:
+  auto_commit:
+    type: boolean
+    example: true
+  workspace_graph:
+    type: boolean
+    example: true
 examples:
   - auto_commit: true
     workspace_graph: true

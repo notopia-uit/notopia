@@ -231,6 +231,11 @@ const vitePressOptions = {
   },
   vite: {
     plugins: [...krokiPlugins(), pagefindPlugin(), diagrams.vitePlugin()],
+    ssr: {
+      // vitepress-openapi >=0.2.13 imports `useData` from 'vitepress'; when externalized, Node resolves
+      // the node entry (no client APIs). Bundling lets VitePress alias it to the client runtime.
+      noExternal: ['vitepress-openapi'],
+    },
   },
   ignoreDeadLinks: ['/notopia/api/index.html'],
 } satisfies UserConfig<NoInfer<DefaultTheme.Config>>;

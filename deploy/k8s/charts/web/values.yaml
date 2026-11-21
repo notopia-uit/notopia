@@ -230,7 +230,7 @@ otel:
   # type: string
   # @schema
   # -- Collector protocol
-  protocol: grpc
+  protocol: http/protobuf
   # @schema
   # type: object
   # additionalProperties: true

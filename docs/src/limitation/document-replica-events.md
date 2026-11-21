@@ -1,3 +1,7 @@
+---
+order: 2
+---
+
 # Document replica event delivery
 
 Keep the document service at one replica until event delivery and deletion races are fixed and

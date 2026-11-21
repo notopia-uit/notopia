@@ -2,8 +2,8 @@
 post:
   security: []
   tags:
-    - Webhook
-  summary: Stripe webhook endpoint (signature verified against the raw body)
+    - BillingWebhook
+  summary: Stripe webhook endpoint
   operationId: stripeWebhook
   parameters:
     - name: Stripe-Signature
@@ -11,7 +11,7 @@ post:
       required: true
       schema:
         type: string
-        examples: [t=1700000000,v1=abc]
+        examples: [t=1700000000, v1=abc]
   requestBody:
     required: true
     content:

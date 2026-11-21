@@ -30,8 +30,23 @@ enum SubscriptionStatus {
   SUBSCRIPTION_STATUS_INCOMPLETE_EXPIRED = 7;
 }
 
-// features/limits stay string-keyed (proto map keys cannot be enums): keys are FeatureKey/LimitKey names.
+message Features {
+  optional bool auto_commit = 1;
+  optional bool workspace_graph = 2;
+}
+
+message Limits {
+  optional int64 members = 1;
+  optional int64 published_notes = 2;
+  optional int64 note_graph_max_depth = 3;
+  optional int64 auto_commit_min_interval_seconds = 4;
+  optional int64 revision_history_days = 5;
+  optional int64 trash_retention_days = 6;
+  optional int64 ai_credits_monthly = 7;
+}
+
 message Entitlements {
+  reserved 5, 6;
   string workspace_id = 1;
   PlanTier plan = 2 [(buf.validate.field).enum = {
     defined_only: true
@@ -42,8 +57,8 @@ message Entitlements {
     not_in: [0]
   }];
   optional google.protobuf.Timestamp access_until = 4;
-  map<string, bool> features = 5;
-  map<string, int64> limits = 6;
+  Features features = 7;
+  Limits limits = 8;
 }
 
 message GetWorkspaceEntitlementsRequest {
@@ -78,12 +93,13 @@ message GetWorkspacePayerResponse {
 }
 
 message BillingPlan {
+  reserved 2, 3;
   PlanTier tier = 1 [(buf.validate.field).enum = {
     defined_only: true
     not_in: [0]
   }];
-  map<string, bool> features = 2;
-  map<string, int64> limits = 3;
+  Features features = 4;
+  Limits limits = 5;
 }
 
 message ListPlansRequest {}

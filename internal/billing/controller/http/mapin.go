@@ -42,16 +42,21 @@ func toInterval(i billing.BillingInterval) (app.BillingInterval, error) {
 	return app.BillingIntervalUnspecified, errs.NewInvalid(fmt.Sprintf("invalid billing interval: %q", i))
 }
 
-func fromFeatures(in *billing.Features) map[string]bool {
+func fromFeatures(in *billing.Features) app.Features {
 	if in == nil {
-		return map[string]bool{}
+		return app.Features{}
 	}
-	return map[string]bool(*in)
+	return app.Features{AutoCommit: in.AutoCommit, WorkspaceGraph: in.WorkspaceGraph}
 }
 
-func fromLimits(in *billing.Limits) map[string]int64 {
+func fromLimits(in *billing.Limits) app.Limits {
 	if in == nil {
-		return map[string]int64{}
+		return app.Limits{}
 	}
-	return map[string]int64(*in)
+	return app.Limits{
+		Members: in.Members, PublishedNotes: in.PublishedNotes,
+		NoteGraphMaxDepth: in.NoteGraphMaxDepth, AutoCommitMinIntervalSeconds: in.AutoCommitMinIntervalSeconds,
+		RevisionHistoryDays: in.RevisionHistoryDays, TrashRetentionDays: in.TrashRetentionDays,
+		AICreditsMonthly: in.AiCreditsMonthly,
+	}
 }

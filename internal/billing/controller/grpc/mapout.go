@@ -43,6 +43,19 @@ func toPBStatus(s app.SubscriptionStatus) (pb.SubscriptionStatus, error) {
 	}
 }
 
+func toPBFeatures(in app.Features) *pb.Features {
+	return &pb.Features{AutoCommit: in.AutoCommit, WorkspaceGraph: in.WorkspaceGraph}
+}
+
+func toPBLimits(in app.Limits) *pb.Limits {
+	return &pb.Limits{
+		Members: in.Members, PublishedNotes: in.PublishedNotes,
+		NoteGraphMaxDepth: in.NoteGraphMaxDepth, AutoCommitMinIntervalSeconds: in.AutoCommitMinIntervalSeconds,
+		RevisionHistoryDays: in.RevisionHistoryDays, TrashRetentionDays: in.TrashRetentionDays,
+		AiCreditsMonthly: in.AICreditsMonthly,
+	}
+}
+
 func toPBEntitlements(e app.Entitlements) (*pb.Entitlements, error) {
 	plan, err := toPBPlanTier(e.Plan)
 	if err != nil {
@@ -54,7 +67,7 @@ func toPBEntitlements(e app.Entitlements) (*pb.Entitlements, error) {
 	}
 	out := &pb.Entitlements{
 		WorkspaceId: e.WorkspaceID.String(), Plan: plan, Status: status,
-		Features: e.Features, Limits: e.Limits, AccessUntil: nil,
+		Features: toPBFeatures(e.Features), Limits: toPBLimits(e.Limits), AccessUntil: nil,
 	}
 	if e.AccessUntil != nil {
 		out.AccessUntil = timestamppb.New(*e.AccessUntil)

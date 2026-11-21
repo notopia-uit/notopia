@@ -1,5 +1,5 @@
 ---
-order: 3
+order: 2
 ---
 
 # Billing Class Diagram
@@ -11,16 +11,6 @@ order: 3
 - Derived from `internal/billing/domain` and `internal/billing/app`
 
 :::
-
-## Rules
-
-- **Aggregates**: `Subscription` (owns the child entity `Refund`, because "refunded total <= paid" is a subscription invariant), `BillingAccount`, `Price`, `Plan`, `BillingPolicy` (singleton). Each has its own repo.
-- **Value objects are immutable**: unexported fields, validated constructors (`NewMoney`, `NewPayer`, `NewProviderSnapshot`, `NewPaymentInfo`, `NewRefundLine`, `NewRefundQuote`), getters only, defensive copies of pointers and slices. `Money` carries a `Currency` enum (VND only for now).
-- **Aggregates raise events**: every mutating method records a domain event; `PopEvents` drains them on `Save`. `SubscriptionStateChangedEvent` is recorded whenever the plan or status changes, except on a duplicate checkout (`NewDuplicate*Subscription`), which never was the workspace's subscription. An external refund records only its settlement (`RefundSucceeded`/`RefundFailed`), never `RefundRequested`.
-- **Writes go through `UnitOfWork.Execute`**, which hands out a `RepoRegistry` bound to one transaction. Events popped by `Save` are written to the outbox in that same transaction.
-- **Reads use singleton repos**: the same repo interfaces are injected directly for reads (no transaction). Their `Save` and locking reads (`forUpdate = true`) fail outside a unit of work, so a write cannot silently run without a transaction.
-- Provider webhook de-duplication (`ProviderEventLog`) is part of `RepoRegistry`, so "processed" commits together with its effect.
-- Queries use `app.BillingReadModel` only; commands use `UnitOfWork`.
 
 ## Domain Layer
 
@@ -83,27 +73,7 @@ skinparam class {
 !define AggregateRoot(name) class "name" as name <<(S, $sky) Aggregate Root>>
 !define RepoParam(name) class "name" as name <<(S, $green) Repo Param>>
 
-skinparam backgroundColor $base
-skinparam defaultFontColor $text
-skinparam roundcorner 16
-skinparam classFontStyle bold
-
-skinparam ArrowColor $subtext0
-skinparam packageStyle rectangle
-
-skinparam package {
-    BackgroundColor $mantle
-    BorderColor $surface1
-    FontColor $mauve
-}
-
-skinparam class {
-    BackgroundColor $base
-    BorderColor $surface1
-    HeaderBackgroundColor $surface0
-    AttributeFontColor $text
-}
-
+package "Enums" {
 Enum(PlanTier) {
     UNSPECIFIED
     FREE
@@ -166,6 +136,7 @@ Enum(LimitKey) {
     REVISION_HISTORY_DAYS
     TRASH_RETENTION_DAYS
     AI_CREDITS_MONTHLY
+}
 }
 
 ValueObject(Money) {
@@ -264,7 +235,6 @@ AggregateRoot(Subscription) {
     paidAt *time.Time
     providerSyncedAt time.Time
     refunds []*Refund
-    events []Event
 
     NewSubscription()
     NewLifetimeSubscription()
@@ -283,7 +253,6 @@ AggregateRoot(Subscription) {
     IsCurrent()
     GrantsAccess()
     AccessUntil()
-    PopEvents()
 }
 
 AggregateRoot(BillingAccount) {
@@ -291,13 +260,11 @@ AggregateRoot(BillingAccount) {
     providerCustomerID string
     payer Payer
     payerMissingSince *time.Time
-    events []Event
 
     OpenBillingAccount()
     ChangePayer()
     MarkPayerMissing()
     UpdateContact()
-    PopEvents()
 }
 
 AggregateRoot(Price) {
@@ -309,82 +276,33 @@ AggregateRoot(Price) {
     providerLookupKey string
     active bool
     archivedAt *time.Time
-    events []Event
 
     NewPrice()
     Archive()
-    PopEvents()
 }
 
 AggregateRoot(Plan) {
     tier PlanTier
     features map[FeatureKey]bool
     limits map[LimitKey]int64
-    events []Event
 
     NewPlan()
     Update()
     Feature()
     Limit()
-    PopEvents()
 }
 
 AggregateRoot(BillingPolicy) {
     pastDueGraceDays int
     lifetimeRefundWindowDays int
     portalConfigurationID *string
-    events []Event
 
     Update()
     SetPortalConfiguration()
-    PopEvents()
 }
 
 class "ResolveEntitlements" as ResolveEntitlements <<(F, $lavender) Function>> {
     (sub, plans, policy, now) Entitlements
-}
-
-interface "Event" as Event <<(I, $maroon) Domain Event>> {
-    GetID()
-    GetAggregateID()
-    GetUserID()
-}
-
-class "SubscriptionStateChangedEvent" as SubscriptionStateChangedEvent <<(V, $maroon) Event>> {
-    workspaceID uuid.UUID
-    plan PlanTier
-    status SubscriptionStatus
-}
-
-class "SubscriptionCanceledNowEvent" as SubscriptionCanceledNowEvent <<(V, $maroon) Event>> {
-    reason RefundReason
-}
-
-class "RefundRequestedEvent" as RefundRequestedEvent <<(V, $maroon) Event>> {
-    refundID uuid.UUID
-    amount Money
-}
-
-class "Other events" as OtherEvents <<(V, $maroon) Event>> {
-    SubscriptionCreated
-    SubscriptionActivated
-    SubscriptionRenewed
-    SubscriptionPastDue
-    SubscriptionPlanChanged
-    SubscriptionCancelScheduled
-    SubscriptionCancelResumed
-    SubscriptionEnded
-    RefundSucceeded
-    RefundFailed
-    BillingAccountOpened
-    PayerChanged
-    PayerMissing
-    BillingContactUpdated
-    PriceCreated
-    PriceArchived
-    PlanUpdated
-    BillingPolicyUpdated
-    PortalConfigurationChanged
 }
 
 RepoInterface(SubscriptionRepo) {
@@ -431,19 +349,6 @@ RepoInterface(ProviderEventLog) {
     PruneBefore()
 }
 
-interface "RepoRegistry" as RepoRegistry <<(I, $pink) Registry>> {
-    Subscription()
-    BillingAccount()
-    Price()
-    Plan()
-    BillingPolicy()
-    ProviderEventLog()
-}
-
-interface "UnitOfWork" as UnitOfWork <<(I, $pink) UnitOfWork>> {
-    Execute(fn func(RepoRegistry) error)
-}
-
 Subscription *-- Refund
 Subscription o-- ProviderSnapshot : applies
 Subscription ..> RefundQuote : quotes
@@ -456,43 +361,19 @@ RefundQuote o-- Money
 PaymentInfo o-- Money
 Refund o-- Money
 Price o-- Money
-Money o-- Currency
 BillingAccount o-- Payer
 BillingAccount "1" -- "0..*" Subscription : workspaceID
 Price --> Plan : tier
-Plan o-- FeatureKey
-Plan o-- LimitKey
-Subscription o-- SubscriptionStatus
-Subscription o-- Interval
-Subscription o-- PlanTier
-Refund o-- RefundReason
-Refund o-- RefundStatus
 ResolveEntitlements ..> Subscription
 ResolveEntitlements ..> Plan
 ResolveEntitlements ..> BillingPolicy
 ResolveEntitlements ..> Entitlements
-
-SubscriptionStateChangedEvent ..|> Event
-SubscriptionCanceledNowEvent ..|> Event
-RefundRequestedEvent ..|> Event
-OtherEvents ..|> Event
-Subscription ..> SubscriptionStateChangedEvent : records
-Subscription ..> SubscriptionCanceledNowEvent : records
-Subscription ..> RefundRequestedEvent : records
-Subscription ..> OtherEvents : records
 
 SubscriptionRepo -- Subscription
 BillingAccountRepo -- BillingAccount
 PriceRepo -- Price
 PlanRepo -- Plan
 BillingPolicyRepo -- BillingPolicy
-RepoRegistry o-- SubscriptionRepo
-RepoRegistry o-- BillingAccountRepo
-RepoRegistry o-- PriceRepo
-RepoRegistry o-- PlanRepo
-RepoRegistry o-- BillingPolicyRepo
-RepoRegistry o-- ProviderEventLog
-UnitOfWork ..> RepoRegistry
 @enduml
 ```
 
@@ -561,27 +442,6 @@ skinparam class {
 !define AggregateRoot(name) class "name" as name <<(S, $sky) Aggregate Root>>
 !define RepoParam(name) class "name" as name <<(S, $green) Repo Param>>
 
-skinparam backgroundColor $base
-skinparam defaultFontColor $text
-skinparam roundcorner 16
-skinparam classFontStyle bold
-
-skinparam ArrowColor $subtext0
-skinparam packageStyle rectangle
-
-skinparam package {
-    BackgroundColor $mantle
-    BorderColor $surface1
-    FontColor $mauve
-}
-
-skinparam class {
-    BackgroundColor $base
-    BorderColor $surface1
-    HeaderBackgroundColor $surface0
-    AttributeFontColor $text
-}
-
 class "Cmds" as Cmds <<(S, $blue) Handlers>> {
     ArchivePrice
     CancelNow
@@ -622,18 +482,6 @@ class "SubscriptionCanceller" as SubscriptionCanceller <<(S, $sky) App Service>>
     CancelNow()
 }
 
-class "CancelProviderSubscriptionHandler" as CancelProviderSubscriptionHandler <<(C, $green) Cmd>> {
-    Handle(CancelProviderSubscription{SubscriptionID})
-}
-
-class "SubmitRefundHandler" as SubmitRefundHandler <<(C, $green) Cmd>> {
-    Handle(SubmitRefund{SubscriptionID, RefundID})
-}
-
-class "ReconcileSubscriptionsHandler" as ReconcileSubscriptionsHandler <<(C, $green) Cmd>> {
-    Handle()
-}
-
 ServiceInterface(PaymentProvider) {
     CreateCustomer()
     UpdateCustomerContact()
@@ -669,9 +517,9 @@ interface "BillingReadModel" as BillingReadModel <<(I, $teal) Read Model>> {
     Prices()
 }
 
-interface "domain.UnitOfWork" as UnitOfWork <<(I, $pink) UnitOfWork>>
 interface "domain.SubscriptionRepo" as SubscriptionRepo <<(I, $pink) Repo>>
 
+package "Enums" {
 Enum(CheckoutPurpose) {
     UNSPECIFIED
     SUBSCRIBE
@@ -690,6 +538,7 @@ Enum(WorkspaceRole) {
     OWNER
     EDITOR
     VIEWER
+}
 }
 
 ValueObject(CheckoutInput) {
@@ -726,21 +575,9 @@ ValueObject(RefundResult) {
     providerSubscriptionID string
 }
 
-Cmds ..> CancelProviderSubscriptionHandler
-Cmds ..> SubmitRefundHandler
-Cmds ..> ReconcileSubscriptionsHandler
-
-SubscriptionCanceller --> UnitOfWork
 SubscriptionCanceller --> SubscriptionRepo
 SubscriptionCanceller --> PaymentProvider
-CancelProviderSubscriptionHandler --> UnitOfWork
-CancelProviderSubscriptionHandler --> PaymentProvider
-SubmitRefundHandler --> UnitOfWork
-SubmitRefundHandler --> PaymentProvider
-ReconcileSubscriptionsHandler --> CancelProviderSubscriptionHandler : retries
-ReconcileSubscriptionsHandler --> SubmitRefundHandler : retries
 
-Cmds --> UnitOfWork : writes
 Cmds --> PaymentProvider
 Cmds --> AuthorizationSvc
 Cmds --> SubscriptionCanceller : CancelNow
@@ -752,9 +589,6 @@ Queries --> SubscriptionCanceller : Quote
 PaymentProvider ..> CheckoutInput
 PaymentProvider ..> CheckoutSessionResult
 PaymentProvider ..> RefundResult
-CheckoutInput o-- CheckoutPurpose
-AuthorizationSvc ..> WorkspacePermission
-AuthorizationSvc ..> WorkspaceRole
 @enduml
 ```
 

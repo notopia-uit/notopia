@@ -1,4 +1,4 @@
-FROM golang:1.27.3-alpine3.23 AS builder
+FROM golang:1.27.4-alpine3.23 AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 \
   -o authorization \
   ./cmd/authorization
 
-FROM alpine:3.23 AS final
+FROM alpine:3.24 AS final
 WORKDIR /app
 COPY --from=builder /app/authorization .
 EXPOSE 8089 18089 28089

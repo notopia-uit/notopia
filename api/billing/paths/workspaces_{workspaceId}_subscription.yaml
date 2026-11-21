@@ -7,7 +7,8 @@ get:
         - openid
   tags:
     - WorkspaceBilling
-  summary: Get workspace subscription, payer and refunds (owner only)
+  summary: Get workspace billing
+  description: Requires workspace billing-management permission. Returns the workspace's subscription, payer, and refund information.
   operationId: getWorkspaceBilling
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml

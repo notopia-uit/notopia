@@ -3,6 +3,7 @@ package commonconfig
 import (
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 type SQL struct {
@@ -20,14 +21,15 @@ func (s *SQL) GetDSN() string {
 	if s.URL != "" {
 		return s.URL.Reveal()
 	}
+	escape := strings.NewReplacer(`\`, `\\`, `'`, `\'`)
 	return fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		s.Host,
+		"host='%s' port=%d user='%s' password='%s' dbname='%s' sslmode='%s'",
+		escape.Replace(s.Host),
 		s.Port,
-		s.User,
-		s.Password.Reveal(),
-		s.Name,
-		s.SSLMode,
+		escape.Replace(s.User),
+		escape.Replace(s.Password.Reveal()),
+		escape.Replace(s.Name),
+		escape.Replace(s.SSLMode),
 	)
 }
 

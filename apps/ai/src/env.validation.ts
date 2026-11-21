@@ -5,7 +5,7 @@ export const envSchema = z.object({
   NOTOPIA_AI_LOG_LEVEL: z
     .enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal'])
     .default('warn'),
-  NOTOPIA_AI_PORT: z.coerce.number().default(8085),
+  NOTOPIA_AI_PORT: z.coerce.number().default(8086),
   NOTOPIA_AI_LLM_BASE_URL: z.string().default(''),
   NOTOPIA_AI_LLM_API_KEY: z.string().default(''),
   NOTOPIA_AI_LLM_MODEL: z.string().default('default'),

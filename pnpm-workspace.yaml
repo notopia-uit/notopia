@@ -8,6 +8,16 @@ packages:
   - "cmd/*"
   - "libs/*"
 autoInstallPeers: true
+catalogs:
+  web-otel:
+    "@opentelemetry/api": "1.9.1"
+    "@opentelemetry/api-logs": "0.223.2"
+    "@opentelemetry/exporter-logs-otlp-proto": "0.223.2"
+    "@opentelemetry/instrumentation": "0.223.2"
+    "@opentelemetry/resources": "2.12.1"
+    "@opentelemetry/sdk-logs": "0.223.2"
+    "@opentelemetry/sdk-metrics": "2.12.1"
+    "@opentelemetry/sdk-trace-base": "2.12.1"
 catalog:
   "@ai-sdk/openai-compatible": "^2.0.81"
   "@ai-sdk/react": "^3.0.303"
@@ -18,7 +28,7 @@ catalog:
   "@blocknote/server-util": "0.55.0"
   "@blocknote/shadcn": "0.55.0"
   "@blocknote/xl-ai": "0.55.0"
-  "@bufbuild/protobuf": "2.11.0"
+  "@bufbuild/protobuf": "2.17.0"
   "@connectrpc/validate": "0.2.0"
   "@d2t/vitest-ctrf-json-reporter": ~1.3.0
   "@floating-ui/dom": "^1.7.6"
@@ -40,22 +50,16 @@ catalog:
   "@nestjs/platform-express": "^11.2.7"
   "@nestjs/platform-socket.io": "^11.2.7"
   "@nestjs/platform-ws": "^11.2.7"
-  "@nestjs/schedule": "12.0.3"
+  "@nestjs/schedule": "12.0.4"
   "@nestjs/schematics": "^11.1.0"
   "@nestjs/terminus": "^12.1.0"
   "@nestjs/testing": "^11.2.7"
   "@nestjs/typeorm": "^11.0.3"
   "@nestjs/websockets": "^11.2.7"
-  "@openapitools/openapi-generator-cli": "2.31.1"
-  "@opentelemetry/api": "^1.9.1"
-  "@opentelemetry/auto-instrumentations-node": "~0.72.0"
-  "@opentelemetry/exporter-logs-otlp-proto": "0.215.0"
-  "@opentelemetry/resources": "~2.7.1"
-  "@opentelemetry/sdk-logs": "0.215.0"
-  "@opentelemetry/sdk-metrics": "~2.7.1"
-  "@opentelemetry/sdk-node": "0.215.0"
-  "@opentelemetry/sdk-trace-node": "~2.7.1"
-  "@opentelemetry/semantic-conventions": "~1.40.0"
+  "@openapitools/openapi-generator-cli": "2.42.2"
+  "@opentelemetry/api": "~1.10.0"
+  "@opentelemetry/auto-instrumentations-node": "~0.83.0"
+  "@opentelemetry/sdk-node": "0.301.2"
   "@redocly/cli": "~2.30.5"
   "@rsdoctor/rspack-plugin": "^1.6.4"
   "@rspack/cli": "^2.2.8"
@@ -84,7 +88,7 @@ catalog:
   "@types/ws": "^8.18.1"
   # typescript: "^7.0.2"
   "@typescript/native": "npm:typescript@^7.0.2"
-  "@vercel/otel": "^2.1.2"
+  "@vercel/otel": "^2.3.0"
   "@vitejs/plugin-react": "^6.1.1"
   "@vitejs/plugin-react-swc": "4.3.3"
   "@vitest/coverage-v8": "^5.0.0"
@@ -109,11 +113,11 @@ catalog:
   marked: "^18.0.3"
   meilisearch: "0.58.0"
   nanoid: "^6.0.1"
-  nestjs-otel: "^8.0.2"
-  nestjs-pino: "^4.6.1"
+  nestjs-otel: "^8.1.1"
+  nestjs-pino: "^5.3.1"
   next: "^16.2.6"
   oidc-client-ts: "^3.5.0"
-  oxfmt: "^0.74.0"
+  oxfmt: "^0.79.0"
   oxlint: "^1.89.0"
   oxlint-tsgolint: "^7.0.2001"
   pg: "^8.23.1"
@@ -122,7 +126,7 @@ catalog:
   pino-pretty: "^13.1.3"
   pixi.js: "^8.15.0"
   postcss: "^8.4.49"
-  protobufjs: "~8.4.0"
+  protobufjs: "~8.8.0"
   radix-ui: "^1.4.3"
   react: "^19.2.8"
   react-dom: "^19.2.8"
@@ -144,7 +148,6 @@ catalog:
   use-stick-to-bottom: "^1.1.6"
   uuid: "^14.0.0"
   vite: "^8.0.12"
-  vite-plugin-dts: "^4.5.4"
   vitest: "^5.0.0"
   webpack-node-externals: "^3.0.0"
   ws: "^8.19.0"
@@ -157,7 +160,7 @@ overrides:
 allowBuilds:
   "@openapitools/openapi-generator-cli": true
   "@parcel/watcher": true
-  '@quobix/vacuum': false
+  "@quobix/vacuum": false
   "@scarf/scarf": true
   "@suites/di.nestjs": true
   "@suites/doubles.vitest": true

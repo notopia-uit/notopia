@@ -199,7 +199,7 @@ type Entitlements struct {
 	// AccessUntil Examples: 2026-11-11T00:00:00Z
 	AccessUntil nullable.Nullable[time.Time] `json:"accessUntil,omitempty"`
 
-	// Features Feature flags by key (auto_commit, workspace_graph).
+	// Features Feature flags available to a plan.
 	//
 	// Examples: {"auto_commit":true,"workspace_graph":true}
 	Features Features `json:"features"`
@@ -239,15 +239,26 @@ type Error struct {
 	MoreInfo *string `json:"more_info,omitempty"`
 }
 
-// Features Feature flags by key (auto_commit, workspace_graph).
+// Features Feature flags available to a plan.
 //
 // Examples: {"auto_commit":true,"workspace_graph":true}
-type Features map[string]bool
+type Features struct {
+	AutoCommit     *bool `json:"auto_commit,omitempty"`
+	WorkspaceGraph *bool `json:"workspace_graph,omitempty"`
+}
 
 // Limits Limits by key. -1 means unlimited.
 //
 // Examples: {"members":10,"revision_history_days":30}
-type Limits map[string]int64
+type Limits struct {
+	AiCreditsMonthly             *int64 `json:"ai_credits_monthly,omitempty"`
+	AutoCommitMinIntervalSeconds *int64 `json:"auto_commit_min_interval_seconds,omitempty"`
+	Members                      *int64 `json:"members,omitempty"`
+	NoteGraphMaxDepth            *int64 `json:"note_graph_max_depth,omitempty"`
+	PublishedNotes               *int64 `json:"published_notes,omitempty"`
+	RevisionHistoryDays          *int64 `json:"revision_history_days,omitempty"`
+	TrashRetentionDays           *int64 `json:"trash_retention_days,omitempty"`
+}
 
 // Payer defines model for Payer.
 type Payer struct {
@@ -266,7 +277,7 @@ type Payer struct {
 
 // Plan defines model for Plan.
 type Plan struct {
-	// Features Feature flags by key (auto_commit, workspace_graph).
+	// Features Feature flags available to a plan.
 	//
 	// Examples: {"auto_commit":true,"workspace_graph":true}
 	Features Features `json:"features"`
@@ -349,13 +360,16 @@ type RefundStatus string
 
 // RefundQuote defines model for RefundQuote.
 type RefundQuote struct {
-	// Amount Examples: 24500
+	// Amount Examples: 29500
 	Amount int64 `json:"amount"`
 
 	// Currency Examples: vnd
 	Currency string `json:"currency"`
 
-	// Payments One line per paid invoice payment of the current period
+	// Payments Refund breakdown by eligible paid invoice payment whose invoice coverage overlaps the current subscription period. A payment's coverage may differ from the current period, for example after a plan change.
+	//
+	//
+	// Examples: [{"amount":24500,"coverageSeconds":2592000,"paidAmount":49000,"unusedSeconds":1296000},{"amount":5000,"coverageSeconds":1296000,"paidAmount":10000,"unusedSeconds":648000}]
 	Payments []RefundQuotePayment `json:"payments"`
 
 	// PeriodSeconds Examples: 2592000
@@ -372,13 +386,19 @@ type RefundQuotePayment struct {
 	// Examples: 24500
 	Amount int64 `json:"amount"`
 
-	// CoverageSeconds Examples: 2592000
+	// CoverageSeconds Length of the payment's invoice coverage in seconds
+	//
+	// Examples: 2592000
 	CoverageSeconds int64 `json:"coverageSeconds"`
 
-	// PaidAmount Examples: 49000
+	// PaidAmount Amount paid for this payment, in the quote currency
+	//
+	// Examples: 49000
 	PaidAmount int64 `json:"paidAmount"`
 
-	// UnusedSeconds Examples: 1296000
+	// UnusedSeconds Unused portion of the payment's invoice coverage in seconds
+	//
+	// Examples: 1296000
 	UnusedSeconds int64 `json:"unusedSeconds"`
 }
 
@@ -422,7 +442,7 @@ type SubscriptionStatus string
 
 // UpdatePlanRequest defines model for UpdatePlanRequest.
 type UpdatePlanRequest struct {
-	// Features Feature flags by key (auto_commit, workspace_graph).
+	// Features Feature flags available to a plan.
 	//
 	// Examples: {"auto_commit":true,"workspace_graph":true}
 	Features *Features `json:"features,omitempty"`

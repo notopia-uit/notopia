@@ -7,7 +7,8 @@ get:
         - openid
   tags:
     - BillingAdmin
-  summary: List all prices including archived (admin)
+  summary: List prices
+  description: Requires billing administrator access. Returns all prices, including archived prices, newest first.
   operationId: adminListPrices
   responses:
     200:
@@ -34,7 +35,8 @@ post:
         - openid
   tags:
     - BillingAdmin
-  summary: Create a price, replacing the active one for the same plan and interval (admin)
+  summary: Create price
+  description: Requires billing administrator access. Replaces the active price for the same plan, billing interval, and currency; the previous price is archived.
   operationId: adminCreatePrice
   requestBody:
     required: true

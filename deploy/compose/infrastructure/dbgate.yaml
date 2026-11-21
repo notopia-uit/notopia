@@ -2,12 +2,12 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 services:
   dbgate:
-    image: dbgate/dbgate:7.3.4-alpine
+    image: dbgate/dbgate:7.3.6-alpine
     container_name: notopia-dbgate
     environment:
       SKIP_ALL_AUTH: true
 
-      CONNECTIONS: note_postgresql,note_redis,document_postgresql,authorization_postgresql
+      CONNECTIONS: note_postgresql,note_redis,document_postgresql,authorization_postgresql,billing_postgresql,ai_postgresql
 
       LABEL_note_postgresql: Note PostgreSQL
       ENGINE_note_postgresql: postgres@dbgate-plugin-postgres
@@ -24,6 +24,14 @@ services:
       LABEL_authorization_postgresql: Authorization PostgreSQL
       ENGINE_authorization_postgresql: postgres@dbgate-plugin-postgres
       URL_authorization_postgresql: postgres://${AUTHORIZATION_POSTGRESQL_USER:-notopiauit}:${AUTHORIZATION_POSTGRESQL_PASSWORD:-notopiauit}@authorization_postgresql:5432/${AUTHORIZATION_POSTGRESQL_DB:-authorization}
+
+      LABEL_billing_postgresql: Billing PostgreSQL
+      ENGINE_billing_postgresql: postgres@dbgate-plugin-postgres
+      URL_billing_postgresql: postgres://${BILLING_POSTGRESQL_USER:-notopiauit}:${BILLING_POSTGRESQL_PASSWORD:-notopiauit}@billing_postgresql:5432/${BILLING_POSTGRESQL_DB:-billing}
+
+      LABEL_ai_postgresql: AI PostgreSQL
+      ENGINE_ai_postgresql: postgres@dbgate-plugin-postgres
+      URL_ai_postgresql: postgres://${AI_POSTGRESQL_USER:-notopiauit}:${AI_POSTGRESQL_PASSWORD:-notopiauit}@ai_postgresql:5432/${AI_POSTGRESQL_DB:-ai}
     volumes:
       - dbgate_data:/root/.dbgate
     labels:

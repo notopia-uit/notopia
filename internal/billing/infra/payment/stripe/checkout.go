@@ -11,8 +11,9 @@ import (
 
 func (p *Provider) CreateCustomer(ctx context.Context, workspaceID uuid.UUID, payer domain.Payer) (string, error) {
 	params := &stripego.CustomerCreateParams{
-		Email: stripego.String(payer.Email()),
-		Name:  stripego.String(payer.Name()),
+		Email:       stripego.String(payer.Email()),
+		Name:        stripego.String(payer.Name()),
+		Description: stripego.String("Notopia workspace: " + workspaceID.String()),
 		Metadata: map[string]string{
 			"workspace_id": workspaceID.String(),
 			"payer_id":     payer.ID(),

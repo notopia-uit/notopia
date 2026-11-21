@@ -1,9 +1,43 @@
 # vim: ft=yaml.openapi
 type: object
 description: Limits by key. -1 means unlimited.
-additionalProperties:
-  type: integer
-  format: int64
+additionalProperties: false
+properties:
+  members:
+    type: integer
+    format: int64
+    minimum: -1
+    example: 10
+  published_notes:
+    type: integer
+    format: int64
+    minimum: -1
+    example: -1
+  note_graph_max_depth:
+    type: integer
+    format: int64
+    minimum: -1
+    example: 5
+  auto_commit_min_interval_seconds:
+    type: integer
+    format: int64
+    minimum: -1
+    example: 300
+  revision_history_days:
+    type: integer
+    format: int64
+    minimum: -1
+    example: 30
+  trash_retention_days:
+    type: integer
+    format: int64
+    minimum: -1
+    example: 30
+  ai_credits_monthly:
+    type: integer
+    format: int64
+    minimum: -1
+    example: 200
 examples:
   - members: 10
     revision_history_days: 30

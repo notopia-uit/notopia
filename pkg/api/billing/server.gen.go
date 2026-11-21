@@ -17,52 +17,52 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// AdminListPlans List plans (admin)
+	// AdminListPlans List plans
 	// (GET /billing/admin/plans)
 	AdminListPlans(c *gin.Context)
-	// AdminUpdatePlan Update plan features and limits (admin)
+	// AdminUpdatePlan Update plan
 	// (PATCH /billing/admin/plans/{tier})
 	AdminUpdatePlan(c *gin.Context, tier TierPath)
-	// AdminGetPolicy Get billing policy (admin)
+	// AdminGetPolicy Get billing policy
 	// (GET /billing/admin/policy)
 	AdminGetPolicy(c *gin.Context)
-	// AdminUpdatePolicy Update billing policy (admin)
+	// AdminUpdatePolicy Update billing policy
 	// (PATCH /billing/admin/policy)
 	AdminUpdatePolicy(c *gin.Context)
-	// AdminListPrices List all prices including archived (admin)
+	// AdminListPrices List prices
 	// (GET /billing/admin/prices)
 	AdminListPrices(c *gin.Context)
-	// AdminCreatePrice Create a price, replacing the active one for the same plan and interval (admin)
+	// AdminCreatePrice Create price
 	// (POST /billing/admin/prices)
 	AdminCreatePrice(c *gin.Context)
-	// AdminArchivePrice Archive a price (admin)
+	// AdminArchivePrice Archive price
 	// (POST /billing/admin/prices/{priceId}/archive)
 	AdminArchivePrice(c *gin.Context, priceId PriceIdPath)
-	// ListPlans List plans with features, limits and active prices
+	// ListPlans List plans
 	// (GET /billing/plans)
 	ListPlans(c *gin.Context)
-	// StripeWebhook Stripe webhook endpoint (signature verified against the raw body)
+	// StripeWebhook Stripe webhook endpoint
 	// (POST /billing/webhooks/stripe)
 	StripeWebhook(c *gin.Context, params StripeWebhookParams)
-	// CreateCheckoutSession Start Stripe Checkout for a plan price (owner only)
+	// CreateCheckoutSession Create checkout session
 	// (POST /billing/workspaces/{workspaceId}/checkout-session)
 	CreateCheckoutSession(c *gin.Context, workspaceId WorkspaceIdPath)
-	// GetWorkspaceEntitlements Get workspace entitlements (member)
+	// GetWorkspaceEntitlements Get workspace entitlements
 	// (GET /billing/workspaces/{workspaceId}/entitlements)
 	GetWorkspaceEntitlements(c *gin.Context, workspaceId WorkspaceIdPath)
-	// ClaimPayer Become the payer by completing a setup Checkout (owner only)
+	// ClaimPayer Claim payer role
 	// (POST /billing/workspaces/{workspaceId}/payer/claim)
 	ClaimPayer(c *gin.Context, workspaceId WorkspaceIdPath)
-	// CreatePortalSession Open Stripe Customer Portal (owner only)
+	// CreatePortalSession Create portal session
 	// (POST /billing/workspaces/{workspaceId}/portal-session)
 	CreatePortalSession(c *gin.Context, workspaceId WorkspaceIdPath)
-	// GetWorkspaceBilling Get workspace subscription, payer and refunds (owner only)
+	// GetWorkspaceBilling Get workspace billing
 	// (GET /billing/workspaces/{workspaceId}/subscription)
 	GetWorkspaceBilling(c *gin.Context, workspaceId WorkspaceIdPath)
-	// CancelNow Cancel the subscription now with a prorated refund (owner only)
+	// CancelNow Cancel subscription now
 	// (POST /billing/workspaces/{workspaceId}/subscription/cancel-now)
 	CancelNow(c *gin.Context, workspaceId WorkspaceIdPath)
-	// PreviewCancelNow Preview the refund of cancelling now (owner only)
+	// PreviewCancelNow Preview immediate cancellation
 	// (GET /billing/workspaces/{workspaceId}/subscription/cancel-now/preview)
 	PreviewCancelNow(c *gin.Context, workspaceId WorkspaceIdPath)
 }
@@ -1850,52 +1850,52 @@ func (response PreviewCancelNow500JSONResponse) VisitPreviewCancelNowResponse(w 
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-	// AdminListPlans List plans (admin)
+	// AdminListPlans List plans
 	// (GET /billing/admin/plans)
 	AdminListPlans(ctx context.Context, request AdminListPlansRequestObject) (AdminListPlansResponseObject, error)
-	// AdminUpdatePlan Update plan features and limits (admin)
+	// AdminUpdatePlan Update plan
 	// (PATCH /billing/admin/plans/{tier})
 	AdminUpdatePlan(ctx context.Context, request AdminUpdatePlanRequestObject) (AdminUpdatePlanResponseObject, error)
-	// AdminGetPolicy Get billing policy (admin)
+	// AdminGetPolicy Get billing policy
 	// (GET /billing/admin/policy)
 	AdminGetPolicy(ctx context.Context, request AdminGetPolicyRequestObject) (AdminGetPolicyResponseObject, error)
-	// AdminUpdatePolicy Update billing policy (admin)
+	// AdminUpdatePolicy Update billing policy
 	// (PATCH /billing/admin/policy)
 	AdminUpdatePolicy(ctx context.Context, request AdminUpdatePolicyRequestObject) (AdminUpdatePolicyResponseObject, error)
-	// AdminListPrices List all prices including archived (admin)
+	// AdminListPrices List prices
 	// (GET /billing/admin/prices)
 	AdminListPrices(ctx context.Context, request AdminListPricesRequestObject) (AdminListPricesResponseObject, error)
-	// AdminCreatePrice Create a price, replacing the active one for the same plan and interval (admin)
+	// AdminCreatePrice Create price
 	// (POST /billing/admin/prices)
 	AdminCreatePrice(ctx context.Context, request AdminCreatePriceRequestObject) (AdminCreatePriceResponseObject, error)
-	// AdminArchivePrice Archive a price (admin)
+	// AdminArchivePrice Archive price
 	// (POST /billing/admin/prices/{priceId}/archive)
 	AdminArchivePrice(ctx context.Context, request AdminArchivePriceRequestObject) (AdminArchivePriceResponseObject, error)
-	// ListPlans List plans with features, limits and active prices
+	// ListPlans List plans
 	// (GET /billing/plans)
 	ListPlans(ctx context.Context, request ListPlansRequestObject) (ListPlansResponseObject, error)
-	// StripeWebhook Stripe webhook endpoint (signature verified against the raw body)
+	// StripeWebhook Stripe webhook endpoint
 	// (POST /billing/webhooks/stripe)
 	StripeWebhook(ctx context.Context, request StripeWebhookRequestObject) (StripeWebhookResponseObject, error)
-	// CreateCheckoutSession Start Stripe Checkout for a plan price (owner only)
+	// CreateCheckoutSession Create checkout session
 	// (POST /billing/workspaces/{workspaceId}/checkout-session)
 	CreateCheckoutSession(ctx context.Context, request CreateCheckoutSessionRequestObject) (CreateCheckoutSessionResponseObject, error)
-	// GetWorkspaceEntitlements Get workspace entitlements (member)
+	// GetWorkspaceEntitlements Get workspace entitlements
 	// (GET /billing/workspaces/{workspaceId}/entitlements)
 	GetWorkspaceEntitlements(ctx context.Context, request GetWorkspaceEntitlementsRequestObject) (GetWorkspaceEntitlementsResponseObject, error)
-	// ClaimPayer Become the payer by completing a setup Checkout (owner only)
+	// ClaimPayer Claim payer role
 	// (POST /billing/workspaces/{workspaceId}/payer/claim)
 	ClaimPayer(ctx context.Context, request ClaimPayerRequestObject) (ClaimPayerResponseObject, error)
-	// CreatePortalSession Open Stripe Customer Portal (owner only)
+	// CreatePortalSession Create portal session
 	// (POST /billing/workspaces/{workspaceId}/portal-session)
 	CreatePortalSession(ctx context.Context, request CreatePortalSessionRequestObject) (CreatePortalSessionResponseObject, error)
-	// GetWorkspaceBilling Get workspace subscription, payer and refunds (owner only)
+	// GetWorkspaceBilling Get workspace billing
 	// (GET /billing/workspaces/{workspaceId}/subscription)
 	GetWorkspaceBilling(ctx context.Context, request GetWorkspaceBillingRequestObject) (GetWorkspaceBillingResponseObject, error)
-	// CancelNow Cancel the subscription now with a prorated refund (owner only)
+	// CancelNow Cancel subscription now
 	// (POST /billing/workspaces/{workspaceId}/subscription/cancel-now)
 	CancelNow(ctx context.Context, request CancelNowRequestObject) (CancelNowResponseObject, error)
-	// PreviewCancelNow Preview the refund of cancelling now (owner only)
+	// PreviewCancelNow Preview immediate cancellation
 	// (GET /billing/workspaces/{workspaceId}/subscription/cancel-now/preview)
 	PreviewCancelNow(ctx context.Context, request PreviewCancelNowRequestObject) (PreviewCancelNowResponseObject, error)
 }

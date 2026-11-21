@@ -41,7 +41,7 @@ entries:
     attrs:
       username: kevinnitro
       name: Kevin Nitro
-      email: tranguyenthaibinh46@gmail.com
+      email: trannguyenthaibinh46@gmail.com
       password: kevinnitro
 
   - model: authentik_core.user

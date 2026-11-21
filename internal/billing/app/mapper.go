@@ -81,18 +81,39 @@ func newRefundStatus(s domain.RefundStatus) RefundStatus {
 	return RefundStatusUnspecified
 }
 
-func newFeatures(m map[domain.FeatureKey]bool) map[string]bool {
-	out := make(map[string]bool, len(m))
-	for k, v := range m {
-		out[k.String()] = v
+func newFeatures(m map[domain.FeatureKey]bool) Features {
+	out := Features{}
+	if v, ok := m[domain.FeatureKeyAutoCommit]; ok {
+		out.AutoCommit = &v
+	}
+	if v, ok := m[domain.FeatureKeyWorkspaceGraph]; ok {
+		out.WorkspaceGraph = &v
 	}
 	return out
 }
 
-func newLimits(m map[domain.LimitKey]int64) map[string]int64 {
-	out := make(map[string]int64, len(m))
-	for k, v := range m {
-		out[k.String()] = v
+func newLimits(m map[domain.LimitKey]int64) Limits {
+	out := Limits{}
+	if v, ok := m[domain.LimitKeyMembers]; ok {
+		out.Members = &v
+	}
+	if v, ok := m[domain.LimitKeyPublishedNotes]; ok {
+		out.PublishedNotes = &v
+	}
+	if v, ok := m[domain.LimitKeyNoteGraphMaxDepth]; ok {
+		out.NoteGraphMaxDepth = &v
+	}
+	if v, ok := m[domain.LimitKeyAutoCommitMinInterval]; ok {
+		out.AutoCommitMinIntervalSeconds = &v
+	}
+	if v, ok := m[domain.LimitKeyRevisionHistoryDays]; ok {
+		out.RevisionHistoryDays = &v
+	}
+	if v, ok := m[domain.LimitKeyTrashRetentionDays]; ok {
+		out.TrashRetentionDays = &v
+	}
+	if v, ok := m[domain.LimitKeyAICreditsMonthly]; ok {
+		out.AICreditsMonthly = &v
 	}
 	return out
 }
@@ -191,27 +212,39 @@ func toDomainPayer(p Payer) (domain.Payer, error) {
 	return domain.NewPayer(p.ID, p.Email, p.Name)
 }
 
-// parseFeatures/parseLimits reject keys the domain does not know (errs.NewInvalid → 400).
-func parseFeatures(in map[string]bool) (map[domain.FeatureKey]bool, error) {
-	out := make(map[domain.FeatureKey]bool, len(in))
-	for s, v := range in {
-		k, err := domain.ParseFeatureKey(s)
-		if err != nil {
-			return nil, err
-		}
-		out[k] = v
+func toDomainFeatureUpdates(in Features) map[domain.FeatureKey]bool {
+	out := map[domain.FeatureKey]bool{}
+	if in.AutoCommit != nil {
+		out[domain.FeatureKeyAutoCommit] = *in.AutoCommit
 	}
-	return out, nil
+	if in.WorkspaceGraph != nil {
+		out[domain.FeatureKeyWorkspaceGraph] = *in.WorkspaceGraph
+	}
+	return out
 }
 
-func parseLimits(in map[string]int64) (map[domain.LimitKey]int64, error) {
-	out := make(map[domain.LimitKey]int64, len(in))
-	for s, v := range in {
-		k, err := domain.ParseLimitKey(s)
-		if err != nil {
-			return nil, err
-		}
-		out[k] = v
+func toDomainLimitUpdates(in Limits) map[domain.LimitKey]int64 {
+	out := map[domain.LimitKey]int64{}
+	if in.Members != nil {
+		out[domain.LimitKeyMembers] = *in.Members
 	}
-	return out, nil
+	if in.PublishedNotes != nil {
+		out[domain.LimitKeyPublishedNotes] = *in.PublishedNotes
+	}
+	if in.NoteGraphMaxDepth != nil {
+		out[domain.LimitKeyNoteGraphMaxDepth] = *in.NoteGraphMaxDepth
+	}
+	if in.AutoCommitMinIntervalSeconds != nil {
+		out[domain.LimitKeyAutoCommitMinInterval] = *in.AutoCommitMinIntervalSeconds
+	}
+	if in.RevisionHistoryDays != nil {
+		out[domain.LimitKeyRevisionHistoryDays] = *in.RevisionHistoryDays
+	}
+	if in.TrashRetentionDays != nil {
+		out[domain.LimitKeyTrashRetentionDays] = *in.TrashRetentionDays
+	}
+	if in.AICreditsMonthly != nil {
+		out[domain.LimitKeyAICreditsMonthly] = *in.AICreditsMonthly
+	}
+	return out
 }

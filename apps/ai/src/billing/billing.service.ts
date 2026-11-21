@@ -46,7 +46,7 @@ export class BillingService implements OnModuleInit {
         const plan = plans.find((candidate) => candidate.tier === tier);
         // A tier the billing service does not offer is not an upgrade target.
         if (!plan) continue;
-        const quota = plan.limits?.ai_credits_monthly;
+        const quota = plan.limits?.aiCreditsMonthly;
         if (quota === undefined || !Number.isSafeInteger(quota) || quota < -1) {
           throw new Error(`Plan "${name}" has an invalid ai_credits_monthly limit`);
         }
@@ -74,7 +74,7 @@ export class BillingService implements OnModuleInit {
       if (!response.entitlements || response.entitlements.workspaceId !== workspaceId) {
         throw new Error('Missing or mismatched billing entitlements');
       }
-      const raw = response.entitlements.limits?.ai_credits_monthly;
+      const raw = response.entitlements.limits?.aiCreditsMonthly;
       const credits = raw === undefined ? 0 : Number(raw);
       if (!Number.isSafeInteger(credits) || credits < -1) throw new Error('Invalid AI quota');
       return credits;

@@ -8,6 +8,8 @@ indent_size=2
 [*.{go,gotmpl}]
 trim_trailing_whitespace = true
 indent_style=tab
+# Nvim inherit the *'s indent_size, so we have to set
+indent_size = 8
 tab_width = 8
 
 [*.lua]

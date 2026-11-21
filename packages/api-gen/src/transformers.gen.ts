@@ -94,8 +94,26 @@ export const getWorkspaceTreeResponseTransformer = async (data: any): Promise<Ge
 };
 
 const billingLimitsSchemaResponseTransformer = (data: any) => {
-    for (const key of Object.keys(data)) {
-        data[key] = BigInt(data[key].toString());
+    if (data.members) {
+        data.members = BigInt(data.members.toString());
+    }
+    if (data.published_notes) {
+        data.published_notes = BigInt(data.published_notes.toString());
+    }
+    if (data.note_graph_max_depth) {
+        data.note_graph_max_depth = BigInt(data.note_graph_max_depth.toString());
+    }
+    if (data.auto_commit_min_interval_seconds) {
+        data.auto_commit_min_interval_seconds = BigInt(data.auto_commit_min_interval_seconds.toString());
+    }
+    if (data.revision_history_days) {
+        data.revision_history_days = BigInt(data.revision_history_days.toString());
+    }
+    if (data.trash_retention_days) {
+        data.trash_retention_days = BigInt(data.trash_retention_days.toString());
+    }
+    if (data.ai_credits_monthly) {
+        data.ai_credits_monthly = BigInt(data.ai_credits_monthly.toString());
     }
     return data;
 };

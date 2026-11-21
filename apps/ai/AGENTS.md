@@ -3,6 +3,10 @@
 NestJS HTTP backend for BlockNote AI and workspace assistant chat. No database or Kafka;
 uses note, authorization and billing gRPC, Meilisearch, and Redis for shared accounting.
 
+Service overview and local setup: [`docs/src/services/ai/index.md`](../../docs/src/services/ai/index.md).
+OpenRouter and OpenCode model configuration:
+[`docs/src/services/ai/model-providers.md`](../../docs/src/services/ai/model-providers.md).
+
 ## Modules
 
 | Module | Role |
@@ -87,6 +91,9 @@ AI SDK stream error parts with a safe message; server tool failures are sanitize
 AI SDK serializes them. The shared UI transport normalizes HTTP JSON into readable errors for workspace chat and BlockNote. Remote file parts are rejected to avoid server-side URL fetches.
 
 ## Configuration and checks
+
+AI uses service digit **6**: HTTP and health share port `8086`; dedicated Redis is
+published on `6376`. Keep defaults, `.env`, Dockerfile and Traefik aligned when changing ports.
 
 `NOTOPIA_AI_SERVICES_BILLING_GRPC_URL` joins existing note/authorization endpoints.
 Defaults: `NOTOPIA_AI_REQUESTS_PER_MINUTE=20`, `NOTOPIA_AI_CONCURRENT_STREAMS=2`,

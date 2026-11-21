@@ -494,17 +494,24 @@ export const BillingPlanTier = {
 export type BillingPlanTier = typeof BillingPlanTier[keyof typeof BillingPlanTier];
 
 /**
- * Feature flags by key (auto_commit, workspace_graph).
+ * Feature flags available to a plan.
  */
 export type BillingFeatures = {
-    [key: string]: boolean;
+    auto_commit?: boolean;
+    workspace_graph?: boolean;
 };
 
 /**
  * Limits by key. -1 means unlimited.
  */
 export type BillingLimits = {
-    [key: string]: bigint;
+    members?: bigint;
+    published_notes?: bigint;
+    note_graph_max_depth?: bigint;
+    auto_commit_min_interval_seconds?: bigint;
+    revision_history_days?: bigint;
+    trash_retention_days?: bigint;
+    ai_credits_monthly?: bigint;
 };
 
 export const BillingBillingInterval = {
@@ -619,12 +626,21 @@ export type BillingRedirectUrl = {
 };
 
 export type BillingRefundQuotePayment = {
+    /**
+     * Amount paid for this payment, in the quote currency
+     */
     paidAmount: bigint;
     /**
      * Refund for this payment
      */
     amount: bigint;
+    /**
+     * Length of the payment's invoice coverage in seconds
+     */
     coverageSeconds: bigint;
+    /**
+     * Unused portion of the payment's invoice coverage in seconds
+     */
     unusedSeconds: bigint;
 };
 
@@ -634,7 +650,8 @@ export type BillingRefundQuote = {
     unusedSeconds: bigint;
     periodSeconds: bigint;
     /**
-     * One line per paid invoice payment of the current period
+     * Refund breakdown by eligible paid invoice payment whose invoice coverage overlaps the current subscription period. A payment's coverage may differ from the current period, for example after a plan change.
+     *
      */
     payments: Array<BillingRefundQuotePayment>;
 };
@@ -2792,7 +2809,7 @@ export type CreateCheckoutSessionError = CreateCheckoutSessionErrors[keyof Creat
 
 export type CreateCheckoutSessionResponses = {
     /**
-     * Redirect the browser to this URL
+     * Checkout session URL. Redirect the browser to this URL to complete the purchase.
      */
     200: BillingRedirectUrl;
 };
@@ -2837,7 +2854,7 @@ export type CreatePortalSessionError = CreatePortalSessionErrors[keyof CreatePor
 
 export type CreatePortalSessionResponses = {
     /**
-     * Redirect the browser to this URL
+     * Customer Portal session URL. Redirect the browser to this URL to manage existing billing.
      */
     200: BillingRedirectUrl;
 };
@@ -2984,7 +3001,7 @@ export type ClaimPayerError = ClaimPayerErrors[keyof ClaimPayerErrors];
 
 export type ClaimPayerResponses = {
     /**
-     * Redirect the browser to this URL
+     * Checkout session URL. Redirect the browser to this URL to set up a payment method.
      */
     200: BillingRedirectUrl;
 };

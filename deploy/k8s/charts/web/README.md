@@ -1,6 +1,6 @@
 # web
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
 
 ## Requirements
 
@@ -41,7 +41,7 @@
 | notopia-common-chart | object | `{"global":{}}` | Common library configuration |
 | otel.enabled | bool | `true` | Enable OpenTelemetry environment |
 | otel.endpoint | string | `""` | Collector endpoint |
-| otel.protocol | string | `"grpc"` | Collector protocol |
+| otel.protocol | string | `"http/protobuf"` | Collector protocol |
 | otel.resourceAttributes | object | `{}` | Additional resource attributes |
 | podAnnotations | object | `{}` | Additional pod annotations |
 | podDisruptionBudget.enabled | bool | `false` | Enable disruption budget |

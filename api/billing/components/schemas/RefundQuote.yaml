@@ -4,7 +4,7 @@ properties:
   amount:
     type: integer
     format: int64
-    examples: [24500]
+    examples: [29500]
   currency:
     type: string
     examples: [vnd]
@@ -18,7 +18,19 @@ properties:
     examples: [2592000]
   payments:
     type: array
-    description: One line per paid invoice payment of the current period
+    description: >
+      Refund breakdown by eligible paid invoice payment whose invoice coverage
+      overlaps the current subscription period. A payment's coverage may differ
+      from the current period, for example after a plan change.
+    examples:
+      - - paidAmount: 49000
+          amount: 24500
+          coverageSeconds: 2592000
+          unusedSeconds: 1296000
+        - paidAmount: 10000
+          amount: 5000
+          coverageSeconds: 1296000
+          unusedSeconds: 648000
     items:
       $ref: ./RefundQuotePayment.yaml
 required: [amount, currency, unusedSeconds, periodSeconds, payments]

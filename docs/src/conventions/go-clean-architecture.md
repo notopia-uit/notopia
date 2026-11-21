@@ -1,3 +1,7 @@
+---
+order: 2
+---
+
 # Go Clean Architecture + CQRS
 
 Rules for every Go service (`internal/{service}`). Reference implementation: `internal/note`.

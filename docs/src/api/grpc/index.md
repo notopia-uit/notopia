@@ -36,15 +36,13 @@
     - [BatchGetWorkspaceEntitlementsResponse](#billing-BatchGetWorkspaceEntitlementsResponse)
     - [BatchGetWorkspaceEntitlementsResponse.EntitlementsEntry](#billing-BatchGetWorkspaceEntitlementsResponse-EntitlementsEntry)
     - [BillingPlan](#billing-BillingPlan)
-    - [BillingPlan.FeaturesEntry](#billing-BillingPlan-FeaturesEntry)
-    - [BillingPlan.LimitsEntry](#billing-BillingPlan-LimitsEntry)
     - [Entitlements](#billing-Entitlements)
-    - [Entitlements.FeaturesEntry](#billing-Entitlements-FeaturesEntry)
-    - [Entitlements.LimitsEntry](#billing-Entitlements-LimitsEntry)
+    - [Features](#billing-Features)
     - [GetWorkspaceEntitlementsRequest](#billing-GetWorkspaceEntitlementsRequest)
     - [GetWorkspaceEntitlementsResponse](#billing-GetWorkspaceEntitlementsResponse)
     - [GetWorkspacePayerRequest](#billing-GetWorkspacePayerRequest)
     - [GetWorkspacePayerResponse](#billing-GetWorkspacePayerResponse)
+    - [Limits](#billing-Limits)
     - [ListPlansRequest](#billing-ListPlansRequest)
     - [ListPlansResponse](#billing-ListPlansResponse)
   
@@ -510,40 +508,8 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | tier | [PlanTier](#billing-PlanTier) |  |  |
-| features | [BillingPlan.FeaturesEntry](#billing-BillingPlan-FeaturesEntry) | repeated |  |
-| limits | [BillingPlan.LimitsEntry](#billing-BillingPlan-LimitsEntry) | repeated |  |
-
-
-
-
-
-
-<a name="billing-BillingPlan-FeaturesEntry"></a>
-
-### BillingPlan.FeaturesEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [bool](#bool) |  |  |
-
-
-
-
-
-
-<a name="billing-BillingPlan-LimitsEntry"></a>
-
-### BillingPlan.LimitsEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [int64](#int64) |  |  |
+| features | [Features](#billing-Features) |  |  |
+| limits | [Limits](#billing-Limits) |  |  |
 
 
 
@@ -553,7 +519,7 @@
 <a name="billing-Entitlements"></a>
 
 ### Entitlements
-features/limits stay string-keyed (proto map keys cannot be enums): keys are FeatureKey/LimitKey names.
+
 
 
 | Field | Type | Label | Description |
@@ -562,40 +528,24 @@ features/limits stay string-keyed (proto map keys cannot be enums): keys are Fea
 | plan | [PlanTier](#billing-PlanTier) |  |  |
 | status | [SubscriptionStatus](#billing-SubscriptionStatus) |  |  |
 | access_until | [google.protobuf.Timestamp](#google-protobuf-Timestamp) | optional |  |
-| features | [Entitlements.FeaturesEntry](#billing-Entitlements-FeaturesEntry) | repeated |  |
-| limits | [Entitlements.LimitsEntry](#billing-Entitlements-LimitsEntry) | repeated |  |
+| features | [Features](#billing-Features) |  |  |
+| limits | [Limits](#billing-Limits) |  |  |
 
 
 
 
 
 
-<a name="billing-Entitlements-FeaturesEntry"></a>
+<a name="billing-Features"></a>
 
-### Entitlements.FeaturesEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [bool](#bool) |  |  |
-
-
-
-
-
-
-<a name="billing-Entitlements-LimitsEntry"></a>
-
-### Entitlements.LimitsEntry
+### Features
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [int64](#int64) |  |  |
+| auto_commit | [bool](#bool) | optional |  |
+| workspace_graph | [bool](#bool) | optional |  |
 
 
 
@@ -657,6 +607,27 @@ features/limits stay string-keyed (proto map keys cannot be enums): keys are Fea
 | ----- | ---- | ----- | ----------- |
 | payer_id | [string](#string) | optional |  |
 | requires_payer | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="billing-Limits"></a>
+
+### Limits
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| members | [int64](#int64) | optional |  |
+| published_notes | [int64](#int64) | optional |  |
+| note_graph_max_depth | [int64](#int64) | optional |  |
+| auto_commit_min_interval_seconds | [int64](#int64) | optional |  |
+| revision_history_days | [int64](#int64) | optional |  |
+| trash_retention_days | [int64](#int64) | optional |  |
+| ai_credits_monthly | [int64](#int64) | optional |  |
 
 
 

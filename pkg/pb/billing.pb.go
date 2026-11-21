@@ -139,22 +139,165 @@ func (SubscriptionStatus) EnumDescriptor() ([]byte, []int) {
 	return file_billing_proto_rawDescGZIP(), []int{1}
 }
 
-// features/limits stay string-keyed (proto map keys cannot be enums): keys are FeatureKey/LimitKey names.
+type Features struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	AutoCommit     *bool                  `protobuf:"varint,1,opt,name=auto_commit,json=autoCommit,proto3,oneof" json:"auto_commit,omitempty"`
+	WorkspaceGraph *bool                  `protobuf:"varint,2,opt,name=workspace_graph,json=workspaceGraph,proto3,oneof" json:"workspace_graph,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *Features) Reset() {
+	*x = Features{}
+	mi := &file_billing_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Features) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Features) ProtoMessage() {}
+
+func (x *Features) ProtoReflect() protoreflect.Message {
+	mi := &file_billing_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Features.ProtoReflect.Descriptor instead.
+func (*Features) Descriptor() ([]byte, []int) {
+	return file_billing_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Features) GetAutoCommit() bool {
+	if x != nil && x.AutoCommit != nil {
+		return *x.AutoCommit
+	}
+	return false
+}
+
+func (x *Features) GetWorkspaceGraph() bool {
+	if x != nil && x.WorkspaceGraph != nil {
+		return *x.WorkspaceGraph
+	}
+	return false
+}
+
+type Limits struct {
+	state                        protoimpl.MessageState `protogen:"open.v1"`
+	Members                      *int64                 `protobuf:"varint,1,opt,name=members,proto3,oneof" json:"members,omitempty"`
+	PublishedNotes               *int64                 `protobuf:"varint,2,opt,name=published_notes,json=publishedNotes,proto3,oneof" json:"published_notes,omitempty"`
+	NoteGraphMaxDepth            *int64                 `protobuf:"varint,3,opt,name=note_graph_max_depth,json=noteGraphMaxDepth,proto3,oneof" json:"note_graph_max_depth,omitempty"`
+	AutoCommitMinIntervalSeconds *int64                 `protobuf:"varint,4,opt,name=auto_commit_min_interval_seconds,json=autoCommitMinIntervalSeconds,proto3,oneof" json:"auto_commit_min_interval_seconds,omitempty"`
+	RevisionHistoryDays          *int64                 `protobuf:"varint,5,opt,name=revision_history_days,json=revisionHistoryDays,proto3,oneof" json:"revision_history_days,omitempty"`
+	TrashRetentionDays           *int64                 `protobuf:"varint,6,opt,name=trash_retention_days,json=trashRetentionDays,proto3,oneof" json:"trash_retention_days,omitempty"`
+	AiCreditsMonthly             *int64                 `protobuf:"varint,7,opt,name=ai_credits_monthly,json=aiCreditsMonthly,proto3,oneof" json:"ai_credits_monthly,omitempty"`
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
+}
+
+func (x *Limits) Reset() {
+	*x = Limits{}
+	mi := &file_billing_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Limits) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Limits) ProtoMessage() {}
+
+func (x *Limits) ProtoReflect() protoreflect.Message {
+	mi := &file_billing_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Limits.ProtoReflect.Descriptor instead.
+func (*Limits) Descriptor() ([]byte, []int) {
+	return file_billing_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Limits) GetMembers() int64 {
+	if x != nil && x.Members != nil {
+		return *x.Members
+	}
+	return 0
+}
+
+func (x *Limits) GetPublishedNotes() int64 {
+	if x != nil && x.PublishedNotes != nil {
+		return *x.PublishedNotes
+	}
+	return 0
+}
+
+func (x *Limits) GetNoteGraphMaxDepth() int64 {
+	if x != nil && x.NoteGraphMaxDepth != nil {
+		return *x.NoteGraphMaxDepth
+	}
+	return 0
+}
+
+func (x *Limits) GetAutoCommitMinIntervalSeconds() int64 {
+	if x != nil && x.AutoCommitMinIntervalSeconds != nil {
+		return *x.AutoCommitMinIntervalSeconds
+	}
+	return 0
+}
+
+func (x *Limits) GetRevisionHistoryDays() int64 {
+	if x != nil && x.RevisionHistoryDays != nil {
+		return *x.RevisionHistoryDays
+	}
+	return 0
+}
+
+func (x *Limits) GetTrashRetentionDays() int64 {
+	if x != nil && x.TrashRetentionDays != nil {
+		return *x.TrashRetentionDays
+	}
+	return 0
+}
+
+func (x *Limits) GetAiCreditsMonthly() int64 {
+	if x != nil && x.AiCreditsMonthly != nil {
+		return *x.AiCreditsMonthly
+	}
+	return 0
+}
+
 type Entitlements struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	Plan          PlanTier               `protobuf:"varint,2,opt,name=plan,proto3,enum=billing.PlanTier" json:"plan,omitempty"`
 	Status        SubscriptionStatus     `protobuf:"varint,3,opt,name=status,proto3,enum=billing.SubscriptionStatus" json:"status,omitempty"`
 	AccessUntil   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=access_until,json=accessUntil,proto3,oneof" json:"access_until,omitempty"`
-	Features      map[string]bool        `protobuf:"bytes,5,rep,name=features,proto3" json:"features,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
-	Limits        map[string]int64       `protobuf:"bytes,6,rep,name=limits,proto3" json:"limits,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	Features      *Features              `protobuf:"bytes,7,opt,name=features,proto3" json:"features,omitempty"`
+	Limits        *Limits                `protobuf:"bytes,8,opt,name=limits,proto3" json:"limits,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Entitlements) Reset() {
 	*x = Entitlements{}
-	mi := &file_billing_proto_msgTypes[0]
+	mi := &file_billing_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -166,7 +309,7 @@ func (x *Entitlements) String() string {
 func (*Entitlements) ProtoMessage() {}
 
 func (x *Entitlements) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[0]
+	mi := &file_billing_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -179,7 +322,7 @@ func (x *Entitlements) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Entitlements.ProtoReflect.Descriptor instead.
 func (*Entitlements) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{0}
+	return file_billing_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Entitlements) GetWorkspaceId() string {
@@ -210,14 +353,14 @@ func (x *Entitlements) GetAccessUntil() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *Entitlements) GetFeatures() map[string]bool {
+func (x *Entitlements) GetFeatures() *Features {
 	if x != nil {
 		return x.Features
 	}
 	return nil
 }
 
-func (x *Entitlements) GetLimits() map[string]int64 {
+func (x *Entitlements) GetLimits() *Limits {
 	if x != nil {
 		return x.Limits
 	}
@@ -233,7 +376,7 @@ type GetWorkspaceEntitlementsRequest struct {
 
 func (x *GetWorkspaceEntitlementsRequest) Reset() {
 	*x = GetWorkspaceEntitlementsRequest{}
-	mi := &file_billing_proto_msgTypes[1]
+	mi := &file_billing_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -245,7 +388,7 @@ func (x *GetWorkspaceEntitlementsRequest) String() string {
 func (*GetWorkspaceEntitlementsRequest) ProtoMessage() {}
 
 func (x *GetWorkspaceEntitlementsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[1]
+	mi := &file_billing_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -258,7 +401,7 @@ func (x *GetWorkspaceEntitlementsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkspaceEntitlementsRequest.ProtoReflect.Descriptor instead.
 func (*GetWorkspaceEntitlementsRequest) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{1}
+	return file_billing_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetWorkspaceEntitlementsRequest) GetWorkspaceId() string {
@@ -277,7 +420,7 @@ type GetWorkspaceEntitlementsResponse struct {
 
 func (x *GetWorkspaceEntitlementsResponse) Reset() {
 	*x = GetWorkspaceEntitlementsResponse{}
-	mi := &file_billing_proto_msgTypes[2]
+	mi := &file_billing_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -289,7 +432,7 @@ func (x *GetWorkspaceEntitlementsResponse) String() string {
 func (*GetWorkspaceEntitlementsResponse) ProtoMessage() {}
 
 func (x *GetWorkspaceEntitlementsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[2]
+	mi := &file_billing_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -302,7 +445,7 @@ func (x *GetWorkspaceEntitlementsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkspaceEntitlementsResponse.ProtoReflect.Descriptor instead.
 func (*GetWorkspaceEntitlementsResponse) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{2}
+	return file_billing_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetWorkspaceEntitlementsResponse) GetEntitlements() *Entitlements {
@@ -321,7 +464,7 @@ type BatchGetWorkspaceEntitlementsRequest struct {
 
 func (x *BatchGetWorkspaceEntitlementsRequest) Reset() {
 	*x = BatchGetWorkspaceEntitlementsRequest{}
-	mi := &file_billing_proto_msgTypes[3]
+	mi := &file_billing_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -333,7 +476,7 @@ func (x *BatchGetWorkspaceEntitlementsRequest) String() string {
 func (*BatchGetWorkspaceEntitlementsRequest) ProtoMessage() {}
 
 func (x *BatchGetWorkspaceEntitlementsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[3]
+	mi := &file_billing_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -346,7 +489,7 @@ func (x *BatchGetWorkspaceEntitlementsRequest) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use BatchGetWorkspaceEntitlementsRequest.ProtoReflect.Descriptor instead.
 func (*BatchGetWorkspaceEntitlementsRequest) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{3}
+	return file_billing_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *BatchGetWorkspaceEntitlementsRequest) GetWorkspaceIds() []string {
@@ -365,7 +508,7 @@ type BatchGetWorkspaceEntitlementsResponse struct {
 
 func (x *BatchGetWorkspaceEntitlementsResponse) Reset() {
 	*x = BatchGetWorkspaceEntitlementsResponse{}
-	mi := &file_billing_proto_msgTypes[4]
+	mi := &file_billing_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -377,7 +520,7 @@ func (x *BatchGetWorkspaceEntitlementsResponse) String() string {
 func (*BatchGetWorkspaceEntitlementsResponse) ProtoMessage() {}
 
 func (x *BatchGetWorkspaceEntitlementsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[4]
+	mi := &file_billing_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -390,7 +533,7 @@ func (x *BatchGetWorkspaceEntitlementsResponse) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use BatchGetWorkspaceEntitlementsResponse.ProtoReflect.Descriptor instead.
 func (*BatchGetWorkspaceEntitlementsResponse) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{4}
+	return file_billing_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *BatchGetWorkspaceEntitlementsResponse) GetEntitlements() map[string]*Entitlements {
@@ -409,7 +552,7 @@ type GetWorkspacePayerRequest struct {
 
 func (x *GetWorkspacePayerRequest) Reset() {
 	*x = GetWorkspacePayerRequest{}
-	mi := &file_billing_proto_msgTypes[5]
+	mi := &file_billing_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -421,7 +564,7 @@ func (x *GetWorkspacePayerRequest) String() string {
 func (*GetWorkspacePayerRequest) ProtoMessage() {}
 
 func (x *GetWorkspacePayerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[5]
+	mi := &file_billing_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -434,7 +577,7 @@ func (x *GetWorkspacePayerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkspacePayerRequest.ProtoReflect.Descriptor instead.
 func (*GetWorkspacePayerRequest) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{5}
+	return file_billing_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetWorkspacePayerRequest) GetWorkspaceId() string {
@@ -454,7 +597,7 @@ type GetWorkspacePayerResponse struct {
 
 func (x *GetWorkspacePayerResponse) Reset() {
 	*x = GetWorkspacePayerResponse{}
-	mi := &file_billing_proto_msgTypes[6]
+	mi := &file_billing_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -466,7 +609,7 @@ func (x *GetWorkspacePayerResponse) String() string {
 func (*GetWorkspacePayerResponse) ProtoMessage() {}
 
 func (x *GetWorkspacePayerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[6]
+	mi := &file_billing_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -479,7 +622,7 @@ func (x *GetWorkspacePayerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkspacePayerResponse.ProtoReflect.Descriptor instead.
 func (*GetWorkspacePayerResponse) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{6}
+	return file_billing_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetWorkspacePayerResponse) GetPayerId() string {
@@ -499,15 +642,15 @@ func (x *GetWorkspacePayerResponse) GetRequiresPayer() bool {
 type BillingPlan struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Tier          PlanTier               `protobuf:"varint,1,opt,name=tier,proto3,enum=billing.PlanTier" json:"tier,omitempty"`
-	Features      map[string]bool        `protobuf:"bytes,2,rep,name=features,proto3" json:"features,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
-	Limits        map[string]int64       `protobuf:"bytes,3,rep,name=limits,proto3" json:"limits,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	Features      *Features              `protobuf:"bytes,4,opt,name=features,proto3" json:"features,omitempty"`
+	Limits        *Limits                `protobuf:"bytes,5,opt,name=limits,proto3" json:"limits,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *BillingPlan) Reset() {
 	*x = BillingPlan{}
-	mi := &file_billing_proto_msgTypes[7]
+	mi := &file_billing_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -519,7 +662,7 @@ func (x *BillingPlan) String() string {
 func (*BillingPlan) ProtoMessage() {}
 
 func (x *BillingPlan) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[7]
+	mi := &file_billing_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -532,7 +675,7 @@ func (x *BillingPlan) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BillingPlan.ProtoReflect.Descriptor instead.
 func (*BillingPlan) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{7}
+	return file_billing_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *BillingPlan) GetTier() PlanTier {
@@ -542,14 +685,14 @@ func (x *BillingPlan) GetTier() PlanTier {
 	return PlanTier_PLAN_TIER_UNSPECIFIED
 }
 
-func (x *BillingPlan) GetFeatures() map[string]bool {
+func (x *BillingPlan) GetFeatures() *Features {
 	if x != nil {
 		return x.Features
 	}
 	return nil
 }
 
-func (x *BillingPlan) GetLimits() map[string]int64 {
+func (x *BillingPlan) GetLimits() *Limits {
 	if x != nil {
 		return x.Limits
 	}
@@ -564,7 +707,7 @@ type ListPlansRequest struct {
 
 func (x *ListPlansRequest) Reset() {
 	*x = ListPlansRequest{}
-	mi := &file_billing_proto_msgTypes[8]
+	mi := &file_billing_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -576,7 +719,7 @@ func (x *ListPlansRequest) String() string {
 func (*ListPlansRequest) ProtoMessage() {}
 
 func (x *ListPlansRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[8]
+	mi := &file_billing_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -589,7 +732,7 @@ func (x *ListPlansRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPlansRequest.ProtoReflect.Descriptor instead.
 func (*ListPlansRequest) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{8}
+	return file_billing_proto_rawDescGZIP(), []int{10}
 }
 
 type ListPlansResponse struct {
@@ -601,7 +744,7 @@ type ListPlansResponse struct {
 
 func (x *ListPlansResponse) Reset() {
 	*x = ListPlansResponse{}
-	mi := &file_billing_proto_msgTypes[9]
+	mi := &file_billing_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -613,7 +756,7 @@ func (x *ListPlansResponse) String() string {
 func (*ListPlansResponse) ProtoMessage() {}
 
 func (x *ListPlansResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_billing_proto_msgTypes[9]
+	mi := &file_billing_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -626,7 +769,7 @@ func (x *ListPlansResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPlansResponse.ProtoReflect.Descriptor instead.
 func (*ListPlansResponse) Descriptor() ([]byte, []int) {
-	return file_billing_proto_rawDescGZIP(), []int{9}
+	return file_billing_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListPlansResponse) GetPlans() []*BillingPlan {
@@ -640,23 +783,39 @@ var File_billing_proto protoreflect.FileDescriptor
 
 const file_billing_proto_rawDesc = "" +
 	"\n" +
-	"\rbilling.proto\x12\abilling\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xee\x03\n" +
+	"\rbilling.proto\x12\abilling\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x82\x01\n" +
+	"\bFeatures\x12$\n" +
+	"\vauto_commit\x18\x01 \x01(\bH\x00R\n" +
+	"autoCommit\x88\x01\x01\x12,\n" +
+	"\x0fworkspace_graph\x18\x02 \x01(\bH\x01R\x0eworkspaceGraph\x88\x01\x01B\x0e\n" +
+	"\f_auto_commitB\x12\n" +
+	"\x10_workspace_graph\"\xa3\x04\n" +
+	"\x06Limits\x12\x1d\n" +
+	"\amembers\x18\x01 \x01(\x03H\x00R\amembers\x88\x01\x01\x12,\n" +
+	"\x0fpublished_notes\x18\x02 \x01(\x03H\x01R\x0epublishedNotes\x88\x01\x01\x124\n" +
+	"\x14note_graph_max_depth\x18\x03 \x01(\x03H\x02R\x11noteGraphMaxDepth\x88\x01\x01\x12K\n" +
+	" auto_commit_min_interval_seconds\x18\x04 \x01(\x03H\x03R\x1cautoCommitMinIntervalSeconds\x88\x01\x01\x127\n" +
+	"\x15revision_history_days\x18\x05 \x01(\x03H\x04R\x13revisionHistoryDays\x88\x01\x01\x125\n" +
+	"\x14trash_retention_days\x18\x06 \x01(\x03H\x05R\x12trashRetentionDays\x88\x01\x01\x121\n" +
+	"\x12ai_credits_monthly\x18\a \x01(\x03H\x06R\x10aiCreditsMonthly\x88\x01\x01B\n" +
+	"\n" +
+	"\b_membersB\x12\n" +
+	"\x10_published_notesB\x17\n" +
+	"\x15_note_graph_max_depthB#\n" +
+	"!_auto_commit_min_interval_secondsB\x18\n" +
+	"\x16_revision_history_daysB\x17\n" +
+	"\x15_trash_retention_daysB\x15\n" +
+	"\x13_ai_credits_monthly\"\xde\x02\n" +
 	"\fEntitlements\x12!\n" +
 	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\x121\n" +
 	"\x04plan\x18\x02 \x01(\x0e2\x11.billing.PlanTierB\n" +
 	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\x04plan\x12?\n" +
 	"\x06status\x18\x03 \x01(\x0e2\x1b.billing.SubscriptionStatusB\n" +
 	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\x06status\x12B\n" +
-	"\faccess_until\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\vaccessUntil\x88\x01\x01\x12?\n" +
-	"\bfeatures\x18\x05 \x03(\v2#.billing.Entitlements.FeaturesEntryR\bfeatures\x129\n" +
-	"\x06limits\x18\x06 \x03(\v2!.billing.Entitlements.LimitsEntryR\x06limits\x1a;\n" +
-	"\rFeaturesEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\bR\x05value:\x028\x01\x1a9\n" +
-	"\vLimitsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01B\x0f\n" +
-	"\r_access_until\"N\n" +
+	"\faccess_until\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\vaccessUntil\x88\x01\x01\x12-\n" +
+	"\bfeatures\x18\a \x01(\v2\x11.billing.FeaturesR\bfeatures\x12'\n" +
+	"\x06limits\x18\b \x01(\v2\x0f.billing.LimitsR\x06limitsB\x0f\n" +
+	"\r_access_untilJ\x04\b\x05\x10\x06J\x04\b\x06\x10\a\"N\n" +
 	"\x1fGetWorkspaceEntitlementsRequest\x12+\n" +
 	"\fworkspace_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\vworkspaceId\"]\n" +
 	" GetWorkspaceEntitlementsResponse\x129\n" +
@@ -673,18 +832,12 @@ const file_billing_proto_rawDesc = "" +
 	"\x19GetWorkspacePayerResponse\x12\x1e\n" +
 	"\bpayer_id\x18\x01 \x01(\tH\x00R\apayerId\x88\x01\x01\x12%\n" +
 	"\x0erequires_payer\x18\x02 \x01(\bR\rrequiresPayerB\v\n" +
-	"\t_payer_id\"\xb2\x02\n" +
+	"\t_payer_id\"\xa4\x01\n" +
 	"\vBillingPlan\x121\n" +
 	"\x04tier\x18\x01 \x01(\x0e2\x11.billing.PlanTierB\n" +
-	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\x04tier\x12>\n" +
-	"\bfeatures\x18\x02 \x03(\v2\".billing.BillingPlan.FeaturesEntryR\bfeatures\x128\n" +
-	"\x06limits\x18\x03 \x03(\v2 .billing.BillingPlan.LimitsEntryR\x06limits\x1a;\n" +
-	"\rFeaturesEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\bR\x05value:\x028\x01\x1a9\n" +
-	"\vLimitsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\"\x12\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\x04tier\x12-\n" +
+	"\bfeatures\x18\x04 \x01(\v2\x11.billing.FeaturesR\bfeatures\x12'\n" +
+	"\x06limits\x18\x05 \x01(\v2\x0f.billing.LimitsR\x06limitsJ\x04\b\x02\x10\x03J\x04\b\x03\x10\x04\"\x12\n" +
 	"\x10ListPlansRequest\"?\n" +
 	"\x11ListPlansResponse\x12*\n" +
 	"\x05plans\x18\x01 \x03(\v2\x14.billing.BillingPlanR\x05plans*`\n" +
@@ -722,48 +875,46 @@ func file_billing_proto_rawDescGZIP() []byte {
 }
 
 var file_billing_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_billing_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_billing_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_billing_proto_goTypes = []any{
 	(PlanTier)(0),                                 // 0: billing.PlanTier
 	(SubscriptionStatus)(0),                       // 1: billing.SubscriptionStatus
-	(*Entitlements)(nil),                          // 2: billing.Entitlements
-	(*GetWorkspaceEntitlementsRequest)(nil),       // 3: billing.GetWorkspaceEntitlementsRequest
-	(*GetWorkspaceEntitlementsResponse)(nil),      // 4: billing.GetWorkspaceEntitlementsResponse
-	(*BatchGetWorkspaceEntitlementsRequest)(nil),  // 5: billing.BatchGetWorkspaceEntitlementsRequest
-	(*BatchGetWorkspaceEntitlementsResponse)(nil), // 6: billing.BatchGetWorkspaceEntitlementsResponse
-	(*GetWorkspacePayerRequest)(nil),              // 7: billing.GetWorkspacePayerRequest
-	(*GetWorkspacePayerResponse)(nil),             // 8: billing.GetWorkspacePayerResponse
-	(*BillingPlan)(nil),                           // 9: billing.BillingPlan
-	(*ListPlansRequest)(nil),                      // 10: billing.ListPlansRequest
-	(*ListPlansResponse)(nil),                     // 11: billing.ListPlansResponse
-	nil,                                           // 12: billing.Entitlements.FeaturesEntry
-	nil,                                           // 13: billing.Entitlements.LimitsEntry
+	(*Features)(nil),                              // 2: billing.Features
+	(*Limits)(nil),                                // 3: billing.Limits
+	(*Entitlements)(nil),                          // 4: billing.Entitlements
+	(*GetWorkspaceEntitlementsRequest)(nil),       // 5: billing.GetWorkspaceEntitlementsRequest
+	(*GetWorkspaceEntitlementsResponse)(nil),      // 6: billing.GetWorkspaceEntitlementsResponse
+	(*BatchGetWorkspaceEntitlementsRequest)(nil),  // 7: billing.BatchGetWorkspaceEntitlementsRequest
+	(*BatchGetWorkspaceEntitlementsResponse)(nil), // 8: billing.BatchGetWorkspaceEntitlementsResponse
+	(*GetWorkspacePayerRequest)(nil),              // 9: billing.GetWorkspacePayerRequest
+	(*GetWorkspacePayerResponse)(nil),             // 10: billing.GetWorkspacePayerResponse
+	(*BillingPlan)(nil),                           // 11: billing.BillingPlan
+	(*ListPlansRequest)(nil),                      // 12: billing.ListPlansRequest
+	(*ListPlansResponse)(nil),                     // 13: billing.ListPlansResponse
 	nil,                                           // 14: billing.BatchGetWorkspaceEntitlementsResponse.EntitlementsEntry
-	nil,                                           // 15: billing.BillingPlan.FeaturesEntry
-	nil,                                           // 16: billing.BillingPlan.LimitsEntry
-	(*timestamppb.Timestamp)(nil),                 // 17: google.protobuf.Timestamp
+	(*timestamppb.Timestamp)(nil),                 // 15: google.protobuf.Timestamp
 }
 var file_billing_proto_depIdxs = []int32{
 	0,  // 0: billing.Entitlements.plan:type_name -> billing.PlanTier
 	1,  // 1: billing.Entitlements.status:type_name -> billing.SubscriptionStatus
-	17, // 2: billing.Entitlements.access_until:type_name -> google.protobuf.Timestamp
-	12, // 3: billing.Entitlements.features:type_name -> billing.Entitlements.FeaturesEntry
-	13, // 4: billing.Entitlements.limits:type_name -> billing.Entitlements.LimitsEntry
-	2,  // 5: billing.GetWorkspaceEntitlementsResponse.entitlements:type_name -> billing.Entitlements
+	15, // 2: billing.Entitlements.access_until:type_name -> google.protobuf.Timestamp
+	2,  // 3: billing.Entitlements.features:type_name -> billing.Features
+	3,  // 4: billing.Entitlements.limits:type_name -> billing.Limits
+	4,  // 5: billing.GetWorkspaceEntitlementsResponse.entitlements:type_name -> billing.Entitlements
 	14, // 6: billing.BatchGetWorkspaceEntitlementsResponse.entitlements:type_name -> billing.BatchGetWorkspaceEntitlementsResponse.EntitlementsEntry
 	0,  // 7: billing.BillingPlan.tier:type_name -> billing.PlanTier
-	15, // 8: billing.BillingPlan.features:type_name -> billing.BillingPlan.FeaturesEntry
-	16, // 9: billing.BillingPlan.limits:type_name -> billing.BillingPlan.LimitsEntry
-	9,  // 10: billing.ListPlansResponse.plans:type_name -> billing.BillingPlan
-	2,  // 11: billing.BatchGetWorkspaceEntitlementsResponse.EntitlementsEntry.value:type_name -> billing.Entitlements
-	3,  // 12: billing.BillingService.GetWorkspaceEntitlements:input_type -> billing.GetWorkspaceEntitlementsRequest
-	5,  // 13: billing.BillingService.BatchGetWorkspaceEntitlements:input_type -> billing.BatchGetWorkspaceEntitlementsRequest
-	7,  // 14: billing.BillingService.GetWorkspacePayer:input_type -> billing.GetWorkspacePayerRequest
-	10, // 15: billing.BillingService.ListPlans:input_type -> billing.ListPlansRequest
-	4,  // 16: billing.BillingService.GetWorkspaceEntitlements:output_type -> billing.GetWorkspaceEntitlementsResponse
-	6,  // 17: billing.BillingService.BatchGetWorkspaceEntitlements:output_type -> billing.BatchGetWorkspaceEntitlementsResponse
-	8,  // 18: billing.BillingService.GetWorkspacePayer:output_type -> billing.GetWorkspacePayerResponse
-	11, // 19: billing.BillingService.ListPlans:output_type -> billing.ListPlansResponse
+	2,  // 8: billing.BillingPlan.features:type_name -> billing.Features
+	3,  // 9: billing.BillingPlan.limits:type_name -> billing.Limits
+	11, // 10: billing.ListPlansResponse.plans:type_name -> billing.BillingPlan
+	4,  // 11: billing.BatchGetWorkspaceEntitlementsResponse.EntitlementsEntry.value:type_name -> billing.Entitlements
+	5,  // 12: billing.BillingService.GetWorkspaceEntitlements:input_type -> billing.GetWorkspaceEntitlementsRequest
+	7,  // 13: billing.BillingService.BatchGetWorkspaceEntitlements:input_type -> billing.BatchGetWorkspaceEntitlementsRequest
+	9,  // 14: billing.BillingService.GetWorkspacePayer:input_type -> billing.GetWorkspacePayerRequest
+	12, // 15: billing.BillingService.ListPlans:input_type -> billing.ListPlansRequest
+	6,  // 16: billing.BillingService.GetWorkspaceEntitlements:output_type -> billing.GetWorkspaceEntitlementsResponse
+	8,  // 17: billing.BillingService.BatchGetWorkspaceEntitlements:output_type -> billing.BatchGetWorkspaceEntitlementsResponse
+	10, // 18: billing.BillingService.GetWorkspacePayer:output_type -> billing.GetWorkspacePayerResponse
+	13, // 19: billing.BillingService.ListPlans:output_type -> billing.ListPlansResponse
 	16, // [16:20] is the sub-list for method output_type
 	12, // [12:16] is the sub-list for method input_type
 	12, // [12:12] is the sub-list for extension type_name
@@ -777,14 +928,16 @@ func file_billing_proto_init() {
 		return
 	}
 	file_billing_proto_msgTypes[0].OneofWrappers = []any{}
-	file_billing_proto_msgTypes[6].OneofWrappers = []any{}
+	file_billing_proto_msgTypes[1].OneofWrappers = []any{}
+	file_billing_proto_msgTypes[2].OneofWrappers = []any{}
+	file_billing_proto_msgTypes[8].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_billing_proto_rawDesc), len(file_billing_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   15,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

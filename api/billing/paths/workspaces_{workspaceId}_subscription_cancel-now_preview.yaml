@@ -7,7 +7,8 @@ get:
         - openid
   tags:
     - WorkspaceBilling
-  summary: Preview the refund of cancelling now (owner only)
+  summary: Preview immediate cancellation
+  description: Requires workspace billing-management permission. Returns the refund quote for cancelling the current subscription immediately.
   operationId: previewCancelNow
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/jackc/pgx/v5"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -239,6 +240,31 @@ func TestGetDSN(t *testing.T) {
 		Name:     "testdb",
 		SSLMode:  "require",
 	}
-	want := "host=localhost port=5432 user=testuser password=testpass dbname=testdb sslmode=require"
+	want := "host='localhost' port=5432 user='testuser' password='testpass' dbname='testdb' sslmode='require'"
 	assert.Equal(t, want, cfg.GetDSN())
+}
+
+func TestGetDSNPreservesKeywordValues(t *testing.T) {
+	for _, value := range []string{"ordinary", "space separated", "quote'value", `back\slash`, "tab\tvalue", "", `p' sslmode=disable password='other`} {
+		t.Run(value, func(t *testing.T) {
+			cfg := commonconfig.SQL{
+				Host:     "localhost",
+				Port:     5432,
+				User:     value,
+				Password: commonconfig.Secret(value),
+				Name:     value,
+				SSLMode:  "require",
+			}
+			if value == "" {
+				cfg.User = "testuser"
+				cfg.Name = "testdb"
+			}
+			parsed, err := pgx.ParseConfig(cfg.GetDSN())
+			require.NoError(t, err)
+			assert.Equal(t, cfg.User, parsed.User)
+			assert.Equal(t, value, parsed.Password)
+			assert.Equal(t, cfg.Name, parsed.Database)
+			require.NotNil(t, parsed.TLSConfig)
+		})
+	}
 }

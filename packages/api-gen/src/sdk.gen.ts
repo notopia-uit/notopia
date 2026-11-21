@@ -774,7 +774,9 @@ export const searchUsers = <ThrowOnError extends boolean = false>(options: Optio
 });
 
 /**
- * List plans with features, limits and active prices
+ * List plans
+ *
+ * Returns plan features, limits, and active prices available for purchase.
  */
 export const listPlans = <ThrowOnError extends boolean = false>(options?: Options<ListPlansData, ThrowOnError>): RequestResult<ListPlansResponses, ListPlansErrors, ThrowOnError> => (options?.client ?? client).get<ListPlansResponses, ListPlansErrors, ThrowOnError>({
     responseTransformer: listPlansResponseTransformer,
@@ -783,7 +785,9 @@ export const listPlans = <ThrowOnError extends boolean = false>(options?: Option
 });
 
 /**
- * Get workspace entitlements (member)
+ * Get workspace entitlements
+ *
+ * Available to workspace members. Returns the entitlements granted to the workspace by its current plan.
  */
 export const getWorkspaceEntitlements = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceEntitlementsData, ThrowOnError>): RequestResult<GetWorkspaceEntitlementsResponses, GetWorkspaceEntitlementsErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceEntitlementsResponses, GetWorkspaceEntitlementsErrors, ThrowOnError>({
     responseTransformer: getWorkspaceEntitlementsResponseTransformer,
@@ -801,7 +805,9 @@ export const getWorkspaceEntitlements = <ThrowOnError extends boolean = false>(o
 });
 
 /**
- * Get workspace subscription, payer and refunds (owner only)
+ * Get workspace billing
+ *
+ * Requires workspace billing-management permission. Returns the workspace's subscription, payer, and refund information.
  */
 export const getWorkspaceBilling = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceBillingData, ThrowOnError>): RequestResult<GetWorkspaceBillingResponses, GetWorkspaceBillingErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceBillingResponses, GetWorkspaceBillingErrors, ThrowOnError>({
     responseTransformer: getWorkspaceBillingResponseTransformer,
@@ -819,7 +825,9 @@ export const getWorkspaceBilling = <ThrowOnError extends boolean = false>(option
 });
 
 /**
- * Start Stripe Checkout for a plan price (owner only)
+ * Create checkout session
+ *
+ * Requires workspace billing-management permission. Returns a URL to redirect the browser to Stripe Checkout to purchase the selected active price.
  */
 export const createCheckoutSession = <ThrowOnError extends boolean = false>(options: Options<CreateCheckoutSessionData, ThrowOnError>): RequestResult<CreateCheckoutSessionResponses, CreateCheckoutSessionErrors, ThrowOnError> => (options.client ?? client).post<CreateCheckoutSessionResponses, CreateCheckoutSessionErrors, ThrowOnError>({
     security: [{
@@ -840,7 +848,9 @@ export const createCheckoutSession = <ThrowOnError extends boolean = false>(opti
 });
 
 /**
- * Open Stripe Customer Portal (owner only)
+ * Create portal session
+ *
+ * Requires workspace billing-management permission and an existing billing account. Returns a URL to redirect the browser to the Stripe Customer Portal to manage existing billing.
  */
 export const createPortalSession = <ThrowOnError extends boolean = false>(options: Options<CreatePortalSessionData, ThrowOnError>): RequestResult<CreatePortalSessionResponses, CreatePortalSessionErrors, ThrowOnError> => (options.client ?? client).post<CreatePortalSessionResponses, CreatePortalSessionErrors, ThrowOnError>({
     security: [{
@@ -857,7 +867,9 @@ export const createPortalSession = <ThrowOnError extends boolean = false>(option
 });
 
 /**
- * Preview the refund of cancelling now (owner only)
+ * Preview immediate cancellation
+ *
+ * Requires workspace billing-management permission. Returns the refund quote for cancelling the current subscription immediately.
  */
 export const previewCancelNow = <ThrowOnError extends boolean = false>(options: Options<PreviewCancelNowData, ThrowOnError>): RequestResult<PreviewCancelNowResponses, PreviewCancelNowErrors, ThrowOnError> => (options.client ?? client).get<PreviewCancelNowResponses, PreviewCancelNowErrors, ThrowOnError>({
     responseTransformer: previewCancelNowResponseTransformer,
@@ -875,7 +887,9 @@ export const previewCancelNow = <ThrowOnError extends boolean = false>(options: 
 });
 
 /**
- * Cancel the subscription now with a prorated refund (owner only)
+ * Cancel subscription now
+ *
+ * Requires workspace billing-management permission. Cancels the current subscription immediately and requests a prorated refund when applicable.
  */
 export const cancelNow = <ThrowOnError extends boolean = false>(options: Options<CancelNowData, ThrowOnError>): RequestResult<CancelNowResponses, CancelNowErrors, ThrowOnError> => (options.client ?? client).post<CancelNowResponses, CancelNowErrors, ThrowOnError>({
     responseTransformer: cancelNowResponseTransformer,
@@ -893,7 +907,9 @@ export const cancelNow = <ThrowOnError extends boolean = false>(options: Options
 });
 
 /**
- * Become the payer by completing a setup Checkout (owner only)
+ * Claim payer role
+ *
+ * Requires workspace billing-management permission. Returns a URL to redirect the browser to Stripe Checkout to set up a payment method and become the workspace payer.
  */
 export const claimPayer = <ThrowOnError extends boolean = false>(options: Options<ClaimPayerData, ThrowOnError>): RequestResult<ClaimPayerResponses, ClaimPayerErrors, ThrowOnError> => (options.client ?? client).post<ClaimPayerResponses, ClaimPayerErrors, ThrowOnError>({
     security: [{
@@ -910,7 +926,9 @@ export const claimPayer = <ThrowOnError extends boolean = false>(options: Option
 });
 
 /**
- * List plans (admin)
+ * List plans
+ *
+ * Requires billing administrator access. Returns plan features, limits, and active prices.
  */
 export const adminListPlans = <ThrowOnError extends boolean = false>(options?: Options<AdminListPlansData, ThrowOnError>): RequestResult<AdminListPlansResponses, AdminListPlansErrors, ThrowOnError> => (options?.client ?? client).get<AdminListPlansResponses, AdminListPlansErrors, ThrowOnError>({
     responseTransformer: adminListPlansResponseTransformer,
@@ -928,7 +946,9 @@ export const adminListPlans = <ThrowOnError extends boolean = false>(options?: O
 });
 
 /**
- * Update plan features and limits (admin)
+ * Update plan
+ *
+ * Requires billing administrator access. Updates the selected plan's features and limits.
  */
 export const adminUpdatePlan = <ThrowOnError extends boolean = false>(options: Options<AdminUpdatePlanData, ThrowOnError>): RequestResult<AdminUpdatePlanResponses, AdminUpdatePlanErrors, ThrowOnError> => (options.client ?? client).patch<AdminUpdatePlanResponses, AdminUpdatePlanErrors, ThrowOnError>({
     responseTransformer: adminUpdatePlanResponseTransformer,
@@ -950,7 +970,9 @@ export const adminUpdatePlan = <ThrowOnError extends boolean = false>(options: O
 });
 
 /**
- * Get billing policy (admin)
+ * Get billing policy
+ *
+ * Requires billing administrator access.
  */
 export const adminGetPolicy = <ThrowOnError extends boolean = false>(options?: Options<AdminGetPolicyData, ThrowOnError>): RequestResult<AdminGetPolicyResponses, AdminGetPolicyErrors, ThrowOnError> => (options?.client ?? client).get<AdminGetPolicyResponses, AdminGetPolicyErrors, ThrowOnError>({
     security: [{
@@ -967,7 +989,9 @@ export const adminGetPolicy = <ThrowOnError extends boolean = false>(options?: O
 });
 
 /**
- * Update billing policy (admin)
+ * Update billing policy
+ *
+ * Requires billing administrator access.
  */
 export const adminUpdatePolicy = <ThrowOnError extends boolean = false>(options: Options<AdminUpdatePolicyData, ThrowOnError>): RequestResult<AdminUpdatePolicyResponses, AdminUpdatePolicyErrors, ThrowOnError> => (options.client ?? client).patch<AdminUpdatePolicyResponses, AdminUpdatePolicyErrors, ThrowOnError>({
     security: [{
@@ -988,7 +1012,9 @@ export const adminUpdatePolicy = <ThrowOnError extends boolean = false>(options:
 });
 
 /**
- * List all prices including archived (admin)
+ * List prices
+ *
+ * Requires billing administrator access. Returns all prices, including archived prices, newest first.
  */
 export const adminListPrices = <ThrowOnError extends boolean = false>(options?: Options<AdminListPricesData, ThrowOnError>): RequestResult<AdminListPricesResponses, AdminListPricesErrors, ThrowOnError> => (options?.client ?? client).get<AdminListPricesResponses, AdminListPricesErrors, ThrowOnError>({
     responseTransformer: adminListPricesResponseTransformer,
@@ -1006,7 +1032,9 @@ export const adminListPrices = <ThrowOnError extends boolean = false>(options?: 
 });
 
 /**
- * Create a price, replacing the active one for the same plan and interval (admin)
+ * Create price
+ *
+ * Requires billing administrator access. Replaces the active price for the same plan, billing interval, and currency; the previous price is archived.
  */
 export const adminCreatePrice = <ThrowOnError extends boolean = false>(options: Options<AdminCreatePriceData, ThrowOnError>): RequestResult<AdminCreatePriceResponses, AdminCreatePriceErrors, ThrowOnError> => (options.client ?? client).post<AdminCreatePriceResponses, AdminCreatePriceErrors, ThrowOnError>({
     responseTransformer: adminCreatePriceResponseTransformer,
@@ -1028,7 +1056,9 @@ export const adminCreatePrice = <ThrowOnError extends boolean = false>(options: 
 });
 
 /**
- * Archive a price (admin)
+ * Archive price
+ *
+ * Requires billing administrator access. Archived prices are no longer available for new checkouts.
  */
 export const adminArchivePrice = <ThrowOnError extends boolean = false>(options: Options<AdminArchivePriceData, ThrowOnError>): RequestResult<AdminArchivePriceResponses, AdminArchivePriceErrors, ThrowOnError> => (options.client ?? client).post<AdminArchivePriceResponses, AdminArchivePriceErrors, ThrowOnError>({
     responseTransformer: adminArchivePriceResponseTransformer,
@@ -1046,7 +1076,7 @@ export const adminArchivePrice = <ThrowOnError extends boolean = false>(options:
 });
 
 /**
- * Stripe webhook endpoint (signature verified against the raw body)
+ * Stripe webhook endpoint
  */
 export const stripeWebhook = <ThrowOnError extends boolean = false>(options: Options<StripeWebhookData, ThrowOnError>): RequestResult<StripeWebhookResponses, StripeWebhookErrors, ThrowOnError> => (options.client ?? client).post<StripeWebhookResponses, StripeWebhookErrors, ThrowOnError>({
     url: '/billing/webhooks/stripe',

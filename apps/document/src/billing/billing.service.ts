@@ -6,6 +6,8 @@ import {
   BILLING_SERVICE_NAME,
   type BillingServiceClient,
   type Entitlements as EntitlementsPb,
+  type Features as FeaturesPb,
+  type Limits as LimitsPb,
   PlanTier as PlanTierPb,
 } from '@notopia-uit/pb/billing';
 import { Traceable } from 'nestjs-otel';
@@ -38,25 +40,22 @@ const toNumber = (value: unknown): number => {
   return Number(value);
 };
 
-const pickKnown = <K extends string, V>(
-  known: readonly K[],
-  raw: Record<string, unknown> | undefined,
-  map: (value: unknown) => V
-): Partial<Record<K, V>> => {
-  const out: Partial<Record<K, V>> = {};
-  for (const key of known) {
-    if (raw && Object.hasOwn(raw, key)) {
-      out[key] = map(raw[key]);
-    }
-  }
+export const toFeatures = (raw: FeaturesPb | undefined): Partial<Record<PlanFeature, boolean>> => {
+  const out: Partial<Record<PlanFeature, boolean>> = {};
+  if (raw?.autoCommit !== undefined) out[PlanFeature.AutoCommit] = raw.autoCommit;
   return out;
 };
 
-export const toFeatures = (raw: Record<string, unknown> | undefined) =>
-  pickKnown(Object.values(PlanFeature), raw, Boolean);
-
-export const toLimits = (raw: Record<string, unknown> | undefined) =>
-  pickKnown(Object.values(PlanLimit), raw, toNumber);
+export const toLimits = (raw: LimitsPb | undefined): Partial<Record<PlanLimit, number>> => {
+  const out: Partial<Record<PlanLimit, number>> = {};
+  if (raw?.autoCommitMinIntervalSeconds !== undefined) {
+    out[PlanLimit.AutoCommitMinIntervalSeconds] = toNumber(raw.autoCommitMinIntervalSeconds);
+  }
+  if (raw?.revisionHistoryDays !== undefined) {
+    out[PlanLimit.RevisionHistoryDays] = toNumber(raw.revisionHistoryDays);
+  }
+  return out;
+};
 
 export const toEntitlements = (e: EntitlementsPb | undefined): Entitlements => {
   if (!e) {
