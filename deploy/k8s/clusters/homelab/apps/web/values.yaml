@@ -1,28 +1,28 @@
 # yaml-language-server: $schema=../../../../charts/web/values.schema.json
 image:
-  tag: ''
+  tag: 'dev-2611.21.0712'
 otel:
   endpoint: http://alloy-alloy.monitoring.svc:4318
   protocol: http/protobuf
 istio:
   allowedPrincipals:
-  - cluster.local/ns/istio-system/sa/default-istio
+    - cluster.local/ns/istio-system/sa/default-istio
 envFrom:
-- secretRef:
-    name: web
+  - secretRef:
+      name: web
 route:
   parentRefs:
-  - name: default
-    namespace: istio-system
-    kind: Gateway
-    sectionName: https-wildcard
-  - name: default
-    namespace: istio-system
-    kind: Gateway
-    sectionName: https-wildcard-local
+    - name: default
+      namespace: istio-system
+      kind: Gateway
+      sectionName: https-wildcard
+    - name: default
+      namespace: istio-system
+      kind: Gateway
+      sectionName: https-wildcard-local
   hostnames:
-  - notopia.${PUBLIC_DOMAIN}
-  - notopia.${LOCAL_DOMAIN}
+    - notopia.${PUBLIC_DOMAIN}
+    - notopia.${LOCAL_DOMAIN}
 env:
   API_URL: https://notopia-api.${PUBLIC_DOMAIN}
   BETTER_AUTH_URL: https://notopia.${PUBLIC_DOMAIN}
