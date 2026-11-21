@@ -10,6 +10,11 @@ flows:
   authorizationCode:
     authorizationUrl: http://authentik.notopia.localhost/application/o/authorize/
     tokenUrl: http://authentik.notopia.localhost/application/o/token/
+    x-default-scopes:
+      - openid
+      - profile
+      - email
+      - notopia
     scopes:
       openid: Required for OIDC
       profile: Access to user profile
