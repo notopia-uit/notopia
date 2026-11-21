@@ -21,6 +21,9 @@ entries:
       name: API Web
       client_secret: notopiauit
       client_type: public
+      grant_types:
+        - authorization_code
+        - refresh_token
       access_code_validity: minutes=10
       access_token_validity: days=30
       refresh_token_threshold: hours=1
