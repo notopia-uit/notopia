@@ -1,0 +1,86 @@
+summary: Example plan catalog
+value:
+  - tier: free
+    features:
+      auto_commit: false
+      workspace_graph: false
+    limits:
+      ai_credits_monthly: 0
+      auto_commit_min_interval_seconds: 0
+      members: 3
+      note_graph_max_depth: 5
+      published_notes: 3
+      revision_history_days: 7
+      trash_retention_days: 7
+    prices: []
+  - tier: plus
+    features:
+      auto_commit: true
+      workspace_graph: true
+    limits:
+      ai_credits_monthly: 200
+      auto_commit_min_interval_seconds: 300
+      members: 10
+      note_graph_max_depth: -1
+      published_notes: -1
+      revision_history_days: 30
+      trash_retention_days: 30
+    prices:
+      - id: 01a1fe97-974f-79d8-88e1-d4002749020b
+        plan: plus
+        interval: month
+        amount: 49000
+        currency: vnd
+        lookupKey: plus_month
+        active: true
+        createdAt: '2026-11-21T21:51:50.726686+07:00'
+        archivedAt: null
+      - id: 01a1fe9b-7467-7124-90e5-8e9860ad9d39
+        plan: plus
+        interval: year
+        amount: 470400
+        currency: vnd
+        lookupKey: plus_year
+        active: true
+        createdAt: '2026-11-21T21:56:03.893201+07:00'
+        archivedAt: null
+  - tier: pro
+    features:
+      auto_commit: true
+      workspace_graph: true
+    limits:
+      ai_credits_monthly: 2000
+      auto_commit_min_interval_seconds: 60
+      members: -1
+      note_graph_max_depth: -1
+      published_notes: -1
+      revision_history_days: -1
+      trash_retention_days: 90
+    prices:
+      - id: 01a1fe9b-7866-7d24-adc2-148d8af32ab3
+        plan: pro
+        interval: month
+        amount: 99000
+        currency: vnd
+        lookupKey: pro_month
+        active: true
+        createdAt: '2026-11-21T21:56:04.786267+07:00'
+        archivedAt: null
+      - id: 01a1fe9b-7be4-7c3c-ba3a-f58542152245
+        plan: pro
+        interval: year
+        amount: 950400
+        currency: vnd
+        lookupKey: pro_year
+        active: true
+        createdAt: '2026-11-21T21:56:05.619059+07:00'
+        archivedAt: null
+      - id: 01a1fe9b-7f1e-77f1-8f50-ac15775bf49b
+        plan: pro
+        interval: lifetime
+        amount: 2490000
+        currency: vnd
+        lookupKey: pro_lifetime
+        active: true
+        createdAt: '2026-11-21T21:56:06.448016+07:00'
+        archivedAt: null
