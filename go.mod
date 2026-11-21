@@ -22,7 +22,7 @@ require (
 	github.com/gin-gonic/gin v1.12.0
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-co-op/gocron-redis-lock/v2 v2.2.1
-	github.com/go-co-op/gocron/v2 v2.23.1
+	github.com/go-co-op/gocron/v2 v2.23.2
 	github.com/go-playground/validator/v10 v10.30.6
 	github.com/goforj/wire v1.3.1
 	github.com/google/uuid v1.6.0
