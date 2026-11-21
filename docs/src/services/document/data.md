@@ -40,7 +40,7 @@ documents: {
   modified: boolean
   lastCommittedAt: timestamptz {constraint: N}
   updatedAt: timestamptz
-  pendingContributorIds: text[]
+  pendingContributorIds: 'text[]'
 
   shape: sql_table
 }
@@ -52,7 +52,7 @@ revisions: {
   documentId: uuid {constraint: FK, N}
   authorId: text {constraint: N}
   trigger: enum
-  contributorIds: text[]
+  contributorIds: 'text[]'
   contentHash: text {constraint: N}
   createdAt: timestamptz
 

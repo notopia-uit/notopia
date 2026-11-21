@@ -84,9 +84,11 @@ async function resolveKrokiServerUrl(): Promise<string | undefined> {
 
 const krokiServerUrl = await resolveKrokiServerUrl();
 
+const base = process.env.DOCS_BASE || '/notopia/';
+
 const diagramPluginOptions = {
   diagramsDir: 'src/public/diagrams',
-  publicPath: '/notopia/diagrams',
+  publicPath: `${base}diagrams`,
   diagramsDistDir: 'diagrams',
   excludedDiagramTypes: ['mermaid'],
   ...(krokiServerUrl ? { krokiServerUrl } : {}),
@@ -191,7 +193,7 @@ const vitePressOptions = {
   title: 'Notopia',
   description: 'Utopia of Notes',
   lang: 'en-GB',
-  base: '/notopia/',
+  base,
   srcDir: 'src',
   transformPageData(pageData) {
     validateAuthorship(pageData.frontmatter.authorship, pageData.relativePath);
@@ -237,7 +239,7 @@ const vitePressOptions = {
       noExternal: ['vitepress-openapi'],
     },
   },
-  ignoreDeadLinks: ['/notopia/api/index.html'],
+  ignoreDeadLinks: [`${base}api/index.html`],
 } satisfies UserConfig<NoInfer<DefaultTheme.Config>>;
 
 const vitePressSidebarOptions = {

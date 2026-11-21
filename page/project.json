@@ -6,6 +6,7 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
+      "inputs": ["default", "^default", { "env": "DOCS_BASE" }],
       "options": {
         "commands": [
           "rm -rf dist/",
@@ -32,7 +33,24 @@
     "deployPage": {
       "executor": "nx-github-pages:deploy",
       "dependsOn": ["build"],
-      "cache": true
+      "cache": false,
+      "options": {
+        "syncWithBaseBranch": true,
+        "preview": {
+          "url": "https://notopia-uit.github.io/notopia",
+          "pathPrefix": "pr/{prNumber}",
+          "comment": true
+        }
+      }
+    },
+    "cleanup-previews": {
+      "executor": "nx-github-pages:cleanup-preview",
+      "cache": false,
+      "options": {
+        "pathPrefix": "pr",
+        "maxAgeDays": 7,
+        "updatePrComments": true
+      }
     }
   },
   "implicitDependencies": ["docs", "apps/api-web"]

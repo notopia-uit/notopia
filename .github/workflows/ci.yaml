@@ -113,18 +113,20 @@ on:
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
   NX_PARALLEL: 3
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  cancel-in-progress: false
+  queue: max
 
 jobs:
   main:
     name: Main
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
       actions: write
@@ -216,7 +218,6 @@ jobs:
 
       - name: Detect Page Affected
         id: page-affected
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           projects="$(pnpm exec nx show projects --affected --with-target deployPage --json)"
           if [ "$(jq length <<< "$projects")" -gt 0 ]; then
@@ -372,21 +373,29 @@ jobs:
     needs: main
     if: >-
       ${{
-        github.ref == 'refs/heads/main' &&
+        needs.main.result == 'success' &&
+        (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main') &&
         (needs.main.outputs.page-affected == 'true' || github.event.inputs.nxAllCmd == 'run-many')
       }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+      queue: max
     permissions:
       contents: write
       actions: read
+      pull-requests: write
     env:
       DOCS_KROKI_URL: http://localhost:8000
+      DOCS_BASE: ${{ github.event_name == 'pull_request' && format('/notopia/pr/{0}/', github.event.pull_request.number) || '/notopia/' }}
     services:
       kroki:
         image: yuzutech/kroki
         env:
           KROKI_LISTEN: 0.0.0.0:8000
+          KROKI_COMMAND_TIMEOUT: 60s
         ports:
           - 8000:8000
     steps:
@@ -399,6 +408,7 @@ jobs:
         with:
           fetch-depth: 0
           filter: tree:0
+          persist-credentials: false
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -420,14 +430,40 @@ jobs:
         if: ${{ github.event.inputs.resetNxCache == 'true' }}
         run: pnpm exec nx reset
 
-      - name: Nx Build and Deploy Page
+      - name: Build Page
         run: |
           nx-cache-action -- \
-          pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
-            --target deployPage \
-            --parallel=${{ env.NX_PARALLEL }} \
+          pnpm exec nx build page \
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
+
+      - name: Publish Preview
+        if: >-
+          ${{
+            github.event_name == 'pull_request' &&
+            github.event.pull_request.head.repo.full_name == github.repository &&
+            github.actor != 'dependabot[bot]' &&
+            github.event.pull_request.user.login != 'dependabot[bot]'
+          }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: pnpm exec nx run page:deployPage --configuration production
+
+      - name: Publish Production
+        if: >-
+          ${{
+            github.ref == 'refs/heads/main' &&
+            (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+          }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export GIT_CONFIG_COUNT=1
+          export GIT_CONFIG_KEY_0=http.https://github.com/.extraheader
+          GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          export GIT_CONFIG_VALUE_0
+          bash scripts/publish-docs.sh "https://github.com/${GITHUB_REPOSITORY}.git" page/dist "$RUNNER_TEMP/gh-pages"
 
       - name: Calculate Docs diagrams Cache Key
         id: cache-key

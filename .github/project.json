@@ -15,7 +15,7 @@
         { "runtime": "shellcheck --version" }
       ],
       "options": {
-        "command": "actionlint"
+        "command": "actionlint -ignore 'unexpected key \"queue\" for \"concurrency\" section'"
       }
     }
   }

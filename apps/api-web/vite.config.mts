@@ -15,7 +15,7 @@ export default defineConfig(() => ({
     host: true,
   },
   plugins: [react()],
-  base: '/notopia/api/',
+  base: `${process.env.DOCS_BASE || '/notopia/'}api/`,
   build: {
     outDir: './dist',
     emptyOutDir: true,

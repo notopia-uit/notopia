@@ -3,6 +3,9 @@
   "name": "api-web",
   "projectType": "application",
   "targets": {
+    "build": {
+      "inputs": ["default", "^default", { "env": "DOCS_BASE" }]
+    },
     "dev": {
       "dependsOn": [
         {
