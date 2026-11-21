@@ -38,6 +38,9 @@ documents: {
   id: uuid {constraint: PK}
   data: bytea
   modified: boolean
+  lastCommittedAt: timestamptz {constraint: N}
+  updatedAt: timestamptz
+  pendingContributorIds: text[]
 
   shape: sql_table
 }
@@ -45,15 +48,21 @@ documents: {
 revisions: {
   id: uuid {constraint: PK}
   name: text {constraint: N}
-  data: json
-  document_id: uuid {constraint: FK}
-  created_at: timestamptz
-  deleted_at: timestamptz {constraint: N}
+  content: text
+  documentId: uuid {constraint: FK, N}
+  authorId: text {constraint: N}
+  trigger: enum
+  contributorIds: text[]
+  contentHash: text {constraint: N}
+  createdAt: timestamptz
 
   shape: sql_table
 }
 
-revisions.document_id -> documents.id
+revisions.documentId -> documents.id
 ```
 
 <!-- diagram id="database-diagram-document" -->
+
+Revision content is serialized JSON stored in a text column. Revisions are hard-deleted, and
+deleting a document cascades to its revisions. See [flows](./flows) for commit and deletion behavior.

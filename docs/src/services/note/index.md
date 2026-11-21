@@ -5,7 +5,7 @@ order: 1
 
 # Note Service
 
-Go service owning workspaces, folders, notes, links, tags, trash and publishing. DDD + CQRS,
+Go service owning workspaces, folders, note metadata, links, tags and trash. DDD + CQRS,
 with a transactional outbox for integration events. Note only stores note metadata; the
 editable binary content lives in the [Document service](../document/).
 
@@ -13,6 +13,20 @@ editable binary content lives in the [Document service](../document/).
 - [Data](./data): database schema
 - [Flows](./flows): sequence diagrams
 - [Events](./events): topics published and consumed
+
+## Use cases
+
+| Area              | Operations and behavior                                                                                                      |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Workspaces        | Create, rename, change slug, delete, list and look up workspaces; creation also creates a root folder and owner membership.  |
+| Membership        | List and update members, leave a workspace and search users. Member limits and payer protection apply to membership changes. |
+| Folders and notes | Create, rename, change icons and move items; read notes and the workspace tree. Metadata is separate from document content.  |
+| Trash             | Trash, restore, permanently delete or empty trash; a scheduled retention purge removes expired trash.                        |
+| Discovery         | Read links and graphs, and request a workspace-scoped search token. Graphs are subject to billing entitlements.              |
+| Document commits  | Consume committed content to update note size, tags and outgoing links.                                                      |
+
+See [Flows](./flows) for authorization, billing, deletion and asynchronous event paths.
+Note and workspace publishing handlers are currently stubs, not implemented publishing workflows.
 
 ## Architecture
 

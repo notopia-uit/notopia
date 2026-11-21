@@ -1,6 +1,6 @@
 ---
 title: Stories
-order: 8
+order: 2
 ---
 
 # Engineering Stories

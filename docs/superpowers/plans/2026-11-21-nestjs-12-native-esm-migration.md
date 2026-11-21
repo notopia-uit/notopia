@@ -17,8 +17,8 @@ infrastructure, or build configuration changes have been applied.
 satisfying the [release gate](#2-what-is-actually-waiting-on-nx).
 Use `executing-plans` for inline work or `subagent-driven-development` if explicitly chosen.
 
-This plan builds on [NestJS bundling and OTel](../../src/stories/nestjs-bundling-otel.md) and
-[the BlockNote 0.55/container investigation](../../src/stories/nestjs-bundling-otel-2026-10-blocknote-055.md).
+This plan builds on [NestJS bundling and OTel](../../src/developer/story/nestjs-bundling-otel.md) and
+[the BlockNote 0.55/container investigation](../../src/developer/story/nestjs-bundling-otel-2026-10-blocknote-055.md).
 Those stories explain why we currently bundle the editor cluster but externalize backend
 dependencies. Their historical recommendation to keep CommonJS is not a permanent prohibition on ESM.
 
@@ -506,9 +506,9 @@ At execution time, update this plan with the selected Nx release and actual prob
 - [OTel ESM startup and Nest 12 dependency example](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
 - [BlockNote 0.57 release notes](https://github.com/TypeCellOS/BlockNote/blob/v0.57.0/CHANGELOG.md)
   and [ESM-only upstream PR](https://github.com/TypeCellOS/BlockNote/pull/3118).
-- [Original bundling/OTel investigation](../../src/stories/nestjs-bundling-otel.md),
-  [0.55/container follow-up](../../src/stories/nestjs-bundling-otel-2026-10-blocknote-055.md), and
-  [gRPC proto-loader investigation](../../src/stories/nestjs-grpc-proto-loader.md).
+- [Original bundling/OTel investigation](../../src/developer/story/nestjs-bundling-otel.md),
+  [0.55/container follow-up](../../src/developer/story/nestjs-bundling-otel-2026-10-blocknote-055.md), and
+  [gRPC proto-loader investigation](../../src/developer/story/nestjs-grpc-proto-loader.md).
 - Published metadata: [Nest TypeORM 12.0.3](https://registry.npmjs.org/@nestjs/typeorm/12.0.3),
   [TypeORM extension 4.6.0](https://registry.npmjs.org/typeorm-extension/4.6.0),
   [schematics 12.0.16](https://registry.npmjs.org/@nestjs/schematics/12.0.16),

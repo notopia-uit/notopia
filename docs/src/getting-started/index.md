@@ -6,6 +6,7 @@ order: 1
 # Getting Started
 
 Local setup and the day-to-day development workflow. Everything below runs from the repo root.
+For a system-wide introduction, see the [architecture overview](/architecture/overview).
 
 ## Prerequisites
 
@@ -66,4 +67,4 @@ for dev fake data.
 - Do not source `.env` files, Nx loads them.
 - JS/TS: `oxlint`, `oxfmt`, `tsc`. Go: `golangci-lint` through `nx lint {project}`.
 - Conventional commits; the pre-commit hook runs `nx affected` for typecheck, lint and format.
-- Go service layout rules are in [Conventions](../conventions/).
+- Go service layout rules are in [Conventions](/developer/conventions/).

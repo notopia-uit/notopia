@@ -23,6 +23,6 @@ See each chart's `project.json` for exact targets.
   implemented and verified; acknowledgement values are assertions, not security controls.
   Read `charts/notopia-edge/README.md` for required controls and adversarial checks.
 - Keep document at one replica; Redis alone does not make event delivery safe across replicas.
-- See [deployment limitations](../../docs/src/limitation/kubernetes-deployment.md) for remaining
-  validation requirements and [document replicas](../../docs/src/limitation/document-replica-events.md)
+- See [deployment limitations](../../docs/src/developer/limitations/kubernetes-deployment.md) for remaining
+  validation requirements and [document replicas](../../docs/src/developer/limitations/document-replica-events.md)
   for event-delivery limitation.

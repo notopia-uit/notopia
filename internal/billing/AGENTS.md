@@ -62,5 +62,5 @@ Integration event consumers never cache billing state; call gRPC every check.
 ## TODO
 
 - Free trial
-- Live payments via VN gateway behind `PaymentProvider` (see `docs/src/stories/BILLING_PAYMENT_PROVIDERS.md`)
+- Live payments via VN gateway behind `PaymentProvider` (see `docs/src/developer/story/BILLING_PAYMENT_PROVIDERS.md`)
 - More currencies (prices VND, zero-decimal)

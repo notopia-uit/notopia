@@ -22,10 +22,10 @@ plugins:
       - addGrpcMetadata=true
       - useDate=true
   - local: protoc-gen-doc
-    out: ./docs/src/api/grpc
+    out: ./docs/src/api
     strategy: all
     opt:
-      - markdown,index.md
+      - markdown,proto.md
 managed:
   enabled: true
   override:

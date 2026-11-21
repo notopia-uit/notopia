@@ -72,6 +72,9 @@ package "Document" as Document <<Frame>> {
         id: string
         data: Buffer
         modified: boolean
+        lastCommittedAt: Date | null
+        updatedAt: Date
+        pendingContributorIds: string[]
         revisions: RevisionEntity[]
     }
 
@@ -80,8 +83,11 @@ package "Document" as Document <<Frame>> {
         document: DocumentEntity
         name: string | null
         content: @blocknote/core.Block[]
+        authorId: string | null
+        trigger: 'manual' | 'auto' | 'sweeper'
+        contributorIds: string[]
+        contentHash: string | null
         createdAt: Date
-        deletedAt: Date | null
     }
 
     Type(AttachmentUploadUrl) {
@@ -102,18 +108,15 @@ package "Document" as Document <<Frame>> {
     }
 
     Service(DocumentService) {
-        - toYDoc(entity: DocumentEntity): yjs.Doc
-        - bufferToBlockNote(data: Buffer, editor: ServerBlockNoteEditor): @blocknote/core.Block[]
-        - extractTagsAndOutgoingLinkIds(editor: ServerBlockNoteEditor): OutgoingLinksAndTags
-        + commitDocument(documentId: string, userId: string)
-        + getAttachmentUploadUrl(documentId: string, userId: string): AttachmentUploadUrl
-        + updateDataById(id: string, data: Buffer)
+        + commitIfDue(...): CommitResult
+        + getAttachmentUploadUrl(...): AttachmentUploadUrl
+        + upsertData(id: string, data: Buffer, modified: boolean)
         + getById(id: string): DocumentEntity | null
     }
 
     Service(RevisionService) {
         + getRevision(revisionId: string): RevisionEntity
-        + getRevisionsByDocumentId(documentId: string, page: number, limit: number): PaginatedRevisions[]
+        + getRevisionsByDocumentId(documentId: string, page: number, limit: number, trigger?: RevisionTrigger): PaginatedRevisions
         + renameRevision(revisionId: string, name: string | null)
         + deleteRevision(revisionId: string)
     }
@@ -178,5 +181,7 @@ package "Document" as Document <<Frame>> {
 ```
 
 <!-- diagram id="class-diagram-document" -->
+
+See [flows](./flows) for the collaboration and revision lifecycle.
 
 <!-- vim:set tabstop=4 softtabstop=4 shiftwidth=4: -->

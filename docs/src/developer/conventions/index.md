@@ -5,7 +5,7 @@ order: 1
 
 # Conventions
 
-Go services follow DDD with CQRS. The [full rules](/conventions/go-clean-architecture) expand
+Go services follow DDD with CQRS. The [full rules](/developer/conventions/go-clean-architecture) expand
 on this summary. The Note service (`internal/note`) is the reference implementation.
 
 - **Layers**: `controller -> app -> domain <- infra`. `domain` is stdlib only, `controller`

@@ -1,5 +1,5 @@
 ---
-order: 4
+order: 5
 authorship:
   - ai
 ---
@@ -13,7 +13,22 @@ AI has no PostgreSQL database. Container-internal Redis still listens on its sta
 It connects a language model to Notopia's authorized note tools. The model provider supplies
 text generation; Notopia supplies workspace permissions, note access, editing and usage limits.
 
-For provider credentials and examples, see [OpenRouter and OpenCode](./model-providers).
+For request and editing sequences, see [AI flows](./flows). For provider credentials and
+examples, see [OpenRouter and OpenCode](./model-providers).
+
+## Use cases
+
+| Use case                           | Actor and outcome                                                                                                       | Important boundary                                                                                       |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Ask about workspace notes          | A member asks the workspace assistant to find or summarize notes using authorized tools.                                | Search and indexed reads cover committed content, not necessarily the current editor state.              |
+| Generate in the editor             | A member invokes BlockNote AI with the current note context and reviews the proposed document operations.               | Editing requires workspace write access and is performed in the browser, not by the model server.        |
+| Edit a note from chat              | A member asks the assistant to open one existing note, generate changes against its live editor state, and review them. | The target is authorized before opening and rechecked on continuation; a task cannot switch targets.     |
+| Discover workspaces                | General chat can list the user's accessible workspaces.                                                                 | Other tools remain scoped to the validated request workspace; discovery does not change billing context. |
+| Resume or cancel an assistant task | The browser returns the expected client-tool results to continue, or cancels the task between streams.                  | Continuation tokens are one-shot; the deadline and step budget do not reset.                             |
+| Operate the service                | An operator configures the provider and persistent Redis and checks service readiness.                                  | Readiness only checks Redis, not the model, gRPC dependencies, or editing session.                       |
+
+Each initial generation requires workspace read access and an available billing allowance.
+The [flows](./flows) describe authorization, accounting, and the handoff to the editor.
 
 ## Architecture
 
@@ -172,19 +187,22 @@ curl -f http://api.notopia.localhost/ai/health/ready
 is running; `/ai/health/ready` pings Redis. Readiness does not prove that model credentials, other gRPC
 services or browser document editing work.
 
-| Symptom                             | Check                                                               |
-| ----------------------------------- | ------------------------------------------------------------------- |
-| `402 planLimitExceeded`             | Workspace billing allowance and remaining Notopia credits           |
-| `429`                               | Per-user rate/concurrency limits; honor `Retry-After`               |
-| `503 aiUsageUnavailable`            | Redis address, connectivity and persistence configuration           |
-| `503 billingServiceUnavailable`     | Billing gRPC and valid plan allowance data                          |
-| Provider authentication/model error | Provider base URL, key, model ID and account access                 |
-| Text works but note tools fail      | Model support for streamed tool calls and structured tool input     |
-| Note opens but editing fails        | Document logs, WebSocket authentication, schema and synchronization |
-| Search shows old content            | Commit the note and check search-worker indexing                    |
+| Symptom                                         | Check                                                               |
+| ----------------------------------------------- | ------------------------------------------------------------------- |
+| `402 planLimitExceeded` or `aiCreditsExhausted` | Workspace billing allowance and remaining Notopia credits           |
+| `429`                                           | Per-user rate/concurrency limits; honor `Retry-After`               |
+| `503 aiUsageUnavailable`                        | Redis address, connectivity and persistence configuration           |
+| `503 billingServiceUnavailable`                 | Billing gRPC and valid plan allowance data                          |
+| Provider authentication/model error             | Provider base URL, key, model ID and account access                 |
+| Text works but note tools fail                  | Model support for streamed tool calls and structured tool input     |
+| Note opens but editing fails                    | Document logs, WebSocket authentication, schema and synchronization |
+| Search shows old content                        | Commit the note and check search-worker indexing                    |
 
 Before streaming, failures are JSON errors. After streaming starts, failures appear as safe
 AI SDK stream error parts; HTTP `200` alone does not prove a generation succeeded.
+Standard chat enriches exhausted-credit errors as `planLimitExceeded`, including upgrade
+details when available; assistant-mode admission currently returns `aiCreditsExhausted`.
+Repeated prompt IDs return `409 duplicateAiRequest`; send a new user message ID to retry.
 
 ## Development checks
 

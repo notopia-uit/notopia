@@ -1,6 +1,6 @@
 ---
 title: Billing
-order: 1
+order: 4
 ---
 
 # Billing Service
@@ -12,7 +12,18 @@ over gRPC and never cache them.
 
 - [Domain](./domain): class diagrams
 - [Data](./data): database diagram
-- [Flows](./flows): checkout, webhooks, cancellation, crons
+- [Flows](./flows): checkout and portal, entitlements, webhooks, cancellation, payer changes and crons
+
+## Use cases
+
+| Actor                           | Use case                                                                                                                                                                                                                                       |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Workspace member                | View available plans and prices; read workspace entitlements with `billing_read`.                                                                                                                                                              |
+| Billing manager                 | View the workspace subscription and payer, [start checkout](./flows#checkout), open the [customer portal](./flows#customer-portal), preview or request [cancel-now](./flows#cancel-now), and [claim payer](./flows#payer-removed-and-claimed). |
+| Internal service                | Resolve one or many workspace [entitlements](./flows#entitlement-resolution) over gRPC.                                                                                                                                                        |
+| Administrator                   | List and update plans, read or update billing policy, and create or archive prices.                                                                                                                                                            |
+| Stripe and background workers   | [Synchronize webhooks](./flows#webhook-pipeline), process outbox side effects and reconcile stale or pending work.                                                                                                                             |
+| Note and Authorization services | Trigger cancellation on [workspace deletion](./flows#workspace-deletion) or handle [payer removal](./flows#payer-removed-and-claimed).                                                                                                         |
 
 ## Plan features and limits
 

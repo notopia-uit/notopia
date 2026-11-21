@@ -10,6 +10,21 @@ realtime websocket. Note content is committed back to the Note service through e
 
 - [Domain](./domain): class diagrams
 - [Data](./data): database schema
+- [Flows](./flows): collaboration, commits, and deletion
+
+## Use cases
+
+| Use case                        | Behavior                                                                                                                                                                                                        |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Collaborate on a note           | Connect using a JWT and note read permission; users without write permission and users viewing trashed notes connect read-only. Edits are synchronized as Yjs updates and stored with a debounce.               |
+| Commit content                  | A writer can commit manually. Eligible plans also commit after stores or sweep idle modified documents. A commit creates a revision and publishes content, tags, and outgoing links for downstream consumers.   |
+| Manage revision history         | List revisions with pagination and an optional trigger filter, read a snapshot with content, rename it, or hard-delete it. A retention job purges old revisions according to the plan while keeping the latest. |
+| Upload an attachment            | A writer requests a presigned upload URL and public URL for an attachment associated with the document.                                                                                                         |
+| React to access or note changes | Workspace role and membership events update or close live connections. A note deletion closes connections and removes its document and revisions.                                                               |
+
+HTTP authentication trusts gateway-forwarded user headers; the WebSocket validates its own JWT.
+The revision handlers currently do not perform a per-document authorization check; they should not
+be assumed to enforce the same permissions as commit or attachment upload.
 
 ## Architecture
 

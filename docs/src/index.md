@@ -1,6 +1,7 @@
 ---
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
+order: 0
 
 hero:
   name: Notopia
@@ -16,3 +17,7 @@ hero:
       text: Services
       link: /services/note/
 ---
+
+# Notopia
+
+Documentation for getting started, understanding, developing, and deploying Notopia.

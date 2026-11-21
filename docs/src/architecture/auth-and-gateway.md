@@ -19,7 +19,7 @@ service excludes its own health path from the middleware, and endpoints that mus
 
 ## Internal traffic
 
-Service-to-service calls use gRPC (definitions in `proto/`, see [gRPC reference](../api/grpc/)).
+Service-to-service calls use gRPC (definitions in `proto/`, see [protocol reference](../api/proto)).
 A service never calls another service's public REST API internally. For example, Note and
 Billing call the Authorization service over gRPC for permission checks, and Note calls Billing
 for entitlements on every check without caching.

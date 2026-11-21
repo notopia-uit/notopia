@@ -9,8 +9,8 @@ Services communicate asynchronously through Redpanda (Kafka API).
 
 ## Transactional outbox
 
-Go services publish through a Watermill transactional outbox so that a domain write and the
-event it produces commit together. The flow in the Note service:
+The Note and Billing services use a Watermill transactional outbox for aggregate events so
+that a domain write and its outbox messages commit together. The flow in the Note service:
 
 1. The repository `Save` drains domain events and publishes them with the Watermill
    `forwarder` publisher, which writes the message into an outbox table in the same Postgres
@@ -20,10 +20,11 @@ event it produces commit together. The flow in the Note service:
 3. A Watermill SQL subscriber polls the table (every second) and the forwarder re-publishes each
    message to its real topic on Redpanda.
 
-Because of this, publishing an integration event inside a unit of work is safe. Notifications
-that must not fail the request (for example billing's `subscription.changed`) are instead
-published best-effort after commit. NestJS services publish and consume directly with
-`@nestjs/microservices`.
+Authorization publishes membership events directly rather than through a transactional
+outbox. NestJS services publish and consume directly with `@nestjs/microservices`; document
+commit events are not atomic with the database transaction. See the
+[authorization](/services/authorization/flows) and [document](/services/document/flows)
+flows for delivery caveats.
 
 ## Topic naming
 

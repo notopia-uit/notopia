@@ -6,9 +6,15 @@ order: 1
 # System Architecture
 
 Notopia is a set of small services behind a single gateway (Traefik). Go services (note,
-authorization, billing) and NestJS services (document, search worker) talk to each other
-over gRPC for synchronous calls and over Redpanda for events. Faded boxes are planned or
-unused.
+authorization, billing) and NestJS services (document, search worker, AI) use gRPC for
+synchronous service calls and Redpanda for events. The diagram shows logical dependencies;
+local Compose provides infrastructure, while application services can run on the host.
+
+Compose includes dedicated Redis instances for note, document, billing and AI. Document
+Redis is optional in configuration and supports collaborative scaling and distributed locks.
+Search-worker Redis is optional and not provisioned by Compose: without it, deletion
+tombstones use in-memory storage suitable only for a single worker. See
+[Search Worker](../services/search-worker/) for the limitations.
 
 See [Messaging](./messaging) for the event backbone and [Auth and Gateway](./auth-and-gateway)
 for how requests are authenticated.
@@ -39,17 +45,6 @@ vars: {
   }
 }
 
-classes: {
-  notUsed: {
-    style: {
-      opacity: 0.4
-      stroke-dash: 5
-      fill: "#9ca0b0"
-      stroke: "#4c4f69"
-    }
-  }
-}
-
 user: User {
   browser: Browser {
     icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/googlechrome.svg
@@ -58,6 +53,10 @@ user: User {
 
 payment_provider: Payment Provider (Stripe sandbox) {
   icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/stripe.svg
+}
+
+model_provider: Model Provider {
+  label: LLM provider (remote or optional local Ollama)
 }
 
 gateway: Gateway {
@@ -86,14 +85,11 @@ services: Services {
     database: Database {
       icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/postgresql.svg
     }
-    pub_sub: Pub/Sub {
+    pub_sub: Redis (optional scaling and locks) {
       icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/redis.svg
-      class: notUsed
     }
     document_service -> database
-    document_service -> pub_sub: {
-      class: notUsed
-    }
+    document_service -> pub_sub
   }
 
   note: Note Service Group {
@@ -134,6 +130,16 @@ services: Services {
     billing_service -> cron_lock
   }
 
+  ai: AI Service Group {
+    ai_service: AI Service {
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/nodedotjs.svg
+    }
+    redis: Redis (quota and continuations) {
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/redis.svg
+    }
+    ai_service -> redis
+  }
+
   search: Search Service Group {
     search_service: Meilisearch {
       icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/meilisearch.svg
@@ -141,14 +147,11 @@ services: Services {
     search_sync_worker: Sync Worker {
       icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/nodedotjs.svg
     }
-    search_sync_worker_database: Sync Database {
+    search_sync_worker_database: Optional Redis tombstones {
       icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/redis.svg
-      class: notUsed
     }
     search_sync_worker -> search_service
-    search_sync_worker -> search_sync_worker_database: {
-      class: notUsed
-    }
+    search_sync_worker -> search_sync_worker_database: optional
   }
 
   event_bus: Event Bus {
@@ -157,7 +160,7 @@ services: Services {
     }
   }
 
-  monotoring: Monitoring {
+  monitoring: Monitoring {
     alloy: Alloy {
       icon: https://raw.githubusercontent.com/grafana/alloy/refs/heads/main/docs/sources/assets/alloy_icon_orange.svg
     }
@@ -193,16 +196,19 @@ gateway -> services.note
 gateway -> services.identity_provider
 gateway -> services.object_storage
 gateway -> services.billing
+gateway -> services.ai
 gateway -> services.search
-gateway -> services.monotoring
+gateway -> services.monitoring
 
 services.document -> services.note
 services.document <-> services.event_bus
 services.document -> services.authorization
 services.document -> services.object_storage
+services.document -> services.billing
 
 services.note <-> services.event_bus
 services.note -> services.authorization
+services.note -> services.billing
 
 services.authorization <- services.event_bus
 
@@ -212,6 +218,11 @@ services.billing -> payment_provider: checkout, refunds
 payment_provider -> gateway: webhooks
 
 services.search <- services.event_bus
+services.ai -> services.note
+services.ai -> services.authorization
+services.ai -> services.billing
+services.ai -> services.search.search_service
+services.ai -> model_provider
 
 style.border-radius: 15
 *.style.border-radius: 15
