@@ -87,9 +87,9 @@ try {
       for (const [directory, metadata] of graph) {
         for (const dependency of metadata.dependencies ?? []) {
           if (!dependency.repository?.startsWith('file://')) continue;
-          const target = path.posix.normalize(
-            path.posix.join(directory, dependency.repository.slice(7))
-          );
+          const target = path.posix
+            .normalize(path.posix.join(directory, dependency.repository.slice(7)))
+            .replace(/\/+$/, '');
           if (changed.has(target) && !changed.has(directory)) {
             changed.add(directory);
             expanded = true;
