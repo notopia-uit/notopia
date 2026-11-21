@@ -102,6 +102,12 @@ func (p *Provider) CreatePortalConfiguration(ctx context.Context, activePrices [
 		},
 		CustomerUpdate: &stripego.BillingPortalConfigurationCreateFeaturesCustomerUpdateParams{
 			Enabled: new(true),
+			AllowedUpdates: []*string{
+				new(string(stripego.BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdateName)),
+				new(string(stripego.BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdateEmail)),
+				new(string(stripego.BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdatePhone)),
+				new(string(stripego.BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdateAddress)),
+			},
 		},
 	}
 	cfg, err := p.sc.V1BillingPortalConfigurations.Create(ctx, &stripego.BillingPortalConfigurationCreateParams{
