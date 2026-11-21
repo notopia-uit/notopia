@@ -159,7 +159,11 @@ jobs:
           echo "IS_RENOVATE=$IS_RENOVATE" >> "$GITHUB_OUTPUT"
           echo "NX_CACHE_ACTION_SKIP_UPLOAD_CACHE=$IS_RENOVATE" >> "$GITHUB_OUTPUT"
 
-          if [[ "$IS_RENOVATE" == false ]] && [[ "$REF_NAME" == "main" || "$REF_NAME" == "dev" || "$BASE_REF" == "main" || "$BASE_REF" == "dev" ]]; then
+          if [[ "$IS_RENOVATE" == false ]] &&
+             [[ "$REF_NAME" == "main" ||
+                "$REF_NAME" == "dev" ||
+                "$BASE_REF" == "main" ||
+                "$BASE_REF" == "dev" ]]; then
             echo "SHOULD_CACHE=true" >> "$GITHUB_OUTPUT"
           else
             echo "SHOULD_CACHE=false" >> "$GITHUB_OUTPUT"
@@ -167,7 +171,15 @@ jobs:
 
           SHOULD_RELEASE=false
           if [[ "$EVENT_NAME" == "workflow_dispatch" && "$REF_NAME" == "main" ]]; then
-            if [[ "$INPUT_RELEASE_ALL" == "true" || "$INPUT_RELEASE_WEB" == "true" || "$INPUT_RELEASE_NOTE" == "true" || "$INPUT_RELEASE_AUTHORIZATION" == "true" || "$INPUT_RELEASE_BILLING" == "true" || "$INPUT_RELEASE_DOC" == "true" || "$INPUT_RELEASE_SW" == "true" || "$INPUT_RELEASE_AI" == "true" || "$INPUT_RELEASE_NPM" == "true" ]]; then
+            if [[ "$INPUT_RELEASE_ALL" == "true" ||
+                  "$INPUT_RELEASE_WEB" == "true" ||
+                  "$INPUT_RELEASE_NOTE" == "true" ||
+                  "$INPUT_RELEASE_AUTHORIZATION" == "true" ||
+                  "$INPUT_RELEASE_BILLING" == "true" ||
+                  "$INPUT_RELEASE_DOC" == "true" ||
+                  "$INPUT_RELEASE_SW" == "true" ||
+                  "$INPUT_RELEASE_AI" == "true" ||
+                  "$INPUT_RELEASE_NPM" == "true" ]]; then
               SHOULD_RELEASE=true
             fi
           fi
@@ -321,7 +333,12 @@ jobs:
         run: bash scripts/bump-deploy-tags.sh "$RELEASE_HEAD" "$RELEASE_PROJECTS"
 
       - name: Push deployment tags and announce releases
-        if: ${{ github.ref == 'refs/heads/main' && steps.setup-vars.outputs.SHOULD_RELEASE == 'true' && steps.release-projects.outputs.RELEASE_PROJECTS != '' }}
+        if: >-
+          ${{
+            github.ref == 'refs/heads/main' &&
+            steps.setup-vars.outputs.SHOULD_RELEASE == 'true' &&
+            steps.release-projects.outputs.RELEASE_PROJECTS != ''
+          }}
         env:
           RELEASE_PROJECTS: ${{ steps.release-projects.outputs.RELEASE_PROJECTS }}
         run: bash scripts/push-deploy-tags.sh "$RELEASE_HEAD" "$RELEASE_PROJECTS"
