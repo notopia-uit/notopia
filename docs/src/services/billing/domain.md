@@ -14,6 +14,12 @@ order: 2
 
 ## Domain Layer
 
+`BillingAccount` owns the payer's recorded contact details; `Subscription` owns its
+refunds and references a catalog `Price`. The subscription's plan and interval are the
+purchased terms. Provider snapshots describe Stripe state, and payment coverage belongs
+to each payment, not the subscription's current period. A refund keeps its payment
+reference and amount after the temporary quote is gone.
+
 ```plantuml
 @startuml Billing
 title Billing Domain
@@ -156,7 +162,6 @@ ValueObject(Payer) {
     ID()
     Email()
     Name()
-    WithContact()
 }
 
 ValueObject(ProviderSnapshot) {
@@ -187,11 +192,11 @@ ValueObject(RefundLine) {
 }
 
 ValueObject(RefundQuote) {
-    amount Money
     unusedSeconds int64
     periodSeconds int64
     lines []RefundLine
 
+    Amount()
     Lines()
 }
 
@@ -264,7 +269,6 @@ AggregateRoot(BillingAccount) {
     OpenBillingAccount()
     ChangePayer()
     MarkPayerMissing()
-    UpdateContact()
 }
 
 AggregateRoot(Price) {
@@ -350,18 +354,18 @@ RepoInterface(ProviderEventLog) {
 }
 
 Subscription *-- Refund
-Subscription o-- ProviderSnapshot : applies
+Subscription ..> ProviderSnapshot : applies
 Subscription ..> RefundQuote : quotes
 Subscription ..> PaymentInfo : quotes from
 Subscription --> Price : priceID
 Subscription ..> BillingPolicy : GrantsAccess
 RefundQuote *-- RefundLine
+RefundLine ..> Refund : creates on cancellation
 RefundLine o-- Money
-RefundQuote o-- Money
 PaymentInfo o-- Money
 Refund o-- Money
 Price o-- Money
-BillingAccount o-- Payer
+BillingAccount *-- Payer
 BillingAccount "1" -- "0..*" Subscription : workspaceID
 Price --> Plan : tier
 ResolveEntitlements ..> Subscription

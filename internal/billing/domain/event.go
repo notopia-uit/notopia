@@ -56,8 +56,7 @@ type (
 		BaseEvent
 		PayerID string
 	}
-	PayerMissingEvent          struct{ BaseEvent }
-	BillingContactUpdatedEvent struct{ BaseEvent }
+	PayerMissingEvent struct{ BaseEvent }
 
 	SubscriptionCreatedEvent struct {
 		BaseEvent

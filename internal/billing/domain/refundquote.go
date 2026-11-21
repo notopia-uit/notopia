@@ -48,9 +48,8 @@ func (l RefundLine) Amount() Money          { return l.amount }
 func (l RefundLine) CoverageSeconds() int64 { return l.coverageSeconds }
 func (l RefundLine) UnusedSeconds() int64   { return l.unusedSeconds }
 
-// RefundQuote.Amount is the sum of Lines; each line becomes one Refund.
+// RefundQuote.Amount is the sum of Lines; positive lines become refunds on cancellation.
 type RefundQuote struct {
-	amount        Money
 	unusedSeconds int64
 	periodSeconds int64
 	lines         []RefundLine
@@ -69,14 +68,23 @@ func NewRefundQuote(lines []RefundLine, unusedSeconds, periodSeconds int64) (Ref
 		}
 	}
 	return RefundQuote{
-		amount:        total,
 		unusedSeconds: unusedSeconds,
 		periodSeconds: periodSeconds,
 		lines:         slices.Clone(lines),
 	}, nil
 }
 
-func (q RefundQuote) Amount() Money        { return q.amount }
+func (q RefundQuote) Amount() Money {
+	if len(q.lines) == 0 {
+		return Money{}
+	}
+	total := q.lines[0].amount
+	for _, line := range q.lines[1:] {
+		total.amount += line.amount.amount
+	}
+	return total
+}
+
 func (q RefundQuote) UnusedSeconds() int64 { return q.unusedSeconds }
 func (q RefundQuote) PeriodSeconds() int64 { return q.periodSeconds }
 func (q RefundQuote) Lines() []RefundLine  { return slices.Clone(q.lines) }

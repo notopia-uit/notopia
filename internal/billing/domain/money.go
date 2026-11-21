@@ -47,7 +47,3 @@ func NewPayer(id, email, name string) (Payer, error) {
 func (p Payer) ID() string    { return p.id }
 func (p Payer) Email() string { return p.email }
 func (p Payer) Name() string  { return p.name }
-
-func (p Payer) WithContact(email, name string) Payer {
-	return Payer{id: p.id, email: email, name: name}
-}

@@ -19,27 +19,26 @@ const (
 const DomainEventTopicPrefix = "events.internal.billing."
 
 const (
-	TopicPlanUpdated                  = DomainEventTopicPrefix + "plan.updated"
-	TopicBillingPolicyUpdated         = DomainEventTopicPrefix + "billing_policy.updated"
-	TopicPortalConfigurationChanged   = DomainEventTopicPrefix + "billing_policy.portal_configuration_changed"
-	TopicPriceCreated                 = DomainEventTopicPrefix + "price.created"
-	TopicPriceArchived                = DomainEventTopicPrefix + "price.archived"
-	TopicBillingAccountOpened         = DomainEventTopicPrefix + "billing_account.opened"
-	TopicBillingAccountPayerChanged   = DomainEventTopicPrefix + "billing_account.payer_changed"
-	TopicBillingAccountPayerMissing   = DomainEventTopicPrefix + "billing_account.payer_missing"
-	TopicBillingAccountContactUpdated = DomainEventTopicPrefix + "billing_account.contact_updated"
-	TopicSubscriptionCreated          = DomainEventTopicPrefix + "subscription.created"
-	TopicSubscriptionActivated        = DomainEventTopicPrefix + "subscription.activated"
-	TopicSubscriptionRenewed          = DomainEventTopicPrefix + "subscription.renewed"
-	TopicSubscriptionPastDue          = DomainEventTopicPrefix + "subscription.past_due"
-	TopicSubscriptionPlanChanged      = DomainEventTopicPrefix + "subscription.plan_changed"
-	TopicSubscriptionCancelScheduled  = DomainEventTopicPrefix + "subscription.cancel_scheduled"
-	TopicSubscriptionCancelResumed    = DomainEventTopicPrefix + "subscription.cancel_resumed"
-	TopicSubscriptionCanceledNow      = DomainEventTopicPrefix + "subscription.canceled_now"
-	TopicSubscriptionEnded            = DomainEventTopicPrefix + "subscription.ended"
-	TopicSubscriptionRefundRequested  = DomainEventTopicPrefix + "subscription.refund_requested"
-	TopicSubscriptionRefundSucceeded  = DomainEventTopicPrefix + "subscription.refund_succeeded"
-	TopicSubscriptionRefundFailed     = DomainEventTopicPrefix + "subscription.refund_failed"
+	TopicPlanUpdated                 = DomainEventTopicPrefix + "plan.updated"
+	TopicBillingPolicyUpdated        = DomainEventTopicPrefix + "billing_policy.updated"
+	TopicPortalConfigurationChanged  = DomainEventTopicPrefix + "billing_policy.portal_configuration_changed"
+	TopicPriceCreated                = DomainEventTopicPrefix + "price.created"
+	TopicPriceArchived               = DomainEventTopicPrefix + "price.archived"
+	TopicBillingAccountOpened        = DomainEventTopicPrefix + "billing_account.opened"
+	TopicBillingAccountPayerChanged  = DomainEventTopicPrefix + "billing_account.payer_changed"
+	TopicBillingAccountPayerMissing  = DomainEventTopicPrefix + "billing_account.payer_missing"
+	TopicSubscriptionCreated         = DomainEventTopicPrefix + "subscription.created"
+	TopicSubscriptionActivated       = DomainEventTopicPrefix + "subscription.activated"
+	TopicSubscriptionRenewed         = DomainEventTopicPrefix + "subscription.renewed"
+	TopicSubscriptionPastDue         = DomainEventTopicPrefix + "subscription.past_due"
+	TopicSubscriptionPlanChanged     = DomainEventTopicPrefix + "subscription.plan_changed"
+	TopicSubscriptionCancelScheduled = DomainEventTopicPrefix + "subscription.cancel_scheduled"
+	TopicSubscriptionCancelResumed   = DomainEventTopicPrefix + "subscription.cancel_resumed"
+	TopicSubscriptionCanceledNow     = DomainEventTopicPrefix + "subscription.canceled_now"
+	TopicSubscriptionEnded           = DomainEventTopicPrefix + "subscription.ended"
+	TopicSubscriptionRefundRequested = DomainEventTopicPrefix + "subscription.refund_requested"
+	TopicSubscriptionRefundSucceeded = DomainEventTopicPrefix + "subscription.refund_succeeded"
+	TopicSubscriptionRefundFailed    = DomainEventTopicPrefix + "subscription.refund_failed"
 )
 
 // DomainEventToTopic maps every domain event to the topic the outbox publishes it on.
@@ -62,8 +61,6 @@ func DomainEventToTopic(event domain.Event) (string, error) {
 		return TopicBillingAccountPayerChanged, nil
 	case *domain.PayerMissingEvent:
 		return TopicBillingAccountPayerMissing, nil
-	case *domain.BillingContactUpdatedEvent:
-		return TopicBillingAccountContactUpdated, nil
 	case *domain.SubscriptionCreatedEvent:
 		return TopicSubscriptionCreated, nil
 	case *domain.SubscriptionActivatedEvent:
