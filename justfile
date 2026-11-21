@@ -37,7 +37,7 @@ shadcnadd component:
 helm-setup:
     set -e; if ! helm plugin list | grep -qE '^unittest[[:space:]]+1\.2\.1([[:space:]]|$)'; then \
       if helm plugin list | grep -qE '^unittest[[:space:]]'; then helm plugin uninstall unittest; fi; \
-      helm plugin install https://github.com/helm-unittest/helm-unittest --version 1.2.1; \
+      helm plugin install oci://ghcr.io/helm-unittest/helm-unittest/unittest:1.2.1 --verify=false; \
     fi
 
 seed: seed-authorization seed-search seed-billing
