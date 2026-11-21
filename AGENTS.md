@@ -66,6 +66,13 @@ pkg/                            # Go packages
 - oapi-codegen generate Go server code (gin, strict server)
 - API/Contract change should come from API spec in `api` and `proto`, run `nx gen api` and `nx gen proto` to generate code
 
+### Docs
+
+- Code first, docs later
+- Use cases, architecture, class, diagrams and explanation
+- Logic, api (openai, grpc), helm chart
+- Update docs when change code, or add new feature
+
 ### Frontend
 
 - Use shadcn component as much as possible, install in `packages/ui`, the package name is `@notopia-uit/ui`
