@@ -1,0 +1,51 @@
+{
+  "name": "ai-chart",
+  "targets": {
+    "gen": {
+      "dependsOn": ["gen:schema", "gen:readme"]
+    },
+    "gen:schema": {
+      "inputs": ["chartSchema"],
+      "outputs": ["{projectRoot}/values.schema.json"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "helm-schema -p -c deploy/k8s/charts/ai"
+      }
+    },
+    "gen:readme": {
+      "inputs": ["chartReadme"],
+      "outputs": ["{projectRoot}/README.md"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "helm-docs -c deploy/k8s/charts/ai"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/ai.lock helm dependency build --skip-refresh deploy/k8s/charts/ai",
+          "flock -s tmp/chart-lock/ai.lock helm lint --strict deploy/k8s/charts/ai --set istio.enabled=false",
+          "flock -s tmp/chart-lock/ai.lock bash -o pipefail -c 'helm template test deploy/k8s/charts/ai --set route.enabled=true --set autoscaling.enabled=true --set podDisruptionBudget.enabled=true --set istio.enabled=true --set istio.allowedPrincipals[0]=cluster.local/ns/default/sa/gateway | kubeconform -strict -schema-location default -schema-location \"https://raw.githubusercontent.com/datreeio/CRDs-catalog/784ec895547a36e548e6810b41f27baade3a0890/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json\"'"
+        ],
+        "parallel": false
+      },
+      "inputs": ["chart"],
+      "dependsOn": []
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "mkdir -p tmp/chart-lock",
+          "flock tmp/chart-lock/ai.lock helm dependency build --skip-refresh deploy/k8s/charts/ai",
+          "flock -s tmp/chart-lock/ai.lock helm unittest deploy/k8s/charts/ai"
+        ],
+        "parallel": false
+      },
+      "inputs": ["chart"],
+      "dependsOn": []
+    }
+  }
+}

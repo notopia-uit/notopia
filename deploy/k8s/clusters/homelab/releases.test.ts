@@ -7,11 +7,11 @@ import { fileURLToPath } from 'node:url';
 
 import { parse } from 'yaml';
 
-import { parseDocuments } from './secret-validation.ts';
+import { checkReleaseSecret, parseDocuments } from './secret-validation.ts';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(root, '../../../..');
-const services = ['web', 'note', 'authorization', 'billing', 'document', 'search-worker'];
+const services = ['web', 'note', 'authorization', 'billing', 'document', 'search-worker', 'ai'];
 const readYaml = (path: string) => parse(readFileSync(path, 'utf8'));
 const build = (directory: string) =>
   parseDocuments(execFileSync('kubectl', ['kustomize', directory], { encoding: 'utf8' }));
@@ -37,7 +37,7 @@ const edgeRender = () =>
 const set = (values: string[]) => new Set(values);
 
 test('broker values', () => {
-  for (const name of services.filter((s) => s !== 'web')) {
+  for (const name of services.filter((s) => s !== 'web' && s !== 'ai')) {
     const values = readYaml(join(root, 'apps', name, 'values.yaml'));
     assert.equal(
       values.env[`NOTOPIA_${name.toUpperCase().replaceAll('-', '_')}_KAFKA_BROKERS`],
@@ -66,6 +66,7 @@ test('exact principals and rendered ports', () => {
     ],
     document: [[edge], ['8082']],
     'search-worker': [[edge], ['28083']],
+    ai: [[edge], ['8086']],
   };
   for (const [name, [principals, ports]] of Object.entries(expected)) {
     const docs = render(name);
@@ -77,6 +78,40 @@ test('exact principals and rendered ports', () => {
       set(ports),
       name
     );
+  }
+});
+
+test('additive policies grant AI only each service gRPC port', () => {
+  const appPolicies = build(join(root, 'apps')).filter(
+    (doc) => doc.kind === 'AuthorizationPolicy' && doc.metadata.namespace === 'notopia'
+  );
+  const ai = 'cluster.local/ns/notopia/sa/ai';
+  for (const [service, port] of Object.entries({
+    note: '18081',
+    authorization: '18089',
+    billing: '18084',
+  })) {
+    const chart = render(service);
+    const labels = chart.find((doc) => doc.kind === 'Deployment').spec.template.metadata.labels;
+    const chartPolicies = chart.filter((doc) => doc.kind === 'AuthorizationPolicy');
+    const effectivePorts = new Set<string>();
+    for (const policy of [...chartPolicies, ...appPolicies]) {
+      if (policy.spec.action && policy.spec.action !== 'ALLOW') continue;
+      const selector = policy.spec.selector?.matchLabels ?? {};
+      if (!Object.entries(selector).every(([key, value]) => labels[key] === value)) continue;
+      for (const rule of policy.spec.rules ?? []) {
+        for (const from of rule.from ?? [{}]) {
+          const principals: string[] | undefined = from.source?.principals;
+          if (principals && !principals.includes(ai) && !principals.includes('*')) continue;
+          for (const to of rule.to ?? [{}]) {
+            const ports: string[] | undefined = to.operation?.ports;
+            if (!ports) effectivePorts.add('*');
+            else for (const p of ports) effectivePorts.add(String(p));
+          }
+        }
+      }
+    }
+    assert.deepEqual(effectivePorts, new Set([port]), service);
   }
 });
 
@@ -95,6 +130,8 @@ test('rendered public rules and header removal', () => {
     '/authorization/health/*',
     '/billing/health/*',
     '/document/health/*',
+    '/ai/health',
+    '/ai/health/*',
     '/search-worker/health/*',
     '/billing/webhooks/stripe',
     '/document/ws/document',
@@ -173,6 +210,15 @@ test('service wiring', () => {
     assert.equal(values[name].redis.passwordSecret.name, `valkey-${name}`);
   }
   assert.deepEqual(values['search-worker'].envFrom, [{ secretRef: { name: 'search-worker' } }]);
+  assert.equal(values.ai.route.requestTimeout, '150s');
+  assert.deepEqual(
+    new Set(
+      values.ai.extraEnv.map(
+        (e: any) => `${e.valueFrom.secretKeyRef.name}:${e.valueFrom.secretKeyRef.key}`
+      )
+    ),
+    new Set(['ai:NOTOPIA_AI_REDIS_URL', 'ai:NOTOPIA_AI_LLM_API_KEY', 'ai:NOTOPIA_AI_MEILI_API_KEY'])
+  );
   assert.equal(
     values.note.env.NOTOPIA_NOTE_MEILISEARCH_NOTE_SEARCH_KEY_UID,
     values['search-worker'].env.NOTOPIA_SEARCH_WORKER_MEILI_NOTE_SEARCH_KEY_UID
@@ -201,6 +247,12 @@ test('service wiring', () => {
       NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL: 'billing:18084',
     },
     'search-worker': { NOTOPIA_SEARCH_WORKER_MEILI_HOST: 'http://meilisearch:7700' },
+    ai: {
+      NOTOPIA_AI_SERVICES_NOTE_GRPC_URL: 'note:18081',
+      NOTOPIA_AI_SERVICES_AUTHORIZATION_GRPC_URL: 'authorization:18089',
+      NOTOPIA_AI_SERVICES_BILLING_GRPC_URL: 'billing:18084',
+      NOTOPIA_AI_MEILI_HOST: 'http://meilisearch:7700',
+    },
   };
   for (const [name, entries] of Object.entries(addresses))
     for (const [key, address] of Object.entries(entries))
@@ -222,6 +274,15 @@ test('service wiring', () => {
       assert.ok(!path.slice(0, -1).includes('*'));
       assert.ok(!path.startsWith('/billing/admin'));
     }
+});
+
+test('AI secrets exist before its release is resumed', () => {
+  const release = build(join(root, 'apps')).find(
+    (resource) => resource.kind === 'HelmRelease' && resource.metadata.name === 'ai'
+  );
+  const secrets = build(join(root, 'infra')).filter((resource) => resource.kind === 'Secret');
+  for (const key of ['NOTOPIA_AI_REDIS_URL', 'NOTOPIA_AI_LLM_API_KEY', 'NOTOPIA_AI_MEILI_API_KEY'])
+    checkReleaseSecret(release, secrets, 'ai', key);
 });
 
 test('rendered edge excludes admin from general JWT', () => {

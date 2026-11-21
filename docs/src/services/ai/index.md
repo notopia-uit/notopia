@@ -110,6 +110,10 @@ continuations of that assistant task do not fetch billing again or debit another
 
 ## Local setup
 
+For the suspended Kubernetes integration and its Redis, credential, streaming,
+and edge-security prerequisites, see the
+[homelab operator runbook](https://github.com/notopia-uit/notopia/blob/main/deploy/k8s/clusters/homelab/README.md).
+
 Run commands from the repository root. Follow the project's normal local infrastructure,
 Authentik and database setup first. Compose runs infrastructure; Nx runs application services.
 

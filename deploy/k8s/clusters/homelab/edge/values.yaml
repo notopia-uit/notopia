@@ -27,6 +27,8 @@ istio:
     - /authorization/health/*
     - /billing/health/*
     - /document/health/*
+    - /ai/health/*
+    - /ai/health
   - paths:
     - /billing/webhooks/stripe
   - paths:

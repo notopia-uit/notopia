@@ -9,6 +9,8 @@ resources:
 - billing/helmrelease.yaml
 - document/helmrelease.yaml
 - search-worker/helmrelease.yaml
+- ai/helmrelease.yaml
+- ai/grpc-authorizationpolicies.yaml
 configurations:
 - kustomizeconfig.yaml
 configMapGenerator:
@@ -30,3 +32,6 @@ configMapGenerator:
 - name: search-worker-helm-values
   files:
   - values.yaml=search-worker/values.yaml
+- name: ai-helm-values
+  files:
+  - values.yaml=ai/values.yaml

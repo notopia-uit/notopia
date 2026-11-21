@@ -11,5 +11,6 @@ resources:
   - valkey/note
   - valkey/billing
   - valkey/document
+  - valkey/ai
   - meilisearch
   - secrets

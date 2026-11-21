@@ -1,0 +1,53 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: note-ai-grpc
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: note
+      app.kubernetes.io/instance: note
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: [cluster.local/ns/notopia/sa/ai]
+    to:
+    - operation:
+        ports: ['18081']
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: authorization-ai-grpc
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: authorization
+      app.kubernetes.io/instance: authorization
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: [cluster.local/ns/notopia/sa/ai]
+    to:
+    - operation:
+        ports: ['18089']
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: billing-ai-grpc
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: billing
+      app.kubernetes.io/instance: billing
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: [cluster.local/ns/notopia/sa/ai]
+    to:
+    - operation:
+        ports: ['18084']
