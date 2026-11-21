@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../../../charts/notopia-edge/values.schema.json
 security:
   externalBoundaryAcknowledged: false
 gateway:
