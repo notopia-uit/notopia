@@ -20,7 +20,7 @@ catalogs:
     "@opentelemetry/sdk-trace-base": "2.12.1"
 catalog:
   "@ai-sdk/openai-compatible": "^2.0.81"
-  "@ai-sdk/react": "^3.0.303"
+  "@ai-sdk/react": "^4.0.0"
   "@aws-sdk/client-s3": "^3.1008.0"
   "@aws-sdk/s3-request-presigner": "^3.1008.0"
   "@blocknote/core": "0.55.0"
