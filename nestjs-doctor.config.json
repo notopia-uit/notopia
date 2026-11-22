@@ -1,4 +1,5 @@
 {
+  "telemetry": false,
   "ignore": {
     "rules": [
       "security/no-synchronize-in-production",
