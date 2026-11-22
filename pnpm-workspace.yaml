@@ -98,7 +98,7 @@ catalog:
   better-auth: "~1.7.6"
   class-variance-authority: "^0.7.1"
   clsx: "^2.1.1"
-  cron: "4.4.1"
+  cron: "4.4.0" # Match @nestjs/schedule's pinned cron version.
   d3: "^7.9.0"
   eslint-plugin-better-tailwindcss: "^4.7.0"
   express: "^5.2.1"
