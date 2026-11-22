@@ -19,10 +19,11 @@
       "matchPackageNames": [
         "@hey-api/openapi-ts",
         "github.com/oapi-codegen/runtime",
-        "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen"
+        "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen",
+        "npm:ts-proto",
+        "protoc-gen-*"
       ],
-      "automerge": true,
-      "matchUpdateTypes": ["patch", "minor"]
+      "automerge": false
     },
     {
       "groupName": "blocknote",
