@@ -3,10 +3,10 @@ fullnameOverride: valkey-document
 deploymentStrategy: Recreate
 replica:
   enabled: false
-dataStorage:
+persistence:
   enabled: true
-  requestedSize: 1Gi
-valkeyConfig: |
+  size: 1Gi
+extraConfig: |
   maxmemory-policy noeviction
   appendonly yes
 auth:

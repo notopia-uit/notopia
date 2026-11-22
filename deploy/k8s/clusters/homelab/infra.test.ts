@@ -48,10 +48,12 @@ test('infrastructure releases and values', () => {
     const release: any = releases.get(`valkey-${service}`);
     checkReleaseSecret(release, secrets, `valkey-${service}`, 'password');
     const values = parse((configs.get(release.spec.valuesFrom[0].name) as any).data['values.yaml']);
-    assert.ok(values.dataStorage.enabled);
+    assert.equal(release.spec.chart.spec.version, '1.0.0');
+    assert.ok(values.persistence.enabled);
+    assert.equal(values.persistence.size, '1Gi');
     assert.equal(values.replica.enabled, false);
-    assert.match(values.valkeyConfig, /maxmemory-policy noeviction/);
-    assert.match(values.valkeyConfig, /appendonly yes/);
+    assert.match(values.extraConfig, /maxmemory-policy noeviction/);
+    assert.match(values.extraConfig, /appendonly yes/);
     assert.equal(values.auth.usersExistingSecret, `valkey-${service}`);
   }
   const release: any = releases.get('meilisearch');
