@@ -2,11 +2,15 @@
 
 Date: 2026-11-01
 
+Reviewed against the current codebase: 2026-11-22. This remains a proposed design, not an
+implemented feature. The attachment limitation below was explicitly accepted.
+
 ## 1. Goal
 
 A workspace owner on **plus** or **pro** can publish the workspace. Anyone, without signing in,
 can then browse its folder tree and read every non-trashed note. Content shown is the note's
-**latest revision**, not the live Yjs document. Unpublishing, or losing the plan, hides it again.
+**latest revision**, not the live Yjs document. Unpublishing, or losing the plan, hides workspace
+and note content served through the public APIs again. Attachment URLs are an exception (D9).
 
 ### Non-goals
 
@@ -15,20 +19,21 @@ can then browse its folder tree and read every non-trashed note. Content shown i
 - Live (websocket) public viewing.
 - Public search, public graph, SEO metadata, HTTP caching of public responses.
 - Caching billing / note state in consumers (tracked in `README.md` TO-DO).
+- Protecting or revoking access to attachment URLs; the existing bucket remains public (D9).
 
 ## 2. Decisions
 
-| #   | Decision                                                                                                                                                                                                                                       |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | New billing feature `publish_workspace`: free ✗, plus ✓, pro ✓.                                                                                                                                                                                |
-| D2  | **note** owns the published flag, the publish/unpublish commands and the gate. It is the only service that answers "is this note publicly readable".                                                                                           |
-| D3  | Publish requires `workspace:edit` (owner only, `policy.csv`), then `publish_workspace` → 402. Permission is checked first, so 403 wins over 402. Unpublish requires only `workspace:edit`.                                                     |
-| D4  | Every public read re-checks: workspace published, not deleted, and `publish_workspace` still in the plan (uncached gRPC). This is the guarantee; it covers past-due grace expiry, which emits no event.                                        |
-| D5  | On `billing.subscription.changed`, note calls `GetEntitlements` (ignores the payload's `plan`, which is the subscription's plan, not the effective one) and unpublishes when the feature is gone. Keeps the stored flag tidy; not relied on.   |
-| D6  | **document** serves content: `GET /document/published/{documentId}` returns the latest revision. It asks note over gRPC (`GetPublishedNote`) and never checks billing itself.                                                                  |
-| D7  | Anything not public returns **404** (never 403/402), so outsiders cannot probe for unpublished workspaces or notes. A published note with no revision yet also returns 404; the web shows "not published yet" because the note is in the tree. |
-| D8  | Public routes live under a dedicated `published` prefix per service (`/note/published/...`, `/document/published/...`), so Traefik exposes them with one `PathPrefix` rule each, without the `jwt` middleware.                                 |
-| D9  | Attachments need nothing: the RustFS `document` bucket is already anonymous-read.                                                                                                                                                              |
+| #   | Decision                                                                                                                                                                                                                                                                                                                                                                           |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | New billing feature `publish_workspace`: free ✗, plus ✓, pro ✓.                                                                                                                                                                                                                                                                                                                    |
+| D2  | **note** owns the published flag, the publish/unpublish commands and the gate. It is the only service that answers "is this note publicly readable".                                                                                                                                                                                                                               |
+| D3  | Publish requires `workspace:edit` (owner only, `policy.csv`), then `publish_workspace` → 402. Permission is checked first, so 403 wins over 402. Unpublish requires only `workspace:edit`.                                                                                                                                                                                         |
+| D4  | Every public read re-checks: workspace published, not deleted, and `publish_workspace` still in the plan (uncached gRPC). This is the guarantee; it covers past-due grace expiry, which emits no event.                                                                                                                                                                            |
+| D5  | On `billing.subscription.changed`, note calls `GetEntitlements` (ignores the payload's `plan`, which is the subscription's plan, not the effective one) and unpublishes when the feature is gone. Keeps the stored flag tidy; not relied on.                                                                                                                                       |
+| D6  | **document** serves content: `GET /document/published/{documentId}` returns the latest revision. It asks note over gRPC (`GetPublishedNote`) and never checks billing itself.                                                                                                                                                                                                      |
+| D7  | Anything not public returns **404** (never 403/402), so outsiders cannot probe for unpublished workspaces or notes. A published note with no revision yet also returns 404; the web shows "not published yet" because the note is in the tree.                                                                                                                                     |
+| D8  | Public routes live under a dedicated `published` prefix per service (`/note/published/...`, `/document/published/...`), so Traefik exposes them with one `PathPrefix` rule each, without the `jwt` middleware.                                                                                                                                                                     |
+| D9  | Keep the existing public attachment bucket. In local compose the RustFS `document` bucket permits anonymous access regardless of workspace publication. Anyone with an object URL can continue to access it after unpublishing, plan loss, or trashing; publication checks do not protect attachments. Private attachment delivery is out of scope and tracked in the root README. |
 
 **Spec deviation:** `2026-10-11-billing-04-enforcement-design.md` lists `cmd_publishworkspace.go`
 as "Not gated". This spec reverses that; the row is updated (§8).
@@ -252,6 +257,10 @@ get:
 `operationId: getPublishedWorkspaceTree`, parameters `workspaceSlugPath` plus the existing
 `rootFolderId` and `depth` query params of `getWorkspaceTree` (no `includeTrashed`; trashed
 items are never public; sort fixed to name asc), `200` → `WorkspaceTreeFolder.yaml` (reused).
+The existing query parameters are defined inline in `workspaces_{workspaceId}_tree.yaml`, not
+as reusable parameter files. A supplied root must belong to the requested workspace and be
+non-trashed, with no trashed ancestor; otherwise return 404. Apply the same rule to the default
+root and all descendants.
 
 `api/note/components/schemas/PublishedWorkspace.yaml`
 
@@ -304,8 +313,6 @@ get:
         application/json:
           schema:
             $ref: ../components/schemas/PublishedDocument.yaml
-          example:
-            $ref: ../components/examples/DocumentContent.json
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     404:
@@ -338,6 +345,9 @@ properties:
     $ref: ./DocumentContent.yaml
 required: [documentId, revisionId, committedAt, content]
 ```
+
+Do not reuse `components/examples/DocumentContent.json` as the response example: it has a
+different envelope. Add a matching `PublishedDocument` example if one is needed.
 
 ### 4.5 billing
 
@@ -385,8 +395,9 @@ message GetPublishedNoteResponse {
 
 ### note (`internal/note`)
 
-- Migration `00003_workspace_published.sql`: `ALTER TABLE workspaces ADD COLUMN published_at
-  TIMESTAMPTZ;` sqlc queries for workspace read/write gain the column.
+- Add the next available numbered migration in `infra/persistence/pgmigration/` (currently
+  `00003`): `ALTER TABLE workspaces ADD COLUMN published_at TIMESTAMPTZ;`. Update sqlc
+  queries, persistence mappings, app read models, and HTTP mapping; regenerate via Nx targets.
 - Domain `Workspace`: `publishedAt *time.Time`, `UnmarshalWorkspace` gains it,
   `PublishedAt()`, `IsPublished()`, `Publish(now, userID)` / `Unpublish(userID)`, no-op (no event)
   when already in that state. Events `WorkspacePublishedEvent{PublishedAt}`,
@@ -395,8 +406,9 @@ message GetPublishedNoteResponse {
 - `cmd_publishworkspace.go`: fields become `ID uuid.UUID, UserID string` (today `Slug`, which
   does not match the API path). Order: permission (`WorkspacePermissionEdit`) → entitlement
   (`errs.NewFeatureNotInPlan` with `RequiredPlanForFeature`, as `q_getworkspacegraph.go`) →
-  `GetByID(forUpdate)` → `Publish` → `Save`.
-- `cmd_unpublishworkspace.go`: `ID`, `UserID`; permission → load → `Unpublish` → `Save`.
+  `uow.Execute` with `GetByID(forUpdate)` → `Publish` → `Save`.
+- `cmd_unpublishworkspace.go`: `ID`, `UserID`; permission → `uow.Execute` with locked load →
+  `Unpublish` → `Save`. All writes use transaction-bound repos and the transactional outbox.
 - `cmd_revokepublication.go` (new): input `WorkspaceID`. `GetEntitlements`; if the feature is
   missing and the workspace is published, `Unpublish(serviceAccountUserID)`. No permission check
   (system actor, like the trash purge).
@@ -411,8 +423,15 @@ message GetPublishedNoteResponse {
     (→ 503), they are not turned into 404.
   - `q_getpublishedworkspace.go` (by slug).
   - `q_getpublishedworkspacetree.go`: the gate, then the existing tree read model with
-    `includeTrashed=false`, name asc.
-  - `q_getpublishednote.go`: note's workspace (read model), note not trashed, then the gate.
+    `includeTrashed=false`, name asc. Harden root resolution: the current
+    `pgreadmodel/workspacetree.go` fetches a supplied root by ID without checking workspace
+    ownership or ancestor trash state (the root itself is filtered by `ReadGetFolderByID`).
+    Enforce workspace membership and non-trashed ancestry before
+    any tree data is returned; a foreign or trashed root must be indistinguishable from missing.
+  - `q_getpublishednote.go`: resolve note and workspace through a read model, require the note
+    and its folder ancestry to be non-trashed, then apply the gate. The existing
+    `ReadGetWorkspaceByNoteID` excludes the immediate folder and note when trashed; ensure
+    ancestor trash semantics also hold.
 - HTTP: implement `PublishWorkspace` / `UnpublishWorkspace` in
   `controller/http/workspace.go`; new `controller/http/published.go` for the public operations
   (they never call `commonhttp.UserFromContext`).
@@ -427,10 +446,13 @@ message GetPublishedNoteResponse {
   `NOT_FOUND`; `UNAVAILABLE` → 503 exception, as the billing client does).
 - `published/published.api.ts` (new module), extends the generated `PublishedApi`:
   `getPublishedDocument(documentId)` → `noteService.getPublishedNote` → latest revision with
-  content (`DocumentService`, extend `getLatestRevisionId` into a content-returning read) → 404
-  when either is missing.
-- The global `HttpUserGuard` rejects requests without gateway headers. Add a `@Public()`
-  metadata decorator that the guard honours, applied to `PublishedApi` only.
+  content → 404 when either is missing. Revisions already store BlockNote blocks in
+  `RevisionEntity.content`; add a latest-revision-with-content read, rather than reconstructing
+  content from live Yjs. Handle deletion between the gate and revision read as 404.
+- `HttpUserGuard` is **not global**: `authenticatedApiModule` wraps generated controllers with
+  `@UseGuards(HttpUserGuard)` in `src/authenticated-api.module.ts`. Register the generated public
+  controller separately without that wrapper, while keeping document and revision controllers
+  guarded. Verify generated module registration does not accidentally expose other endpoints.
 
 ### gateway (`deploy/compose/infrastructure/traefik/dynamic`)
 
@@ -448,6 +470,10 @@ message GetPublishedNoteResponse {
   - `app/(published)/p/[workspaceSlug]/[noteId]/page.tsx`: read-only BlockNote render of
     `content`; "not published yet" state on 404 when the note is in the tree.
   - Unknown/unpublished workspace → `not-found.tsx`.
+  - Fetch public APIs without an authenticated session, disable persistent response caching so
+    subsequent requests recheck publication and entitlement, and distinguish 503 from 404.
+    Verify the requested note belongs to the displayed workspace's public tree before showing it;
+    otherwise an unrelated public note ID could be displayed under the wrong workspace.
 - `settings/general`: owner-only "Publish workspace" switch + copyable public link
   (`/p/{slug}`); 402 opens the existing upgrade prompt; state from `Workspace.publishedAt`,
   refreshed by `WorkspacePublicationChangedEvent`.
@@ -472,7 +498,13 @@ message GetPublishedNoteResponse {
 - note app (testify + mockery mocks of `AuthorizationSvc`, `BillingSvc`):
   publish 403 before 402, 402 on free, success; `RevokePublication` unpublishes only when the
   feature is missing; public gate returns 404 for each not-public case and 503 on billing error.
+- Public tree: foreign workspace roots, trashed roots and trashed ancestors return 404; never
+  leak their descendants. Public note lookup rejects trashed ancestry.
 - document: `getPublishedDocument` 404 on `null` from note, 404 on no revision, 200 shape.
+- Gateway and document integration: public endpoints work without gateway identity headers;
+  existing authenticated endpoints remain guarded and cannot be reached through public routers.
+- Web: a billing outage is not rendered as unpublished; a note ID from another workspace does
+  not render under the current workspace; public responses are not persistently cached.
 - Manual: publish on plus, open `/p/{slug}` signed out, cancel subscription in Stripe sandbox,
   confirm the workspace is unpublished and the page 404s.
 
@@ -483,4 +515,5 @@ message GetPublishedNoteResponse {
   `cmd_publishworkspace.go` → "`publish_workspace` feature (see 2026-11-01-publish-workspace-design)".
 - `internal/note/AGENTS.md` entitlement gates section.
 - `docs/src/services/note/flows.md`: publish + public read sequence.
-- `README.md` TO-DO: the "planned" public-read entries are added already.
+- `README.md` TO-DO: the "planned" public-read entries and public attachment limitation are
+  recorded already; update the planned entries when implementation lands.

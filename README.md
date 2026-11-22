@@ -191,6 +191,9 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] Event is tracked by either otel or correlation id.
       But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
 - [ ] Revision endpoints aren't protected with authorization
+- [ ] Public attachments: the local RustFS `document` bucket allows anonymous access to known
+      object URLs, including for unpublished workspaces. Unpublishing, plan loss, or trashing
+      does not revoke those URLs; consider protected attachment delivery.
 - [ ] Caching the subscription in other services so that it will not harm the billing service
   > These bullets below written by AI, I haven't verified yet
   > Skipped for simplicity. These call another service over gRPC on every request/run;
