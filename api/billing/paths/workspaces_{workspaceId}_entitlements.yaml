@@ -22,6 +22,8 @@ get:
           examples:
             freeWorkspace:
               $ref: ../examples/entitlementsFreeWorkspace.yaml
+            plusWorkspace:
+              $ref: ../examples/entitlementsPlusWorkspace.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

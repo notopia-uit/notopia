@@ -1,0 +1,18 @@
+summary: Workspace with an active Plus monthly subscription
+value:
+  payer:
+    email: owner@example.com
+    id: "7"
+    missingSince: null
+    name: Example Owner
+  subscription:
+    accessUntil: "2026-12-22T15:50:14+07:00"
+    cancelAtPeriodEnd: false
+    canceledAt: null
+    currentPeriodEnd: "2026-12-22T15:50:14+07:00"
+    currentPeriodStart: "2026-11-22T15:50:14+07:00"
+    id: 01a20272-f883-7af4-86a0-9eec8614c491
+    interval: month
+    plan: plus
+    refunds: []
+    status: active

@@ -19,6 +19,9 @@ get:
         application/json:
           schema:
             $ref: ../components/schemas/WorkspaceBilling.yaml
+          examples:
+            plusWorkspace:
+              $ref: ../examples/workspaceBillingPlus.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
