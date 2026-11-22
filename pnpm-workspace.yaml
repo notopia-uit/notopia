@@ -175,3 +175,8 @@ allowBuilds:
   unrs-resolver: true
   vue-demi: true
 minimumReleaseAge: 0
+permissions:
+  "@scalar/cli":
+    skills: false
+  "pixi.js":
+    skills: false
