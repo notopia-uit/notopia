@@ -48,7 +48,7 @@ func New(
 		),
 	)
 
-	httpPing := fmt.Sprintf("http://%s/note/ping", serverCfg.Health.Address())
+	httpPing := fmt.Sprintf("http://%s/note/ping", serverCfg.HTTP.Address())
 	grpcAddr := serverCfg.GRPC.Address()
 
 	readyChecker := health.NewChecker(

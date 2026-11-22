@@ -2,6 +2,8 @@ package commonhttp
 
 import (
 	"log/slog"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
@@ -16,8 +18,10 @@ type GinSlogHandlerFunc gin.HandlerFunc
 func NewGinSlogHandler(
 	logCfg *commonconfig.Log,
 	logger *slog.Logger,
+	serviceName metadata.ServiceName,
 	_ otel.Global,
 ) GinSlogHandlerFunc {
+	pingPath := "/" + strings.TrimPrefix(serviceName.String(), "notopia-") + "/ping"
 	cfg := sloggin.Config{
 		WithUserAgent:      true,
 		WithRequestID:      true,
@@ -27,6 +31,16 @@ func NewGinSlogHandler(
 		WithResponseHeader: true,
 		WithSpanID:         true,
 		WithTraceID:        true,
+		Filters: []sloggin.Filter{
+			func(c *gin.Context) bool {
+				switch {
+				case c.Request.URL.Path == pingPath && c.Writer.Status() < http.StatusBadRequest:
+					return false
+				default:
+					return true
+				}
+			},
+		},
 	}
 	return GinSlogHandlerFunc(sloggin.NewWithConfig(logger, cfg))
 }
