@@ -48,7 +48,7 @@
     "jiti": "2.7.0",
     "jsdom": "~28.1.0",
     "junit-to-ctrf": "catalog:",
-    "nestjs-doctor": "0.4.33",
+    "nestjs-doctor": "0.9.10",
     "nestjs-doctor-lsp": "0.1.2",
     "node-test-junit-reporter": "catalog:",
     "nx": "24.0.6",
