@@ -271,7 +271,8 @@ jobs:
           fail-rate-report: true
           slowest-report: true
           upload-artifact: true
-          pull-request-report: true
+          # Enabling this prevents the reporter from writing the job summary.
+          pull-request-report: false
 
       - name: Check for changes after Build/Gen
         run: |
