@@ -76,7 +76,7 @@ try {
     '\0'
   )) {
     const match = /^(deploy\/k8s\/charts\/[^/]+)\//.exec(file);
-    if (match) changed.add(match[1]);
+    if (match && file !== `${match[1]}/project.json`) changed.add(match[1]);
   }
 
   // Include both graphs so removing a dependency cannot bypass a required bump.
