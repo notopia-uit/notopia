@@ -3,7 +3,7 @@
 services:
   billing_postgresql:
     container_name: notopia-billing_postgresql
-    image: postgres:18.7-alpine3.23
+    image: postgres:19.0-alpine3.23
     environment:
       POSTGRES_DB: ${BILLING_POSTGRESQL_DB:-billing}
       POSTGRES_USER: ${BILLING_POSTGRESQL_USER:-notopiauit}

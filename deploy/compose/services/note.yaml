@@ -3,7 +3,7 @@
 services:
   note_postgresql:
     container_name: notopia-note_postgresql
-    image: postgres:18.7-alpine3.23
+    image: postgres:19.0-alpine3.23
     environment:
       POSTGRES_DB: ${NOTE_POSTGRESQL_DB:-note}
       POSTGRES_USER: ${NOTE_POSTGRESQL_USER:-notopiauit}
