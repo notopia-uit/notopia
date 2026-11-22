@@ -1,0 +1,1 @@
+var e=e=>Object.entries(e),t=new Set([`__proto__`,`prototype`,`constructor`]),n=(e,n)=>{if(t.has(e)){let t=n?`Prototype pollution key detected: "${e}" in ${n}`:`Prototype pollution key detected: "${e}"`;throw Error(t)}},r=e=>t.has(e);export{n,e as r,r as t};
