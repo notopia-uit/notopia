@@ -17,6 +17,8 @@ export function App() {
               title: 'Notopia API',
             },
           ],
+          showDeveloperTools: 'always',
+          isEditable: true,
           showOperationId: true,
           persistAuth: true,
           telemetry: false,
