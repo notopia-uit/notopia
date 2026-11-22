@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - "**"
+      - main
     paths: &pushPaths
       - "**"
       - "!.agents/**/*"
@@ -382,8 +382,22 @@ jobs:
     if: >-
       ${{
         needs.main.result == 'success' &&
-        (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main') &&
-        (needs.main.outputs.page-affected == 'true' || github.event.inputs.nxAllCmd == 'run-many')
+        (
+          github.event_name == 'pull_request' ||
+          github.event_name == 'workflow_dispatch' ||
+          github.ref == 'refs/heads/main'
+        ) &&
+        (
+          github.event_name != 'pull_request' ||
+          (
+            !startsWith(github.head_ref, 'renovate/') &&
+            github.event.pull_request.user.login != 'renovate[bot]'
+          )
+        ) &&
+        (
+        needs.main.outputs.page-affected == 'true' ||
+        github.event.inputs.nxAllCmd == 'run-many'
+        )
       }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
