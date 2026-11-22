@@ -37,15 +37,10 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "mkdir -p tmp/chart-lock",
-          "flock tmp/chart-lock/search-worker.lock helm dependency build --skip-refresh deploy/k8s/charts/search-worker",
-          "flock -s tmp/chart-lock/search-worker.lock helm unittest deploy/k8s/charts/search-worker",
-          "flock -s tmp/chart-lock/search-worker.lock node --test deploy/k8s/charts/search-worker/tests/*.test.ts"
-        ],
-        "parallel": false
+        "command": "bash scripts/test-chart.sh search-worker"
       },
-      "inputs": ["chart"],
+      "inputs": ["chart", "{workspaceRoot}/scripts/test-chart.sh"],
+      "outputs": ["{workspaceRoot}/coverage/charts/search-worker"],
       "dependsOn": []
     }
   }

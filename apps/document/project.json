@@ -74,14 +74,10 @@
       }
     },
     "test": {
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"]
+      "outputs": ["{workspaceRoot}/coverage/document"]
     },
     "docker:build": {
-      "dependsOn": [
-        "prune",
-        "build",
-        "^build"
-      ]
+      "dependsOn": ["prune", "build", "^build"]
     },
     "nx-release-publish": {
       "parallelism": false

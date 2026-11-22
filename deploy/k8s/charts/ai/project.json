@@ -37,14 +37,10 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "mkdir -p tmp/chart-lock",
-          "flock tmp/chart-lock/ai.lock helm dependency build --skip-refresh deploy/k8s/charts/ai",
-          "flock -s tmp/chart-lock/ai.lock helm unittest deploy/k8s/charts/ai"
-        ],
-        "parallel": false
+        "command": "bash scripts/test-chart.sh ai"
       },
-      "inputs": ["chart"],
+      "inputs": ["chart", "{workspaceRoot}/scripts/test-chart.sh"],
+      "outputs": ["{workspaceRoot}/coverage/charts/ai"],
       "dependsOn": []
     }
   }

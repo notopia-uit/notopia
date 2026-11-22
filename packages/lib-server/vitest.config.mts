@@ -13,7 +13,7 @@ export default defineConfig({
       module: {
         type: 'es6',
       },
-    }) as any, // because unplugin broken on new vitest. Until it fix
+    }),
   ],
   test: {
     name: 'lib-server',
@@ -24,7 +24,9 @@ export default defineConfig({
     reporters: [
       'default',
       'junit',
-      ...(process.env.GITHUB_ACTIONS === 'true' ? ['github-actions'] : []),
+      ...(process.env.GITHUB_ACTIONS === 'true'
+        ? ([['github-actions', { jobSummary: { enabled: false } }]] as any)
+        : []),
       new CtrfReporter({
         outputFile: 'tests-ctrf.json',
         outputDir: '../../coverage/lib-server',

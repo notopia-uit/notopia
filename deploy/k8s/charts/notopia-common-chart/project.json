@@ -38,15 +38,10 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "mkdir -p tmp/chart-lock",
-          "flock tmp/chart-lock/notopia-common-chart.lock helm dependency build --skip-refresh deploy/k8s/charts/notopia-common-chart/tests/fixture",
-          "flock -s tmp/chart-lock/notopia-common-chart.lock helm unittest deploy/k8s/charts/notopia-common-chart/tests/fixture",
-          "flock -s tmp/chart-lock/notopia-common-chart.lock node --test deploy/k8s/charts/notopia-common-chart/tests/*.test.ts"
-        ],
-        "parallel": false
+        "command": "bash scripts/test-chart.sh notopia-common-chart"
       },
-      "inputs": ["chart"],
+      "inputs": ["chart", "{workspaceRoot}/scripts/test-chart.sh"],
+      "outputs": ["{workspaceRoot}/coverage/charts/notopia-common-chart"],
       "dependsOn": []
     }
   }

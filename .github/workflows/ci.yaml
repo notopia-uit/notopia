@@ -252,11 +252,18 @@ jobs:
       - name: Check chart versions
         run: node scripts/check-chart-versions.ts "$NX_BASE" "$NX_HEAD"
 
+      - name: Convert Kubernetes Test Reports
+        if: always() && hashFiles('coverage/charts/**/*.xml') != ''
+        run: >-
+          pnpm exec junit-to-ctrf 'coverage/charts/**/*.xml'
+          --output coverage/charts/kubernetes-ctrf.json
+          --tool kubernetes
+
       - name: Publish Test Report
         uses: ctrf-io/github-test-reporter@v1
         if: always()
         with:
-          report-path: "./coverage/**/ctrf.json"
+          report-path: "./coverage/**/*ctrf.json"
           github-report: true
           summary-delta-report: true
           insights-report: true

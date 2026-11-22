@@ -154,6 +154,8 @@ catalog:
   yjs: "^13.6.30"
   zod: "^4.4.3"
   yaml: 2.9.1
+  junit-to-ctrf: 0.2.0
+  node-test-junit-reporter: 2.0.1
 overrides:
   "@nestjs/common": "catalog:"
   "@nestjs/core": "catalog:"

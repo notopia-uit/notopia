@@ -37,15 +37,10 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "mkdir -p tmp/chart-lock",
-          "flock tmp/chart-lock/notopia-edge.lock helm dependency build --skip-refresh deploy/k8s/charts/notopia-edge",
-          "flock -s tmp/chart-lock/notopia-edge.lock helm unittest deploy/k8s/charts/notopia-edge",
-          "flock -s tmp/chart-lock/notopia-edge.lock node --test deploy/k8s/charts/notopia-edge/tests/*.test.ts"
-        ],
-        "parallel": false
+        "command": "bash scripts/test-chart.sh notopia-edge"
       },
-      "inputs": ["chart"],
+      "inputs": ["chart", "{workspaceRoot}/scripts/test-chart.sh"],
+      "outputs": ["{workspaceRoot}/coverage/charts/notopia-edge"],
       "dependsOn": []
     }
   }

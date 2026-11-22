@@ -69,6 +69,7 @@
     ],
     "chart": [
       "{projectRoot}/**/*",
+      { "externalDependencies": ["node-test-junit-reporter"] },
       "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/**/*",
       "{workspaceRoot}/deploy/k8s/charts/notopia-common-chart/.helmignore",
       {
