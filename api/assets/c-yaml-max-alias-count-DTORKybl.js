@@ -1,1 +1,0 @@
-var e=1e5;export{e as t};
