@@ -197,7 +197,7 @@ type CreatePriceRequestPlan string
 // Entitlements defines model for Entitlements.
 type Entitlements struct {
 	// AccessUntil Examples: 2026-11-11T00:00:00Z
-	AccessUntil nullable.Nullable[time.Time] `json:"accessUntil,omitempty"`
+	AccessUntil nullable.Nullable[time.Time] `json:"accessUntil"`
 
 	// Features Feature flags available to a plan.
 	//
@@ -285,7 +285,7 @@ type Payer struct {
 	Id string `json:"id"`
 
 	// MissingSince Examples: 2026-10-11T00:00:00Z
-	MissingSince nullable.Nullable[time.Time] `json:"missingSince,omitempty"`
+	MissingSince nullable.Nullable[time.Time] `json:"missingSince"`
 
 	// Name Examples: Kevin Nitro
 	Name string `json:"name"`
@@ -320,7 +320,7 @@ type Price struct {
 	Amount int64 `json:"amount"`
 
 	// ArchivedAt Examples: 2026-10-12T00:00:00Z
-	ArchivedAt nullable.Nullable[time.Time] `json:"archivedAt,omitempty"`
+	ArchivedAt nullable.Nullable[time.Time] `json:"archivedAt"`
 
 	// CreatedAt Examples: 2026-10-11T00:00:00Z
 	CreatedAt time.Time `json:"createdAt"`
@@ -421,19 +421,19 @@ type RefundQuotePayment struct {
 // Subscription defines model for Subscription.
 type Subscription struct {
 	// AccessUntil Examples: 2026-11-11T00:00:00Z
-	AccessUntil nullable.Nullable[time.Time] `json:"accessUntil,omitempty"`
+	AccessUntil nullable.Nullable[time.Time] `json:"accessUntil"`
 
 	// CancelAtPeriodEnd Examples: false
 	CancelAtPeriodEnd bool `json:"cancelAtPeriodEnd"`
 
 	// CanceledAt Examples: 2026-10-20T00:00:00Z
-	CanceledAt nullable.Nullable[time.Time] `json:"canceledAt,omitempty"`
+	CanceledAt nullable.Nullable[time.Time] `json:"canceledAt"`
 
 	// CurrentPeriodEnd Examples: 2026-11-11T00:00:00Z
-	CurrentPeriodEnd nullable.Nullable[time.Time] `json:"currentPeriodEnd,omitempty"`
+	CurrentPeriodEnd nullable.Nullable[time.Time] `json:"currentPeriodEnd"`
 
 	// CurrentPeriodStart Examples: 2026-10-11T00:00:00Z
-	CurrentPeriodStart nullable.Nullable[time.Time] `json:"currentPeriodStart,omitempty"`
+	CurrentPeriodStart nullable.Nullable[time.Time] `json:"currentPeriodStart"`
 
 	// Id Examples: 0192f0a0-0000-7000-8000-000000000003
 	Id openapi_types.UUID `json:"id"`
@@ -480,8 +480,8 @@ type UpdatePolicyRequest struct {
 
 // WorkspaceBilling defines model for WorkspaceBilling.
 type WorkspaceBilling struct {
-	Payer        nullable.Nullable[Payer]        `json:"payer,omitempty"`
-	Subscription nullable.Nullable[Subscription] `json:"subscription,omitempty"`
+	Payer        nullable.Nullable[Payer]        `json:"payer"`
+	Subscription nullable.Nullable[Subscription] `json:"subscription"`
 }
 
 // PriceIdPath defines model for priceIdPath.

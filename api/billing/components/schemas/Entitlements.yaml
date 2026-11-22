@@ -17,4 +17,4 @@ properties:
     $ref: ./Features.yaml
   limits:
     $ref: ./Limits.yaml
-required: [workspaceId, plan, status, features, limits]
+required: [workspaceId, plan, status, accessUntil, features, limits]

@@ -459,7 +459,7 @@ export const zBillingPrice = z.object({
     lookupKey: z.string(),
     active: z.boolean(),
     createdAt: z.iso.datetime(),
-    archivedAt: z.iso.datetime().nullish()
+    archivedAt: z.iso.datetime().nullable()
 });
 
 export const zBillingPlan = z.object({
@@ -492,7 +492,7 @@ export const zBillingEntitlements = z.object({
     workspaceId: z.uuid(),
     plan: zBillingPlanTier,
     status: zBillingSubscriptionStatus,
-    accessUntil: z.iso.datetime().nullish(),
+    accessUntil: z.iso.datetime().nullable(),
     features: zBillingFeatures,
     limits: zBillingLimits
 });
@@ -523,11 +523,11 @@ export const zBillingSubscription = z.object({
     plan: zBillingPlanTier,
     interval: zBillingBillingInterval,
     status: zBillingSubscriptionStatus,
-    currentPeriodStart: z.iso.datetime().nullish(),
-    currentPeriodEnd: z.iso.datetime().nullish(),
+    currentPeriodStart: z.iso.datetime().nullable(),
+    currentPeriodEnd: z.iso.datetime().nullable(),
     cancelAtPeriodEnd: z.boolean(),
-    canceledAt: z.iso.datetime().nullish(),
-    accessUntil: z.iso.datetime().nullish(),
+    canceledAt: z.iso.datetime().nullable(),
+    accessUntil: z.iso.datetime().nullable(),
     refunds: z.array(zBillingRefund)
 });
 
@@ -535,12 +535,12 @@ export const zBillingPayer = z.object({
     id: z.string(),
     email: z.string(),
     name: z.string(),
-    missingSince: z.iso.datetime().nullish()
+    missingSince: z.iso.datetime().nullable()
 });
 
 export const zBillingWorkspaceBilling = z.object({
-    subscription: zBillingSubscription.nullish(),
-    payer: zBillingPayer.nullish()
+    subscription: zBillingSubscription.nullable(),
+    payer: zBillingPayer.nullable()
 });
 
 export const zBillingCheckoutSessionRequest = z.object({

@@ -43,6 +43,9 @@ type ServerInterface interface {
 	// StripeWebhook Stripe webhook endpoint
 	// (POST /billing/webhooks/stripe)
 	StripeWebhook(c *gin.Context, params StripeWebhookParams)
+	// GetWorkspaceBilling Get workspace billing
+	// (GET /billing/workspaces/{workspaceId})
+	GetWorkspaceBilling(c *gin.Context, workspaceId WorkspaceIdPath)
 	// CreateCheckoutSession Create checkout session
 	// (POST /billing/workspaces/{workspaceId}/checkout-session)
 	CreateCheckoutSession(c *gin.Context, workspaceId WorkspaceIdPath)
@@ -55,9 +58,6 @@ type ServerInterface interface {
 	// CreatePortalSession Create portal session
 	// (POST /billing/workspaces/{workspaceId}/portal-session)
 	CreatePortalSession(c *gin.Context, workspaceId WorkspaceIdPath)
-	// GetWorkspaceBilling Get workspace billing
-	// (GET /billing/workspaces/{workspaceId}/subscription)
-	GetWorkspaceBilling(c *gin.Context, workspaceId WorkspaceIdPath)
 	// CancelNow Cancel subscription now
 	// (POST /billing/workspaces/{workspaceId}/subscription/cancel-now)
 	CancelNow(c *gin.Context, workspaceId WorkspaceIdPath)
@@ -246,6 +246,31 @@ func (siw *ServerInterfaceWrapper) StripeWebhook(c *gin.Context) {
 	siw.Handler.StripeWebhook(c, params)
 }
 
+// GetWorkspaceBilling operation middleware
+func (siw *ServerInterfaceWrapper) GetWorkspaceBilling(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetWorkspaceBilling(c, workspaceId)
+}
+
 // CreateCheckoutSession operation middleware
 func (siw *ServerInterfaceWrapper) CreateCheckoutSession(c *gin.Context) {
 
@@ -346,31 +371,6 @@ func (siw *ServerInterfaceWrapper) CreatePortalSession(c *gin.Context) {
 	siw.Handler.CreatePortalSession(c, workspaceId)
 }
 
-// GetWorkspaceBilling operation middleware
-func (siw *ServerInterfaceWrapper) GetWorkspaceBilling(c *gin.Context) {
-
-	var err error
-	_ = err
-
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
-
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetWorkspaceBilling(c, workspaceId)
-}
-
 // CancelNow operation middleware
 func (siw *ServerInterfaceWrapper) CancelNow(c *gin.Context) {
 
@@ -450,7 +450,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/billing/plans", wrapper.ListPlans)
 	router.GET(options.BaseURL+"/billing/workspaces/:workspaceId/entitlements", wrapper.GetWorkspaceEntitlements)
-	router.GET(options.BaseURL+"/billing/workspaces/:workspaceId/subscription", wrapper.GetWorkspaceBilling)
+	router.GET(options.BaseURL+"/billing/workspaces/:workspaceId", wrapper.GetWorkspaceBilling)
 	router.POST(options.BaseURL+"/billing/workspaces/:workspaceId/checkout-session", wrapper.CreateCheckoutSession)
 	router.POST(options.BaseURL+"/billing/workspaces/:workspaceId/portal-session", wrapper.CreatePortalSession)
 	router.GET(options.BaseURL+"/billing/workspaces/:workspaceId/subscription/cancel-now/preview", wrapper.PreviewCancelNow)
@@ -1160,6 +1160,86 @@ func (response StripeWebhook500JSONResponse) VisitStripeWebhookResponse(w http.R
 	return err
 }
 
+type GetWorkspaceBillingRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+}
+
+type GetWorkspaceBillingResponseObject interface {
+	VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error
+}
+
+type GetWorkspaceBilling200JSONResponse WorkspaceBilling
+
+func (response GetWorkspaceBilling200JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetWorkspaceBilling400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response GetWorkspaceBilling400JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestErrorJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetWorkspaceBilling401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response GetWorkspaceBilling401JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.UnauthorizedErrorJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetWorkspaceBilling403JSONResponse struct{ ForbiddenErrorJSONResponse }
+
+func (response GetWorkspaceBilling403JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ForbiddenErrorJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetWorkspaceBilling500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetWorkspaceBilling500JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.InternalServerErrorJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type CreateCheckoutSessionRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 	Body        *CreateCheckoutSessionJSONRequestBody
@@ -1551,86 +1631,6 @@ func (response CreatePortalSession500JSONResponse) VisitCreatePortalSessionRespo
 	return err
 }
 
-type GetWorkspaceBillingRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
-}
-
-type GetWorkspaceBillingResponseObject interface {
-	VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error
-}
-
-type GetWorkspaceBilling200JSONResponse WorkspaceBilling
-
-func (response GetWorkspaceBilling200JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetWorkspaceBilling400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response GetWorkspaceBilling400JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestErrorJSONResponse); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetWorkspaceBilling401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response GetWorkspaceBilling401JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := runtime.JSONMarshalWrite(&buf, response.UnauthorizedErrorJSONResponse); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetWorkspaceBilling403JSONResponse struct{ ForbiddenErrorJSONResponse }
-
-func (response GetWorkspaceBilling403JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := runtime.JSONMarshalWrite(&buf, response.ForbiddenErrorJSONResponse); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(403)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetWorkspaceBilling500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response GetWorkspaceBilling500JSONResponse) VisitGetWorkspaceBillingResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := runtime.JSONMarshalWrite(&buf, response.InternalServerErrorJSONResponse); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
 type CancelNowRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 }
@@ -1876,6 +1876,9 @@ type StrictServerInterface interface {
 	// StripeWebhook Stripe webhook endpoint
 	// (POST /billing/webhooks/stripe)
 	StripeWebhook(ctx context.Context, request StripeWebhookRequestObject) (StripeWebhookResponseObject, error)
+	// GetWorkspaceBilling Get workspace billing
+	// (GET /billing/workspaces/{workspaceId})
+	GetWorkspaceBilling(ctx context.Context, request GetWorkspaceBillingRequestObject) (GetWorkspaceBillingResponseObject, error)
 	// CreateCheckoutSession Create checkout session
 	// (POST /billing/workspaces/{workspaceId}/checkout-session)
 	CreateCheckoutSession(ctx context.Context, request CreateCheckoutSessionRequestObject) (CreateCheckoutSessionResponseObject, error)
@@ -1888,9 +1891,6 @@ type StrictServerInterface interface {
 	// CreatePortalSession Create portal session
 	// (POST /billing/workspaces/{workspaceId}/portal-session)
 	CreatePortalSession(ctx context.Context, request CreatePortalSessionRequestObject) (CreatePortalSessionResponseObject, error)
-	// GetWorkspaceBilling Get workspace billing
-	// (GET /billing/workspaces/{workspaceId}/subscription)
-	GetWorkspaceBilling(ctx context.Context, request GetWorkspaceBillingRequestObject) (GetWorkspaceBillingResponseObject, error)
 	// CancelNow Cancel subscription now
 	// (POST /billing/workspaces/{workspaceId}/subscription/cancel-now)
 	CancelNow(ctx context.Context, request CancelNowRequestObject) (CancelNowResponseObject, error)
@@ -2253,6 +2253,32 @@ func (sh *strictHandler) StripeWebhook(ctx *gin.Context, params StripeWebhookPar
 	}
 }
 
+// GetWorkspaceBilling operation middleware
+func (sh *strictHandler) GetWorkspaceBilling(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+	var request GetWorkspaceBillingRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	handler := func(ctx *gin.Context, request any) (any, error) {
+		return sh.ssi.GetWorkspaceBilling(ctx, request.(GetWorkspaceBillingRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetWorkspaceBilling")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		sh.options.HandlerErrorFunc(ctx, err)
+	} else if validResponse, ok := response.(GetWorkspaceBillingResponseObject); ok {
+		if err := validResponse.VisitGetWorkspaceBillingResponse(ctx.Writer); err != nil {
+			sh.options.ResponseErrorHandlerFunc(ctx, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(ctx, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // CreateCheckoutSession operation middleware
 func (sh *strictHandler) CreateCheckoutSession(ctx *gin.Context, workspaceId WorkspaceIdPath) {
 	var request CreateCheckoutSessionRequestObject
@@ -2368,32 +2394,6 @@ func (sh *strictHandler) CreatePortalSession(ctx *gin.Context, workspaceId Works
 		sh.options.HandlerErrorFunc(ctx, err)
 	} else if validResponse, ok := response.(CreatePortalSessionResponseObject); ok {
 		if err := validResponse.VisitCreatePortalSessionResponse(ctx.Writer); err != nil {
-			sh.options.ResponseErrorHandlerFunc(ctx, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(ctx, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// GetWorkspaceBilling operation middleware
-func (sh *strictHandler) GetWorkspaceBilling(ctx *gin.Context, workspaceId WorkspaceIdPath) {
-	var request GetWorkspaceBillingRequestObject
-
-	request.WorkspaceId = workspaceId
-
-	handler := func(ctx *gin.Context, request any) (any, error) {
-		return sh.ssi.GetWorkspaceBilling(ctx, request.(GetWorkspaceBillingRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetWorkspaceBilling")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		sh.options.HandlerErrorFunc(ctx, err)
-	} else if validResponse, ok := response.(GetWorkspaceBillingResponseObject); ok {
-		if err := validResponse.VisitGetWorkspaceBillingResponse(ctx.Writer); err != nil {
 			sh.options.ResponseErrorHandlerFunc(ctx, err)
 		}
 	} else if response != nil {

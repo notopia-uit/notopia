@@ -30,4 +30,4 @@ properties:
     type: [string, "null"]
     format: date-time
     examples: [2026-10-12T00:00:00Z]
-required: [id, plan, interval, amount, currency, lookupKey, active, createdAt]
+required: [id, plan, interval, amount, currency, lookupKey, active, createdAt, archivedAt]

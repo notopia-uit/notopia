@@ -820,7 +820,7 @@ export const getWorkspaceBilling = <ThrowOnError extends boolean = false>(option
             scheme: 'bearer',
             type: 'http'
         }],
-    url: '/billing/workspaces/{workspaceId}/subscription',
+    url: '/billing/workspaces/{workspaceId}',
     ...options
 });
 

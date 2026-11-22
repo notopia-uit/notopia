@@ -223,7 +223,10 @@ func toSubscription(s app.Subscription) (billing.Subscription, error) {
 }
 
 func toWorkspaceBilling(v app.WorkspaceBillingView) (billing.WorkspaceBilling, error) {
-	out := billing.WorkspaceBilling{}
+	out := billing.WorkspaceBilling{
+		Payer:        nullable.NewNullNullable[billing.Payer](),
+		Subscription: nullable.NewNullNullable[billing.Subscription](),
+	}
 	if v.Payer != nil {
 		p := v.Payer
 		out.Payer = nullable.NewNullableWithValue(billing.Payer{Id: p.ID, Email: p.Email, Name: p.Name, MissingSince: nullableTime(p.MissingSince)})

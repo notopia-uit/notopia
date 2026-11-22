@@ -1,0 +1,17 @@
+summary: Free workspace without a subscription
+value:
+  accessUntil: null
+  features:
+    auto_commit: false
+    workspace_graph: false
+  limits:
+    ai_credits_monthly: 0
+    auto_commit_min_interval_seconds: 0
+    members: 3
+    note_graph_max_depth: 5
+    published_notes: 3
+    revision_history_days: 7
+    trash_retention_days: 7
+  plan: free
+  status: none
+  workspaceId: 01a201e5-bc74-7c00-bc94-30e24975d54e

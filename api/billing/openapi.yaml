@@ -30,8 +30,8 @@ paths:
     $ref: ./paths/plans.yaml
   /billing/workspaces/{workspaceId}/entitlements:
     $ref: ./paths/workspaces_{workspaceId}_entitlements.yaml
-  /billing/workspaces/{workspaceId}/subscription:
-    $ref: ./paths/workspaces_{workspaceId}_subscription.yaml
+  /billing/workspaces/{workspaceId}:
+    $ref: ./paths/workspaces_{workspaceId}.yaml
   /billing/workspaces/{workspaceId}/checkout-session:
     $ref: ./paths/workspaces_{workspaceId}_checkout-session.yaml
   /billing/workspaces/{workspaceId}/portal-session:

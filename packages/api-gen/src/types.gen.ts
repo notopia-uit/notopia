@@ -555,7 +555,7 @@ export type BillingPrice = {
     lookupKey: string;
     active: boolean;
     createdAt: Date;
-    archivedAt?: Date | null;
+    archivedAt: Date | null;
 };
 
 export type BillingPlan = {
@@ -602,7 +602,7 @@ export type BillingEntitlements = {
     workspaceId: string;
     plan: BillingPlanTier;
     status: BillingSubscriptionStatus;
-    accessUntil?: Date | null;
+    accessUntil: Date | null;
     features: BillingFeatures;
     limits: BillingLimits;
 };
@@ -621,11 +621,11 @@ export type BillingSubscription = {
     plan: BillingPlanTier;
     interval: BillingBillingInterval;
     status: BillingSubscriptionStatus;
-    currentPeriodStart?: Date | null;
-    currentPeriodEnd?: Date | null;
+    currentPeriodStart: Date | null;
+    currentPeriodEnd: Date | null;
     cancelAtPeriodEnd: boolean;
-    canceledAt?: Date | null;
-    accessUntil?: Date | null;
+    canceledAt: Date | null;
+    accessUntil: Date | null;
     refunds: Array<BillingRefund>;
 };
 
@@ -633,12 +633,12 @@ export type BillingPayer = {
     id: string;
     email: string;
     name: string;
-    missingSince?: Date | null;
+    missingSince: Date | null;
 };
 
 export type BillingWorkspaceBilling = {
-    subscription?: BillingSubscription | null;
-    payer?: BillingPayer | null;
+    subscription: BillingSubscription | null;
+    payer: BillingPayer | null;
 };
 
 export type BillingCheckoutSessionRequest = {
@@ -2756,7 +2756,7 @@ export type GetWorkspaceBillingData = {
         workspaceId: string;
     };
     query?: never;
-    url: '/billing/workspaces/{workspaceId}/subscription';
+    url: '/billing/workspaces/{workspaceId}';
 };
 
 export type GetWorkspaceBillingErrors = {

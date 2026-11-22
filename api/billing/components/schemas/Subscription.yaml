@@ -34,4 +34,4 @@ properties:
     type: array
     items:
       $ref: ./Refund.yaml
-required: [id, plan, interval, status, cancelAtPeriodEnd, refunds]
+required: [id, plan, interval, status, currentPeriodStart, currentPeriodEnd, cancelAtPeriodEnd, canceledAt, accessUntil, refunds]

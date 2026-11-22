@@ -19,6 +19,9 @@ get:
         application/json:
           schema:
             $ref: ../components/schemas/Entitlements.yaml
+          examples:
+            freeWorkspace:
+              $ref: ../examples/entitlementsFreeWorkspace.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
