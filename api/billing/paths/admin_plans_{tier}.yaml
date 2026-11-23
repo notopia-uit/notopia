@@ -16,8 +16,11 @@ patch:
     required: true
     content:
       application/json:
-        schema:
-          $ref: ../components/schemas/UpdatePlanRequest.yaml
+          schema:
+            $ref: ../components/schemas/UpdatePlanRequest.yaml
+          examples:
+            plusPlan:
+              $ref: ../examples/adminUpdatePlanPlusPlan.yaml
   responses:
     200:
       description: Updated plan
@@ -25,6 +28,9 @@ patch:
         application/json:
           schema:
             $ref: ../components/schemas/Plan.yaml
+          examples:
+            updatedPlusPlan:
+              $ref: ../examples/adminUpdatePlanUpdatedPlusPlan.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

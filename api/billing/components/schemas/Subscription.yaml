@@ -4,7 +4,7 @@ properties:
   id:
     type: string
     format: uuid
-    examples: [0192f0a0-0000-7000-8000-000000000003]
+    examples: [00000000-0000-4000-8000-000000000201]
   plan:
     $ref: ./PlanTier.yaml
   interval:
@@ -14,24 +14,25 @@ properties:
   currentPeriodStart:
     type: [string, "null"]
     format: date-time
-    examples: [2026-10-11T00:00:00Z]
+    examples: [2026-11-22T08:50:14Z]
   currentPeriodEnd:
     type: [string, "null"]
     format: date-time
-    examples: [2026-11-11T00:00:00Z]
+    examples: [2026-12-22T08:50:14Z]
   cancelAtPeriodEnd:
     type: boolean
     examples: [false]
   canceledAt:
     type: [string, "null"]
     format: date-time
-    examples: [2026-10-20T00:00:00Z]
+    examples: [null]
   accessUntil:
     type: [string, "null"]
     format: date-time
-    examples: [2026-11-11T00:00:00Z]
+    examples: [2026-12-22T08:50:14Z]
   refunds:
     type: array
+    examples: [[]]
     items:
       $ref: ./Refund.yaml
 required: [id, plan, interval, status, currentPeriodStart, currentPeriodEnd, cancelAtPeriodEnd, canceledAt, accessUntil, refunds]

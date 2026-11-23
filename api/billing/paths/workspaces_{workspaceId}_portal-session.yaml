@@ -19,6 +19,9 @@ post:
         application/json:
           schema:
             $ref: ../components/schemas/RedirectURL.yaml
+          examples:
+            customerPortalSession:
+              $ref: ../examples/createPortalSessionCustomerPortalSession.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

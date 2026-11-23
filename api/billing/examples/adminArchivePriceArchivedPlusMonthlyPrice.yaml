@@ -1,0 +1,11 @@
+summary: Archived Plus monthly price
+value:
+  id: 00000000-0000-4000-8000-000000000001
+  plan: plus
+  interval: month
+  amount: 49000
+  currency: vnd
+  lookupKey: plus_month
+  active: false
+  createdAt: '2026-11-21T00:00:00Z'
+  archivedAt: '2026-11-22T00:00:00Z'

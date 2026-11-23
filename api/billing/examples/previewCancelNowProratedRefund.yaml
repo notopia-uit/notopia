@@ -1,0 +1,11 @@
+summary: Prorated refund quote
+value:
+  amount: 24500
+  currency: vnd
+  unusedSeconds: 1296000
+  periodSeconds: 2592000
+  payments:
+    - paidAmount: 49000
+      amount: 24500
+      coverageSeconds: 2592000
+      unusedSeconds: 1296000

@@ -1,0 +1,24 @@
+summary: Updated Plus plan
+value:
+  tier: plus
+  features:
+    auto_commit: true
+    workspace_graph: true
+  limits:
+    members: 10
+    published_notes: -1
+    note_graph_max_depth: -1
+    auto_commit_min_interval_seconds: 300
+    revision_history_days: 30
+    trash_retention_days: 30
+    ai_credits_monthly: 200
+  prices:
+    - id: 00000000-0000-4000-8000-000000000001
+      plan: plus
+      interval: month
+      amount: 49000
+      currency: vnd
+      lookupKey: plus_month
+      active: true
+      createdAt: '2026-11-21T00:00:00Z'
+      archivedAt: null

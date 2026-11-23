@@ -1,0 +1,7 @@
+summary: Stripe subscription updated event
+value:
+  id: evt_test_example
+  type: customer.subscription.updated
+  data:
+    object:
+      id: sub_test_example

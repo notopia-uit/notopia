@@ -21,9 +21,9 @@ get:
             $ref: ../components/schemas/Entitlements.yaml
           examples:
             freeWorkspace:
-              $ref: ../examples/entitlementsFreeWorkspace.yaml
+              $ref: ../examples/getWorkspaceEntitlementsFreeWorkspace.yaml
             plusWorkspace:
-              $ref: ../examples/entitlementsPlusWorkspace.yaml
+              $ref: ../examples/getWorkspaceEntitlementsPlusWorkspace.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

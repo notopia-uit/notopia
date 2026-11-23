@@ -1,4 +1,4 @@
-summary: Example plan catalog
+summary: Illustrative plan catalog (prices and IDs vary by environment)
 value:
   - tier: free
     features:
@@ -26,16 +26,16 @@ value:
       revision_history_days: 30
       trash_retention_days: 30
     prices:
-      - id: 01a1fe97-974f-79d8-88e1-d4002749020b
+      - id: 00000000-0000-4000-8000-000000000001
         plan: plus
         interval: month
         amount: 49000
         currency: vnd
         lookupKey: plus_month
         active: true
-        createdAt: '2026-11-21T21:51:50.726686+07:00'
+        createdAt: '2026-11-21T00:00:00Z'
         archivedAt: null
-      - id: 01a1fe9b-7467-7124-90e5-8e9860ad9d39
+      - id: 00000000-0000-4000-8000-000000000002
         plan: plus
         interval: year
         amount: 470400
@@ -57,7 +57,7 @@ value:
       revision_history_days: -1
       trash_retention_days: 90
     prices:
-      - id: 01a1fe9b-7866-7d24-adc2-148d8af32ab3
+      - id: 00000000-0000-4000-8000-000000000003
         plan: pro
         interval: month
         amount: 99000
@@ -66,7 +66,7 @@ value:
         active: true
         createdAt: '2026-11-21T21:56:04.786267+07:00'
         archivedAt: null
-      - id: 01a1fe9b-7be4-7c3c-ba3a-f58542152245
+      - id: 00000000-0000-4000-8000-000000000004
         plan: pro
         interval: year
         amount: 950400
@@ -75,7 +75,7 @@ value:
         active: true
         createdAt: '2026-11-21T21:56:05.619059+07:00'
         archivedAt: null
-      - id: 01a1fe9b-7f1e-77f1-8f50-ac15775bf49b
+      - id: 00000000-0000-4000-8000-000000000005
         plan: pro
         interval: lifetime
         amount: 2490000

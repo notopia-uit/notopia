@@ -16,8 +16,11 @@ post:
     required: true
     content:
       application/json:
-        schema:
-          $ref: ../components/schemas/CheckoutSessionRequest.yaml
+          schema:
+            $ref: ../components/schemas/CheckoutSessionRequest.yaml
+          examples:
+            plusMonthlyCheckout:
+              $ref: ../examples/createCheckoutSessionPlusMonthlyCheckout.yaml
   responses:
     200:
       description: Checkout session URL. Redirect the browser to this URL to complete the purchase.
@@ -25,6 +28,9 @@ post:
         application/json:
           schema:
             $ref: ../components/schemas/RedirectURL.yaml
+          examples:
+            checkoutSession:
+              $ref: ../examples/createCheckoutSessionCheckoutSession.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

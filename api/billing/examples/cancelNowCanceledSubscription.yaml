@@ -1,0 +1,24 @@
+summary: Canceled subscription with a pending refund
+value:
+  payer:
+    id: "112"
+    email: trannguyenthaibinh46@gmail.com
+    name: Kevin Nitro
+    missingSince: null
+  subscription:
+    id: 00000000-0000-4000-8000-000000000201
+    plan: plus
+    interval: month
+    status: canceled
+    currentPeriodStart: '2026-11-22T08:50:14Z'
+    currentPeriodEnd: '2026-12-22T08:50:14Z'
+    cancelAtPeriodEnd: false
+    canceledAt: '2026-12-07T08:50:14Z'
+    accessUntil: null
+    refunds:
+      - id: 00000000-0000-4000-8000-000000000301
+        amount: 24500
+        currency: vnd
+        reason: cancel_now
+        status: pending
+        createdAt: '2026-12-07T08:50:14Z'

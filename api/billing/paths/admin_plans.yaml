@@ -19,6 +19,9 @@ get:
             type: array
             items:
               $ref: ../components/schemas/Plan.yaml
+          examples:
+            catalog:
+              $ref: ../examples/planCatalog.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

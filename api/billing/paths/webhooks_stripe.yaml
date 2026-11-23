@@ -20,6 +20,9 @@ post:
           type: object
           additionalProperties: true
           x-go-type: json.RawMessage
+        examples:
+          subscriptionUpdated:
+            $ref: ../examples/stripeWebhookSubscriptionUpdated.yaml
   responses:
     204:
       description: Event accepted

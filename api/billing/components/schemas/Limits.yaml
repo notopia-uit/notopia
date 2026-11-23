@@ -17,7 +17,7 @@ properties:
     type: integer
     format: int64
     minimum: -1
-    example: 5
+    example: -1
   auto_commit_min_interval_seconds:
     type: integer
     format: int64
@@ -40,4 +40,9 @@ properties:
     example: 200
 examples:
   - members: 10
+    published_notes: -1
+    note_graph_max_depth: -1
+    auto_commit_min_interval_seconds: 300
     revision_history_days: 30
+    trash_retention_days: 30
+    ai_credits_monthly: 200

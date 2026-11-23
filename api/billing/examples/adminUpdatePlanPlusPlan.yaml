@@ -1,0 +1,13 @@
+summary: Plus plan features and limits
+value:
+  features:
+    auto_commit: true
+    workspace_graph: true
+  limits:
+    members: 10
+    published_notes: -1
+    note_graph_max_depth: -1
+    auto_commit_min_interval_seconds: 300
+    revision_history_days: 30
+    trash_retention_days: 30
+    ai_credits_monthly: 200

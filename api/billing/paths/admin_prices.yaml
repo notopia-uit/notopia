@@ -19,6 +19,9 @@ get:
             type: array
             items:
               $ref: ../components/schemas/Price.yaml
+          examples:
+            priceList:
+              $ref: ../examples/adminListPricesPriceList.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
@@ -42,8 +45,11 @@ post:
     required: true
     content:
       application/json:
-        schema:
-          $ref: ../components/schemas/CreatePriceRequest.yaml
+          schema:
+            $ref: ../components/schemas/CreatePriceRequest.yaml
+          examples:
+            newPlusMonthlyPrice:
+              $ref: ../examples/adminCreatePriceNewPlusMonthlyPrice.yaml
   responses:
     201:
       description: Created price
@@ -51,6 +57,9 @@ post:
         application/json:
           schema:
             $ref: ../components/schemas/Price.yaml
+          examples:
+            createdPlusMonthlyPrice:
+              $ref: ../examples/adminCreatePriceCreatedPlusMonthlyPrice.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

@@ -4,7 +4,7 @@ properties:
   id:
     type: string
     format: uuid
-    examples: [0192f0a0-0000-7000-8000-000000000001]
+    examples: [00000000-0000-4000-8000-000000000001]
   plan:
     $ref: ./PlanTier.yaml
   interval:
@@ -25,9 +25,9 @@ properties:
   createdAt:
     type: string
     format: date-time
-    examples: [2026-10-11T00:00:00Z]
+    examples: [2026-11-21T00:00:00Z]
   archivedAt:
     type: [string, "null"]
     format: date-time
-    examples: [2026-10-12T00:00:00Z]
+    examples: [null]
 required: [id, plan, interval, amount, currency, lookupKey, active, createdAt, archivedAt]

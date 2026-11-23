@@ -17,6 +17,9 @@ get:
         application/json:
           schema:
             $ref: ../components/schemas/BillingPolicy.yaml
+          examples:
+            currentPolicy:
+              $ref: ../examples/adminGetPolicyCurrentPolicy.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
@@ -40,8 +43,11 @@ patch:
     required: true
     content:
       application/json:
-        schema:
-          $ref: ../components/schemas/UpdatePolicyRequest.yaml
+          schema:
+            $ref: ../components/schemas/UpdatePolicyRequest.yaml
+          examples:
+            policyUpdate:
+              $ref: ../examples/adminUpdatePolicyPolicyUpdate.yaml
   responses:
     200:
       description: Updated billing policy
@@ -49,6 +55,9 @@ patch:
         application/json:
           schema:
             $ref: ../components/schemas/BillingPolicy.yaml
+          examples:
+            updatedPolicy:
+              $ref: ../examples/adminUpdatePolicyUpdatedPolicy.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

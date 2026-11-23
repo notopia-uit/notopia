@@ -1,0 +1,4 @@
+summary: Current billing policy
+value:
+  pastDueGraceDays: 3
+  lifetimeRefundWindowDays: 14

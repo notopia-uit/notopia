@@ -17,7 +17,7 @@ get:
               $ref: ../components/schemas/Plan.yaml
           examples:
             catalog:
-              $ref: ../examples/plans.yaml
+              $ref: ../examples/planCatalog.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     500:

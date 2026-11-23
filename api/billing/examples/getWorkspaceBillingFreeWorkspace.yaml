@@ -1,0 +1,4 @@
+summary: Workspace without a subscription or payer
+value:
+  payer: null
+  subscription: null

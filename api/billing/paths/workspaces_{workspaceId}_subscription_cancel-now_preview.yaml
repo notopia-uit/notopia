@@ -19,6 +19,9 @@ get:
         application/json:
           schema:
             $ref: ../components/schemas/RefundQuote.yaml
+          examples:
+            proratedRefund:
+              $ref: ../examples/previewCancelNowProratedRefund.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

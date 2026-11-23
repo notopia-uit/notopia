@@ -20,8 +20,10 @@ get:
           schema:
             $ref: ../components/schemas/WorkspaceBilling.yaml
           examples:
+            freeWorkspace:
+              $ref: ../examples/getWorkspaceBillingFreeWorkspace.yaml
             plusWorkspace:
-              $ref: ../examples/workspaceBillingPlus.yaml
+              $ref: ../examples/getWorkspaceBillingPlusWorkspace.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
