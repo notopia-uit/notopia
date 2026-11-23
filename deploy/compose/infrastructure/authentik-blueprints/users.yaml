@@ -8,6 +8,7 @@ metadata:
       User list
 entries:
   - model: authentik_core.user
+    id: notopiauit
     identifiers:
       username: notopiauit
     attrs:
@@ -18,6 +19,7 @@ entries:
       password: notopiauit
 
   - model: authentik_core.user
+    id: user
     identifiers:
       pk: 110
     attrs:
@@ -27,6 +29,7 @@ entries:
       password: user
 
   - model: authentik_core.user
+    id: ntgnguyen
     identifiers:
       pk: 111
     attrs:
@@ -36,6 +39,7 @@ entries:
       password: ntgnguyen
 
   - model: authentik_core.user
+    id: kevinnitro
     identifiers:
       pk: 112
     attrs:
@@ -45,6 +49,7 @@ entries:
       password: kevinnitro
 
   - model: authentik_core.user
+    id: admin
     identifiers:
       pk: 101
     attrs:
@@ -52,6 +57,56 @@ entries:
       name: Admin
       email: admin@notopia.com
       password: admin
+
+  - model: authentik_core.token
+    identifiers:
+      identifier: notopiauit-app-password
+    attrs:
+      description: Local development app password for notopiauit
+      expiring: false
+      key: notopiauit
+      intent: app_password
+      user: !KeyOf notopiauit
+
+  - model: authentik_core.token
+    identifiers:
+      identifier: user-app-password
+    attrs:
+      description: Local development app password for user
+      expiring: false
+      key: notopiauit
+      intent: app_password
+      user: !KeyOf user
+
+  - model: authentik_core.token
+    identifiers:
+      identifier: ntgnguyen-app-password
+    attrs:
+      description: Local development app password for ntgnguyen
+      expiring: false
+      key: notopiauit
+      intent: app_password
+      user: !KeyOf ntgnguyen
+
+  - model: authentik_core.token
+    identifiers:
+      identifier: kevinnitro-app-password
+    attrs:
+      description: Local development app password for kevinnitro
+      expiring: false
+      key: notopiauit
+      intent: app_password
+      user: !KeyOf kevinnitro
+
+  - model: authentik_core.token
+    identifiers:
+      identifier: admin-app-password
+    attrs:
+      description: Local development app password for admin
+      expiring: false
+      key: notopiauit
+      intent: app_password
+      user: !KeyOf admin
 
   - model: authentik_core.user
     id: note-service

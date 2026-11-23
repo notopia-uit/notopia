@@ -10,7 +10,9 @@ Layout:
 #### Authentik
 
 - Users/Client/Role list in `./deploy/compose/infrastructure/authentik-blueprints/users.yaml`
-  > Read file for login users. Must use Oauth2 flow; no direct access grant.
+  > Read file for login users. Prefer authorization code with PKCE; api-web also permits
+  > the password grant for local testing using the fixture users' app password `notopiauit`.
+  > These shared credentials are for local development only and bypass MFA.
   > For debugging, use curl or similar.
 - Frontend App in `./deploy/compose/infrastructure/authentik-blueprints/app-web.yaml`
   (includes JWKS, callback URL, etc.)

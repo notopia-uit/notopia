@@ -24,6 +24,7 @@ entries:
       grant_types:
         - authorization_code
         - refresh_token
+        - password
       access_code_validity: minutes=10
       access_token_validity: days=30
       refresh_token_threshold: hours=1
