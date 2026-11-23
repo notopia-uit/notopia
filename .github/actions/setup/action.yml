@@ -1,5 +1,6 @@
 name: Setup Notopia
 description: Shared tools, dependencies, caches and Nx base/head SHAs
+
 inputs:
   cache:
     description: Enable dependency and tool caches
@@ -10,6 +11,7 @@ inputs:
   golangci:
     description: Install golangci-lint
     default: 'false'
+
 runs:
   using: composite
   steps:
@@ -44,7 +46,6 @@ runs:
     - name: Setup Mise
       uses: jdx/mise-action@v5
       with:
-        version: 2026.11.12
         experimental: true
         cache: ${{ inputs.cache == 'true' }}
 

@@ -1,7 +1,5 @@
 #:schema https://raw.githubusercontent.com/jdx/mise/refs/heads/main/schema/mise.json
 
-# CI only, selected with MISE_ENV=ci. golangci-lint and pnpm come from their GitHub actions.
-
 [tools]
 just = "1.59.0"
 "pipx:codecov-cli" = "11.2.8"

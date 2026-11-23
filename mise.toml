@@ -1,9 +1,5 @@
 #:schema https://raw.githubusercontent.com/jdx/mise/refs/heads/main/schema/mise.json
 
-# Shared by local development and CI. Local-only config: mise.dev.toml, CI-only config: mise.ci.toml.
-# Workflow: docs/src/developer/mise.md
-
-# Keep in sync with the mise version pinned in .github/actions/setup/action.yml
 min_version = "2026.11.12"
 
 [env]
