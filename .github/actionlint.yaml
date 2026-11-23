@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://www.schemastore.org/actionlint.json
+paths:
+  .github/workflows/**/*.{yml,yaml}:
+    ignore:
+      - 'unexpected key "queue" for "concurrency" section'
