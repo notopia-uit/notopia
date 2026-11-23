@@ -1,0 +1,67 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      ts-proto:
+        specifier: 2.22.0
+        version: 2.22.0
+
+packages:
+
+  '@bufbuild/protobuf@2.17.0':
+    resolution: {integrity: sha512-hcPkSz6D7MiTU/5VBBhK+kxaYDoOdQ6yJRFJ3kS8Nydp+VZXfg1vrpABKPNod8bXMufsVCmiUJVIKFzCzta4uw==}
+
+  case-anything@2.1.13:
+    resolution: {integrity: sha512-zlOQ80VrQ2Ue+ymH5OuM/DlDq64mEm+B9UTdHULv5osUMD6HalNTblf2b1u/m6QecjsnOkBpqVZ+XPwIVsy7Ng==}
+    engines: {node: '>=12.13'}
+
+  detect-libc@1.0.3:
+    resolution: {integrity: sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg==}
+    engines: {node: '>=0.10'}
+    hasBin: true
+
+  dprint-node@1.0.8:
+    resolution: {integrity: sha512-iVKnUtYfGrYcW1ZAlfR/F59cUVL8QIhWoBJoSjkkdua/dkWIgjZfiLMeTjiB06X0ZLkQ0M2C1VbUj/CxkIf1zg==}
+
+  ts-poet@6.12.1:
+    resolution: {integrity: sha512-N/5xnO/ugx3C9Wfibfnkv48dyzn8iNce1kuhh8tpDG7bDfij4H7agPBKyxAKU6v4VfRvQZEulmSVinvGT2Qmwg==}
+
+  ts-proto-descriptors@2.1.0:
+    resolution: {integrity: sha512-S5EZYEQ6L9KLFfjSRpZWDIXDV/W7tAj8uW7pLsihIxyr62EAVSiKuVPwE8iWnr849Bqa53enex1jhDUcpgquzA==}
+
+  ts-proto@2.22.0:
+    resolution: {integrity: sha512-FODGAPNklhzjkmsGgzekOZqbUT1CNxE90H+eFQdRGvVsyqywyeCE0zn+8LPrFZjegCue18O8wdMGlYoYH87PQg==}
+    hasBin: true
+
+snapshots:
+
+  '@bufbuild/protobuf@2.17.0': {}
+
+  case-anything@2.1.13: {}
+
+  detect-libc@1.0.3: {}
+
+  dprint-node@1.0.8:
+    dependencies:
+      detect-libc: 1.0.3
+
+  ts-poet@6.12.1:
+    dependencies:
+      dprint-node: 1.0.8
+
+  ts-proto-descriptors@2.1.0:
+    dependencies:
+      '@bufbuild/protobuf': 2.17.0
+
+  ts-proto@2.22.0:
+    dependencies:
+      '@bufbuild/protobuf': 2.17.0
+      case-anything: 2.1.13
+      ts-poet: 6.12.1
+      ts-proto-descriptors: 2.1.0

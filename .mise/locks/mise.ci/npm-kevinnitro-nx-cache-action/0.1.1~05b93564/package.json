@@ -1,0 +1,7 @@
+{
+  "name": "mise-npm-install",
+  "private": true,
+  "dependencies": {
+    "@kevinnitro/nx-cache-action": "0.1.1"
+  }
+}

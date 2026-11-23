@@ -1,0 +1,26 @@
+#:schema https://raw.githubusercontent.com/jdx/mise/refs/heads/main/schema/mise.json
+
+# Local development only, selected by default through .miserc.toml. CI runs with MISE_ENV=ci.
+
+[env]
+OPENCODE_EXPERIMENTAL = "true"
+OPENCODE_EXPERIMENTAL_OXFMT = "true"
+OPENCODE_EXPERIMENTAL_EXA = "true"
+COMPOSE_FILE = "./deploy/compose/compose.yaml"
+'_'.path.paths = ["./node_modules/.bin/"]
+
+[tools]
+golangci-lint = "2.15.0"
+pnpm = "12.14.0"
+"github:go-delve/delve" = "1.27.2"
+"npm:@tailwindcss/language-server" = "0.16.0"
+"npm:skills" = "latest"
+stripe = "latest"
+
+[shell_alias]
+compose = "docker compose"
+p = "pnpm"
+oxlint = "pnpm exec oxlint"
+oxfmt = "pnpm exec oxfmt"
+lazydocker = "lazydocker -f ./deploy/compose/compose.yaml"
+css-language-server = "mise exec npm@tailwindcss/language-server -- css-language-server"

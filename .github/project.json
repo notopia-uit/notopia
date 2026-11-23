@@ -9,8 +9,8 @@
         "default",
         "{projectRoot}/workflows/**/*.yaml",
         "{projectRoot}/actions/**/*.yaml",
-        "{workspaceRoot}/.mise.ci.toml",
         "{workspaceRoot}/mise.toml",
+        "{workspaceRoot}/mise.ci.toml",
         { "runtime": "actionlint -version" },
         { "runtime": "shellcheck --version" }
       ],

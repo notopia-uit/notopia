@@ -1,0 +1,5 @@
+# Default config environment for local development. CI overrides it with MISE_ENV=ci.
+env = ["dev"]
+
+# .tool-versions only feeds actions/setup-go and golangci-lint-action in CI
+override_tool_versions_filenames = ["none"]
