@@ -22,7 +22,7 @@ tags:
     description: Subscription, entitlements and payer of a workspace
   - name: BillingAdmin
     description: Admin-only catalog management (group notopia-admins)
-  - name: Webhook
+  - name: BillingWebhook
     description: Payment provider webhooks
 
 paths:
