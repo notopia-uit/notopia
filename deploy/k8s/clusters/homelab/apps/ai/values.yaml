@@ -19,8 +19,8 @@ env:
   NOTOPIA_AI_SERVICES_AUTHORIZATION_GRPC_URL: authorization:18089
   NOTOPIA_AI_SERVICES_BILLING_GRPC_URL: billing:18084
   NOTOPIA_AI_MEILI_HOST: http://meilisearch:7700
-  NOTOPIA_AI_LLM_BASE_URL: https://provider.example.invalid/v1
-  NOTOPIA_AI_LLM_MODEL: replace-before-use
+  NOTOPIA_AI_LLM_BASE_URL: https://openrouter.ai/api/v1
+  NOTOPIA_AI_LLM_MODEL: openrouter/free
 extraEnv:
   - name: NOTOPIA_AI_REDIS_URL
     valueFrom:

@@ -202,6 +202,7 @@ test('service wiring', () => {
     );
   }
   assert.equal(values.web.otel.protocol, 'http/protobuf');
+  assert.equal(values.note.env.NOTOPIA_NOTE_AUTHENTIK_SCHEME, 'https');
   assert.ok(values.web.env.DOCUMENT_WS_URL.startsWith('wss://'));
   for (const name of ['note', 'billing', 'authorization'])
     assert.equal(values[name].database.urlSecret.name, `cnpg-${name}-app`);

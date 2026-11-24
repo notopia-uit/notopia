@@ -30,6 +30,7 @@ route:
 env:
   NOTOPIA_BILLING_SERVER_URL: https://notopia-api.${PUBLIC_DOMAIN}
   NOTOPIA_BILLING_BILLING_WEB_BASE_URL: https://notopia.${PUBLIC_DOMAIN}
+  # NOTOPIA_BILLING_IDENTITY_SERVICE_ACCOUNT_USER_ID: "<authentik-service-account-user-id>"
   NOTOPIA_BILLING_SERVICES_AUTHORIZATION_URL: authorization:18089
   NOTOPIA_BILLING_SERVICES_AUTHORIZATION_LIVE_URL: http://authorization:28089/authorization/health/live
   NOTOPIA_BILLING_KAFKA_BROKERS: redpanda.redpanda.svc.cluster.local:9093
