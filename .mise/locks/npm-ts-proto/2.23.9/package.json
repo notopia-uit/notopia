@@ -2,6 +2,6 @@
   "name": "mise-npm-install",
   "private": true,
   "dependencies": {
-    "ts-proto": "2.22.0"
+    "ts-proto": "2.23.9"
   }
 }
