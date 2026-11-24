@@ -19,6 +19,23 @@ url = "https://github.com/go-delve/delve/releases/download/v1.27.2/dlv_1.27.2_da
 url_api = "https://api.github.com/repos/go-delve/delve/releases/assets/553080498"
 provenance = "github-attestations"
 
+[[tools."github:rustfs/cli"]]
+version = "0.1.38"
+backend = "github:rustfs/cli"
+specifiers = ["latest"]
+
+[tools."github:rustfs/cli"."platforms.linux-x64"]
+checksum = "sha256:6eedd4da0754455c126cceb10cc17374c16adce67466fefc94ed5896a2cccac9"
+checksum_source = "mise-versions"
+url = "https://github.com/rustfs/cli/releases/download/v0.1.38/rustfs-cli-linux-amd64-gnu-v0.1.38.tar.gz"
+url_api = "https://api.github.com/repos/rustfs/cli/releases/assets/762310805"
+
+[tools."github:rustfs/cli"."platforms.macos-arm64"]
+checksum = "sha256:899939290acc6ce07254d7ead738e3be37a1decdb039cd5e131042e0125ea9fe"
+checksum_source = "mise-versions"
+url = "https://github.com/rustfs/cli/releases/download/v0.1.38/rustfs-cli-macos-arm64-v0.1.38.tar.gz"
+url_api = "https://api.github.com/repos/rustfs/cli/releases/assets/762310790"
+
 [[tools.golangci-lint]]
 version = "2.15.0"
 backend = "aqua:golangci/golangci-lint"

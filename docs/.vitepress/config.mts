@@ -11,6 +11,7 @@ import {
   createBuildTimeDiagramsPlugin,
 } from 'vitepress-plugin-diagrams';
 import { pagefindPlugin } from 'vitepress-plugin-pagefind';
+import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs';
 import { withSidebar } from 'vitepress-sidebar';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 import waitOn from 'wait-on';
@@ -205,6 +206,7 @@ const vitePressOptions = {
     },
     config: (md) => {
       diagrams.configureMarkdown(md);
+      md.use(tabsMarkdownPlugin);
     },
   },
   themeConfig: {
