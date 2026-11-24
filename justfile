@@ -88,5 +88,6 @@ fixtures-authorization:
 
 stripe-listen:
     stripe listen \
-      --all-snapshot \
+      --events checkout.session.completed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,invoice.paid,invoice.payment_failed,refund.created,refund.updated,refund.failed \
+      --events-from @self \
       --forward-to http://api.notopia.localhost/billing/webhooks/stripe
