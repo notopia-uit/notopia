@@ -27,10 +27,9 @@ specifiers = ["0.1.1"]
 allow_low_downloads = "true"
 
 [[tools."pipx:codecov-cli"]]
-version = "11.2.8"
+version = "11.3.2"
 backend = "pipx:codecov-cli"
-specifiers = ["11.2.8"]
-uv = { path = ".mise/locks/mise.ci/pipx-codecov-cli/11.2.8", digest = "sha256:fe997053072c4a3b8a618beea2edcd4b3a75ec460240137d964e2cd2194231bc" }
+specifiers = ["11.3.2"]
 
 [[tools.python]]
 version = "3.13.18"
