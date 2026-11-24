@@ -5,6 +5,7 @@ OPENCODE_EXPERIMENTAL = "true"
 OPENCODE_EXPERIMENTAL_OXFMT = "true"
 OPENCODE_EXPERIMENTAL_EXA = "true"
 COMPOSE_FILE = "./deploy/compose/compose.yaml"
+NX_DAEMON = false                              # Until this is fixed: https://github.com/nrwl/nx/issues/36467
 '_'.path.paths = ["./node_modules/.bin/"]
 
 [tools]
