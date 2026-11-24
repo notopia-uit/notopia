@@ -168,7 +168,7 @@ pkg/                            # Go packages
 
 ### Superpowers
 
-- Only use the skill when human ask for superpowers workflow
+- By default, no use `brainstorm`, `writing-plans`, … by superpowers if human not ask for
 - Skip unnecessary, not worth, obvious cases testing for faster, resources CI savings
 - Not need to write full code, can use `…`, skip imports, mapper code, or write comments to note expand the code more while writing;
   agents later can fill in the details, but should not skip important logic
