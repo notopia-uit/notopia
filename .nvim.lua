@@ -20,7 +20,15 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 		end
 
 		local buffer = event.buf
-		local decrypted = event.event == "BufNewFile"
+		local decrypted = true
+		if event.event ~= "BufNewFile" then
+			for _, line in ipairs(vim.api.nvim_buf_get_lines(buffer, 0, -1, false)) do
+				if line:match("^sops:%s*") or line:find("ENC%[AES256_GCM,") then
+					decrypted = false
+					break
+				end
+			end
+		end
 		vim.bo[buffer].swapfile = false
 		vim.bo[buffer].undofile = false
 
