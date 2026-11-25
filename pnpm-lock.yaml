@@ -236,22 +236,22 @@ catalogs:
       version: 0.99.0
     '@hocuspocus/extension-database':
       specifier: ^4.8.0
-      version: 4.8.0
+      version: 4.9.0
     '@hocuspocus/extension-logger':
       specifier: ^4.8.0
-      version: 4.8.0
+      version: 4.9.0
     '@hocuspocus/extension-redis':
       specifier: ^4.8.0
-      version: 4.8.0
+      version: 4.9.0
     '@hocuspocus/provider':
       specifier: ^4.8.0
-      version: 4.8.0
+      version: 4.9.0
     '@hocuspocus/provider-react':
       specifier: ^4.8.0
-      version: 4.8.0
+      version: 4.9.0
     '@hocuspocus/server':
       specifier: ^4.8.0
-      version: 4.8.0
+      version: 4.9.0
     '@icons-pack/react-simple-icons':
       specifier: ^13.13.0
       version: 13.15.1
@@ -944,16 +944,16 @@ importers:
         version: 0.8.1
       '@hocuspocus/extension-database':
         specifier: 'catalog:'
-        version: 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/extension-logger':
         specifier: 'catalog:'
-        version: 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/extension-redis':
         specifier: 'catalog:'
-        version: 4.8.0(supports-color@8.1.1)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 4.9.0(supports-color@8.1.1)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/server':
         specifier: 'catalog:'
-        version: 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@nestjs/common':
         specifier: ^11.2.7
         version: 11.2.9(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
@@ -1249,7 +1249,7 @@ importers:
         version: 0.55.0(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@lezer/common@1.5.5)(@lezer/highlight@1.2.5)(@types/hast@3.0.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(date-fns@4.4.0)(highlight.js@11.12.0)(lowlight@3.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(tailwindcss@4.3.5)(y-prosemirror@1.3.7(prosemirror-model@1.25.13)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/provider-react':
         specifier: 'catalog:'
-        version: 4.8.0(@hocuspocus/provider@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)
+        version: 4.9.0(@hocuspocus/provider@4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)
       '@notopia-uit/ui':
         specifier: 'workspace:'
         version: link:../../packages/ui
@@ -1279,10 +1279,10 @@ importers:
         version: 1.8.0
       '@hocuspocus/provider':
         specifier: 'catalog:'
-        version: 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/provider-react':
         specifier: 'catalog:'
-        version: 4.8.0(@hocuspocus/provider@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)
+        version: 4.9.0(@hocuspocus/provider@4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)
       '@notopia-uit/api-gen':
         specifier: 'workspace:'
         version: link:../../packages/api-gen
@@ -1471,10 +1471,10 @@ importers:
         version: 0.55.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.5)(@lezer/highlight@1.2.5)(@types/hast@3.0.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(highlight.js@11.12.0)(lowlight@3.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(y-prosemirror@1.3.7(prosemirror-model@1.25.13)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/provider':
         specifier: 'catalog:'
-        version: 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/provider-react':
         specifier: 'catalog:'
-        version: 4.8.0(@hocuspocus/provider@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)
+        version: 4.9.0(@hocuspocus/provider@4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)
       yjs:
         specifier: 'catalog:'
         version: 13.6.33
@@ -1556,10 +1556,10 @@ importers:
         version: 0.55.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.5)(@lezer/highlight@1.2.5)(@tiptap/pm@3.33.0)(@types/hast@3.0.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(highlight.js@11.12.0)(lowlight@3.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(y-prosemirror@1.3.7(prosemirror-model@1.25.13)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)(zod@4.6.7)
       '@hocuspocus/provider':
         specifier: 'catalog:'
-        version: 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/provider-react':
         specifier: 'catalog:'
-        version: 4.8.0(@hocuspocus/provider@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)
+        version: 4.9.0(@hocuspocus/provider@4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)
       '@icons-pack/react-simple-icons':
         specifier: 'catalog:'
         version: 13.15.1(react@19.3.1)
@@ -3207,38 +3207,38 @@ packages:
   '@hey-api/types@0.1.4':
     resolution: {integrity: sha512-thWfawrDIP7wSI9ioT13I5soaaqB5vAPIiZmgD8PbeEVKNrkonc0N/Sjj97ezl7oQgusZmaNphGdMKipPO6IBg==}
 
-  '@hocuspocus/common@4.8.0':
-    resolution: {integrity: sha512-UI8Vye3mds2aMUHaWfwkDq0+257JUpvKa0nyAOjXWLfyhYHsAq8eku+ynZc/PaShyOci/VD54cW/rLQJGHHPKg==}
+  '@hocuspocus/common@4.9.0':
+    resolution: {integrity: sha512-lrp5gtT8kvLt9/MuRRQPKaveihv5emSsP9+sMCq2rx8xVGn33PZIv0haSGyb37CbAIlVaHb/yG22VKKMx+clYg==}
 
-  '@hocuspocus/extension-database@4.8.0':
-    resolution: {integrity: sha512-QHvS84BpPMqKtBxGkfzwODiP3n7nAru4smrgv3nyYfQT0682VtAb3YS/wp12FwuFnyt9WEdQ7584s/bD0Lz69g==}
+  '@hocuspocus/extension-database@4.9.0':
+    resolution: {integrity: sha512-dL7IuQx6ask7x9lNOINK7MtNextmoFZLXQy+WXHTqs3NwEMheP0DBum8mLTm8tzf7nKVF52f13bvnHHoYrhDsg==}
     peerDependencies:
       yjs: ^13.6.8
 
-  '@hocuspocus/extension-logger@4.8.0':
-    resolution: {integrity: sha512-3gg2nkpnnKOo2hOZ48m8kCc/5fIQgmo3yUmUnFPsllGy1byTc88OGUX50sabA7NF1fyG5fVkC+PshZwA/PkBjw==}
+  '@hocuspocus/extension-logger@4.9.0':
+    resolution: {integrity: sha512-NuKIO7VwR+thq+lTLxtqBDd/1g650muZwoAd8QjWpM6MZCzhHtD75Mzz4AfF/Sbrd58rWZNJUvEXIEzD4PNZBw==}
 
-  '@hocuspocus/extension-redis@4.8.0':
-    resolution: {integrity: sha512-Tva3oOJor5X3xkeq9MU1cppzDr72VsRmWAPFXxUbT8rduggw7PaUs+9KETTnGGcNAqYbtkud6Xt/OMxCkdhhow==}
+  '@hocuspocus/extension-redis@4.9.0':
+    resolution: {integrity: sha512-DKKDKFhKhIhU3ZsQz21lKrIEhAwIjsY273pBMhYQMFo9p+qXGhxJI6EA4Yx5aPMPhl7kfNbvs+vPwLUJ6yPTPw==}
     peerDependencies:
       y-protocols: ^1.0.6
       yjs: ^13.6.8
 
-  '@hocuspocus/provider-react@4.8.0':
-    resolution: {integrity: sha512-l2QTv9r1qu94xMw5jY2N3NCc7/CFaRZ5LhRdAZzE+SDNWPMX5xUwQTDyLbE6IycgR64TFPat3HeHw9FucaKXwg==}
+  '@hocuspocus/provider-react@4.9.0':
+    resolution: {integrity: sha512-7aHAouvDbfPH8xSfvgIACO/aEbjc9K4J4rGmtyrBQSHwr1XhOtVgTujb3vDqbIEB76AzshNSPaa4pJ4PuD9Sbw==}
     peerDependencies:
-      '@hocuspocus/provider': ^4.8.0
+      '@hocuspocus/provider': ^4.9.0
       react: ^18.0.0 || ^19.0.0
       yjs: ^13.6.8
 
-  '@hocuspocus/provider@4.8.0':
-    resolution: {integrity: sha512-WUwwu3W55n0fkMF1uYhx4WXlRjJ/t7OjsxiuzTMMQGDvvZrZA37CAysdqc7JXLVmN6A5IIWadE921pxN9/JotA==}
+  '@hocuspocus/provider@4.9.0':
+    resolution: {integrity: sha512-I+B/bJs8SRCBZRRevdNkMGtCAE6S13hsTFX2SZ33iSSJC/4IZcsl5+St9/OYYxxkETfvelJKsmhtwdyIwXnsEg==}
     peerDependencies:
       y-protocols: ^1.0.6
       yjs: ^13.6.8
 
-  '@hocuspocus/server@4.8.0':
-    resolution: {integrity: sha512-P8U4I4R4Ft+B37d4CFs4tG8oPJ3rnJJiFx3CXBJpKSIrXTz5YDldRmv7eGqmUq4QRSoWR6FjN4DUIX1QO0PccA==}
+  '@hocuspocus/server@4.9.0':
+    resolution: {integrity: sha512-8qRkIcFpcz4cw2WHLgUdwZGAqiUUdueh9iCdhujYfExHsnGnJ3iTiowGOs25HsNfUhxQRj6HJBGi4M2lP3rEpg==}
     engines: {node: '>=22'}
     peerDependencies:
       y-protocols: ^1.0.6
@@ -17387,30 +17387,30 @@ snapshots:
 
   '@hey-api/types@0.1.4': {}
 
-  '@hocuspocus/common@4.8.0':
+  '@hocuspocus/common@4.9.0':
     dependencies:
       lib0: 0.2.119
 
-  '@hocuspocus/extension-database@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@hocuspocus/extension-database@4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
-      '@hocuspocus/server': 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@hocuspocus/server': 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       yjs: 13.6.33
     transitivePeerDependencies:
       - srvx
       - y-protocols
 
-  '@hocuspocus/extension-logger@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@hocuspocus/extension-logger@4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
-      '@hocuspocus/server': 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@hocuspocus/server': 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
     transitivePeerDependencies:
       - srvx
       - y-protocols
       - yjs
 
-  '@hocuspocus/extension-redis@4.8.0(supports-color@8.1.1)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@hocuspocus/extension-redis@4.9.0(supports-color@8.1.1)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
-      '@hocuspocus/common': 4.8.0
-      '@hocuspocus/server': 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@hocuspocus/common': 4.9.0
+      '@hocuspocus/server': 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@sesamecare-oss/redlock': 1.4.0(ioredis@5.6.1(supports-color@8.1.1))
       ioredis: 5.6.1(supports-color@8.1.1)
       kleur: 4.1.5
@@ -17420,23 +17420,23 @@ snapshots:
       - srvx
       - supports-color
 
-  '@hocuspocus/provider-react@4.8.0(@hocuspocus/provider@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)':
+  '@hocuspocus/provider-react@4.9.0(@hocuspocus/provider@4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.3.1)(yjs@13.6.33)':
     dependencies:
-      '@hocuspocus/provider': 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@hocuspocus/provider': 4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       react: 19.3.1
       yjs: 13.6.33
 
-  '@hocuspocus/provider@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@hocuspocus/provider@4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
-      '@hocuspocus/common': 4.8.0
+      '@hocuspocus/common': 4.9.0
       '@lifeomic/attempt': 3.1.0
       lib0: 0.2.119
       y-protocols: 1.0.7(yjs@13.6.33)
       yjs: 13.6.33
 
-  '@hocuspocus/server@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@hocuspocus/server@4.9.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
-      '@hocuspocus/common': 4.8.0
+      '@hocuspocus/common': 4.9.0
       async-mutex: 0.5.0
       crossws: 0.4.17
       kleur: 4.1.5
