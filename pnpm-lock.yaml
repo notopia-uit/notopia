@@ -190,10 +190,10 @@ settings:
 catalogs:
   default:
     '@actions/cache':
-      specifier: 6.3.0
+      specifier: ~6.3.0
       version: 6.3.0
     '@actions/core':
-      specifier: 3.0.1
+      specifier: ~3.0.1
       version: 3.0.1
     '@ai-sdk/openai-compatible':
       specifier: ^2.0.81
