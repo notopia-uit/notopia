@@ -199,19 +199,21 @@ checksum = "sha256:10c436258e24693ce8baf13dbffce98b77275797455e8b72510967547f132
 url = "https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26.0.1%2B8/OpenJDK26U-jdk_aarch64_mac_hotspot_26.0.1_8.tar.gz"
 
 [[tools.mockery]]
-version = "3.9.1"
+version = "3.9.2"
 backend = "aqua:vektra/mockery"
-specifiers = ["3.9.1"]
+specifiers = ["3.9.2"]
 
 [tools.mockery."platforms.linux-x64"]
-checksum = "sha256:498b459515c463080df83735792b620c335f027c8b4c0e666d4de98156f0ea68"
-url = "https://github.com/vektra/mockery/releases/download/v3.9.1/mockery_3.9.1_Linux_x86_64.tar.gz"
-url_api = "https://api.github.com/repos/vektra/mockery/releases/assets/728292189"
+checksum = "sha256:cdb339d5cc71edd1683f0c60a98d987b3cced062b5b8ea460951d978e68785ec"
+checksum_source = "mise-versions"
+url = "https://github.com/vektra/mockery/releases/download/v3.9.2/mockery_3.9.2_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/vektra/mockery/releases/assets/784108742"
 
 [tools.mockery."platforms.macos-arm64"]
-checksum = "sha256:db565bb673f7fe539710da270db04523a80c63d2273dc64dbb5d29227e467c5b"
-url = "https://github.com/vektra/mockery/releases/download/v3.9.1/mockery_3.9.1_Darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/vektra/mockery/releases/assets/728292270"
+checksum = "sha256:9891afe0b5917a07a8acf5970996a05e4968e51cefdfb36ae4eb464846bdac0b"
+checksum_source = "mise-versions"
+url = "https://github.com/vektra/mockery/releases/download/v3.9.2/mockery_3.9.2_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/vektra/mockery/releases/assets/784108740"
 
 [[tools.node]]
 version = "26.13.1"
