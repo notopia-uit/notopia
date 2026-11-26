@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-action.json
 name: Setup Notopia
 description: Shared tools, dependencies, caches and Nx base/head SHAs
 
@@ -70,6 +71,12 @@ runs:
     - name: Install Node Dependencies
       shell: bash
       run: pnpm install
+
+    - name: Setup OpenAPI Generator
+      uses: ./.github/actions/setup-openapi-generator
+      with:
+        config-path: api/openapitools.json
+        cache: ${{ inputs.cache }}
 
     - name: Install Go Dependencies
       if: ${{ inputs.go == 'true' }}

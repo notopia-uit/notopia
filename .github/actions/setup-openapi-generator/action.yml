@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-action.json
+name: Setup OpenAPI Generator
+description: Read the configured generator version and optionally cache its lazily downloaded JAR
+
+inputs:
+  config-path:
+    description: Path to the OpenAPI Generator configuration
+    default: api/openapitools.json
+  cache:
+    description: Enable the JAR cache
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Read generator version
+      id: version
+      if: ${{ inputs.cache == 'true' }}
+      shell: bash
+      env:
+        CONFIG_PATH: ${{ inputs.config-path }}
+      run: |
+        version="$(jq -er '."generator-cli".version | select(type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*$"))' "$CONFIG_PATH")"
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    - name: Cache generator JAR
+      if: ${{ inputs.cache == 'true' }}
+      uses: actions/cache@v6
+      with:
+        path: api/node_modules/.openapi-generator/${{ steps.version.outputs.version }}.jar
+        key: openapi-generator-jar-v1-${{ steps.version.outputs.version }}

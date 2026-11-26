@@ -3,6 +3,7 @@
   "spaces": 2,
   "generator-cli": {
     "version": "7.25.0",
+    "storageDir": "./node_modules/.openapi-generator",
     "generators": {
       "document-nestjs-server": {
         "generatorName": "typescript-nestjs-server",
