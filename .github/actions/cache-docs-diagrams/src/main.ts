@@ -1,11 +1,11 @@
 import * as cache from '@actions/cache';
 import * as core from '@actions/core';
 
+import { cachePrefix, diagramsPath } from './constants.ts';
+
 try {
   if (core.getBooleanInput('restore')) {
-    const key = await cache.restoreCache(['docs/src/public/diagrams/'], 'docs-diagrams-', [
-      'docs-diagrams-',
-    ]);
+    const key = await cache.restoreCache([diagramsPath], cachePrefix, [cachePrefix]);
 
     if (key) {
       core.saveState('matched-key', key);

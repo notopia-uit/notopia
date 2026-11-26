@@ -1,27 +1,33 @@
-import { execFileSync } from 'node:child_process';
-import { mkdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, readdir } from 'node:fs/promises';
+import { join, relative } from 'node:path';
 
 import * as cache from '@actions/cache';
 import * as core from '@actions/core';
 
-try {
-  const path = 'docs/src/public/diagrams/';
-  await mkdir(path, { recursive: true });
+import { cachePrefix, diagramsPath } from './constants.ts';
 
-  const hash = execFileSync(
-    'bash',
-    [
-      '-o',
-      'pipefail',
-      '-c',
-      "find docs/src/public/diagrams -type f -print0 | sort -z | xargs -0 -r sha256sum | sha256sum | cut -d ' ' -f 1",
-    ],
-    { encoding: 'utf8' }
-  ).trim();
-  const key = `docs-diagrams-${hash}`;
+try {
+  await mkdir(diagramsPath, { recursive: true });
+
+  const entries = await readdir(diagramsPath, { recursive: true, withFileTypes: true });
+  const files = entries
+    .filter((entry) => entry.isFile())
+    .map((entry) => join(entry.parentPath, entry.name))
+    .sort();
+  const hash = createHash('sha256');
+
+  for (const file of files) {
+    const fileHash = createHash('sha256')
+      .update(await readFile(file))
+      .digest('hex');
+    hash.update(JSON.stringify([relative(diagramsPath, file), fileHash]));
+  }
+
+  const key = `${cachePrefix}${hash.digest('hex')}`;
 
   if (key !== core.getState('matched-key')) {
-    await cache.saveCache([path], key);
+    await cache.saveCache([diagramsPath], key);
   }
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : String(error));
