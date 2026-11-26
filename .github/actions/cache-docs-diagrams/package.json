@@ -1,0 +1,9 @@
+{
+  "name": "@notopia-uit/cache-docs-diagrams",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@actions/cache": "catalog:",
+    "@actions/core": "catalog:"
+  }
+}

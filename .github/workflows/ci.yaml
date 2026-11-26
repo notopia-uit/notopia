@@ -440,15 +440,10 @@ jobs:
           cache: "true"
           go: "true"
 
-      - name: Restore Docs diagrams Cache
-        id: diagrams-cache
-        uses: actions/cache/restore@v6
-        if: ${{ github.event.inputs.noRestoreDocsDiagramsCache != 'true' }}
+      - name: Cache docs diagrams
+        uses: ./.github/actions/cache-docs-diagrams
         with:
-          path: docs/src/public/diagrams/
-          key: docs-diagrams-
-          restore-keys: |
-            docs-diagrams-
+          restore: ${{ github.event.inputs.noRestoreDocsDiagramsCache != 'true' }}
 
       - name: Nx reset cache
         if: ${{ github.event.inputs.resetNxCache == 'true' }}
@@ -488,17 +483,3 @@ jobs:
           GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           export GIT_CONFIG_VALUE_0
           bash scripts/publish-docs.sh "https://github.com/${GITHUB_REPOSITORY}.git" page/dist "$RUNNER_TEMP/gh-pages"
-
-      - name: Calculate Docs diagrams Cache Key
-        id: cache-key
-        run: |
-          mkdir -p docs/src/public/diagrams
-          hash="$(find docs/src/public/diagrams -type f -print0 | sort -z | xargs -0 -r sha256sum | sha256sum | cut -d ' ' -f 1)"
-          echo "cache_key=docs-diagrams-$hash" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Docs diagrams
-        if: ${{ steps.cache-key.outputs.cache_key != steps.diagrams-cache.outputs.cache-matched-key }}
-        uses: actions/cache/save@v6
-        with:
-          path: docs/src/public/diagrams/
-          key: ${{ steps.cache-key.outputs.cache_key }}

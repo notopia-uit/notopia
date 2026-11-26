@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": true,
+    "composite": false,
+    "incremental": false,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "customConditions": [],
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"]
+}

@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-action.json
+name: Cache docs diagrams
+description: Restore the latest docs diagrams cache and save changed diagrams after the job
+inputs:
+  restore:
+    description: Restore the latest diagrams cache before the build
+    default: 'true'
+runs:
+  using: node24
+  main: src/main.ts
+  post: src/post.ts
+  post-if: success()
