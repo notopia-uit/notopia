@@ -83,16 +83,18 @@ url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/643957413"
 provenance = "github-attestations"
 
 [[tools.stripe]]
-version = "1.55.11"
+version = "1.55.15"
 backend = "aqua:stripe/stripe-cli"
 specifiers = ["latest"]
 
 [tools.stripe."platforms.linux-x64"]
-checksum = "sha256:c710bdb63045ea8e4c3d218efe4c269a90a32bd807c1306a29438e54f80bcfdc"
-url = "https://github.com/stripe/stripe-cli/releases/download/v1.55.11/stripe_1.55.11_linux_x86_64.tar.gz"
-url_api = "https://api.github.com/repos/stripe/stripe-cli/releases/assets/737215210"
+checksum = "sha256:c9210819dfd19b5e077a0617af7a6eaffd8fb7295477f764d84eeee39f4e7e45"
+checksum_source = "mise-versions"
+url = "https://github.com/stripe/stripe-cli/releases/download/v1.55.15/stripe_1.55.15_linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/stripe/stripe-cli/releases/assets/788577263"
 
 [tools.stripe."platforms.macos-arm64"]
-checksum = "sha256:0b78f1bc5efb7c7b00cf5e5cddd673d674a030b68dd7a6f025ff180f67154502"
-url = "https://github.com/stripe/stripe-cli/releases/download/v1.55.11/stripe_1.55.11_mac-os_arm64.tar.gz"
-url_api = "https://api.github.com/repos/stripe/stripe-cli/releases/assets/737190873"
+checksum = "sha256:a6c0a05840fcd329e44dcda959a1dcdd7a473516f20e8b670093570776c5b514"
+checksum_source = "mise-versions"
+url = "https://github.com/stripe/stripe-cli/releases/download/v1.55.15/stripe_1.55.15_mac-os_arm64.tar.gz"
+url_api = "https://api.github.com/repos/stripe/stripe-cli/releases/assets/788578998"
