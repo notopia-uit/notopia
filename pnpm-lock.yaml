@@ -1402,8 +1402,8 @@ importers:
         specifier: 1.2.3
         version: 1.2.3(mermaid@11.17.2)(vue@3.5.45(@typescript/typescript6@6.0.2))
       vitepress-openapi:
-        specifier: 0.2.16
-        version: 0.2.16(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2))
+        specifier: 0.2.21
+        version: 0.2.21(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2))
       vitepress-plugin-pagefind:
         specifier: 0.4.27
         version: 0.4.27(pagefind@1.6.0)(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2))
@@ -3875,8 +3875,8 @@ packages:
   '@lifeomic/attempt@3.1.0':
     resolution: {integrity: sha512-QZqem4QuAnAyzfz+Gj5/+SLxqwCAw2qmt7732ZXodr6VDWGeYLG6w1i/vYLa55JQM9wRuBKLmXmiZ2P0LtE5rw==}
 
-  '@lucide/vue@1.70.0':
-    resolution: {integrity: sha512-kutUu3oEtfQnyaP6hh76ShG2dxa8PiL6uY3rk3DqclQe0Vd2FtPlnclezR0XMQtlFMPiEaCOXDSuhehFHW5ErQ==}
+  '@lucide/vue@1.82.0':
+    resolution: {integrity: sha512-Wd9UJqVTF1Q0RxEseQfD/46dBXLAgbRXdx1LI0XZTcoIWSAkjQRz7OC7b+fhl8t+tMwlH9U24WYLG6hX/zKO3Q==}
     peerDependencies:
       vue: '>=3.0.1'
 
@@ -7912,6 +7912,9 @@ packages:
   '@types/web-bluetooth@0.0.21':
     resolution: {integrity: sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==}
 
+  '@types/web-bluetooth@0.0.22':
+    resolution: {integrity: sha512-4O7kU0Ut0irZvFyk3EvgDrzFYBQI80Puhkb65I7eV6WTZX4iOo5zoDrEfjDBRB7x5Stz31csoHO4hAjSiRTALw==}
+
   '@types/wrap-ansi@3.0.0':
     resolution: {integrity: sha512-ltIpx+kM7g/MLRZfkbL7EsCEjfzCcScLpkg37eXEtx5kmrAKBkTJwd1GIAjDSL8wTpM6Hzn5YO4pSb91BEwu1g==}
 
@@ -8401,6 +8404,12 @@ packages:
     peerDependencies:
       vue: ^3.5.0
 
+  '@vueuse/core@15.1.0':
+    resolution: {integrity: sha512-OuZ5ecLw/sikX0HFjlJM/p/PkfL0567Ntfov9G0jYlw92QqZpPVikZOoB1Mpe4unZ+7E/QQ+uFpEgAjj2FYRbw==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      vue: ^3.5.0
+
   '@vueuse/integrations@15.0.0':
     resolution: {integrity: sha512-uWC1608pEocJPeRk1IqrEA3uYHhAGTJNibcMAdxgdK2Sy2Hypc6b+VdNO9KekCxyPc4VXK8SKDp8vsXefR/ZFg==}
     engines: {node: '>=22'}
@@ -8454,6 +8463,10 @@ packages:
     resolution: {integrity: sha512-sfWE5LADAKJ0KnjtGliMdSN8Ij/L7uP6rXIZlgPloAI4zvvefbw6H5Lt7KJA6RqQOYgVqWF5Guj50HHMIzygBg==}
     engines: {node: '>=22'}
 
+  '@vueuse/metadata@15.1.0':
+    resolution: {integrity: sha512-yHKFelRTdQdp7vdjXXEw68Wh9v8OgyxWm1v1aHbGM6Z4qbqHhB6QgB8MTNB76pZYh22wPeALCdr8qjShlxPBHA==}
+    engines: {node: '>=22'}
+
   '@vueuse/shared@10.11.1':
     resolution: {integrity: sha512-LHpC8711VFZlDaYUXEBbFBCQ7GS3dVU9mjOhhMhXP6txTV4EhYQg/KGnQuvt/sPAtoUKq7VVUnL6mVtFoL42sA==}
 
@@ -8464,6 +8477,12 @@ packages:
 
   '@vueuse/shared@15.0.0':
     resolution: {integrity: sha512-vbNXhGrbV53xPOMSyOzMHQRvhMgZf7oNDw2RChUetVxwTIEkInQ1joZ9JbT0G3z2n2AJNjvmCWeM9ySYrnvogA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      vue: ^3.5.0
+
+  '@vueuse/shared@15.1.0':
+    resolution: {integrity: sha512-JAbQLO+vOULt8MPR4oRbvstBuztTTMIX4LOfCGeBvp9JSgj5OppZDing3gKDrmlyUQvYYFSPIX4dxkfJgdsxWQ==}
     engines: {node: '>=22'}
     peerDependencies:
       vue: ^3.5.0
@@ -15065,9 +15084,10 @@ packages:
       '@mermaid-js/mermaid-zenuml':
         optional: true
 
-  vitepress-openapi@0.2.16:
-    resolution: {integrity: sha512-Glp062ywCp+3gBdTwf9j6rG1YOzxhWu34tiIkB9fIELRkTxEIBAe1jNT9Watz+GqWin8gCwgV61M5tVkJTCSUw==}
-    engines: {node: ^20.19.0 || ^22.13.0 || >=24.0.0}
+  vitepress-openapi@0.2.21:
+    resolution: {integrity: sha512-oHDm9YFcjvjRj4+E7kn6JOqPnaBQLpNyOgTemXecMaKcTng3TRnnOGx8iZR1Isi1/esrtEi4UqvGZSF8fCz/OA==}
+    engines: {node: ^22.13.0 || >=24.0.0}
+    hasBin: true
     peerDependencies:
       vitepress: '>=1.0.0'
       vue: ^3.5.0
@@ -18317,7 +18337,7 @@ snapshots:
 
   '@lifeomic/attempt@3.1.0': {}
 
-  '@lucide/vue@1.70.0(vue@3.5.45(@typescript/typescript6@6.0.2))':
+  '@lucide/vue@1.82.0(vue@3.5.45(@typescript/typescript6@6.0.2))':
     dependencies:
       vue: 3.5.45(@typescript/typescript6@6.0.2)
 
@@ -23175,6 +23195,8 @@ snapshots:
 
   '@types/web-bluetooth@0.0.21': {}
 
+  '@types/web-bluetooth@0.0.22': {}
+
   '@types/wrap-ansi@3.0.0': {}
 
   '@types/ws@8.18.2':
@@ -23620,6 +23642,13 @@ snapshots:
       '@vueuse/shared': 15.0.0(vue@3.5.45(typescript@6.0.3))
       vue: 3.5.45(typescript@6.0.3)
 
+  '@vueuse/core@15.1.0(vue@3.5.45(@typescript/typescript6@6.0.2))':
+    dependencies:
+      '@types/web-bluetooth': 0.0.22
+      '@vueuse/metadata': 15.1.0
+      '@vueuse/shared': 15.1.0(vue@3.5.45(@typescript/typescript6@6.0.2))
+      vue: 3.5.45(@typescript/typescript6@6.0.2)
+
   '@vueuse/integrations@15.0.0(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(focus-trap@8.2.4)(fuse.js@7.5.0)(jwt-decode@4.0.0)(vue@3.5.45(@typescript/typescript6@6.0.2))':
     dependencies:
       '@vueuse/core': 15.0.0(vue@3.5.45(@typescript/typescript6@6.0.2))
@@ -23648,6 +23677,8 @@ snapshots:
 
   '@vueuse/metadata@15.0.0': {}
 
+  '@vueuse/metadata@15.1.0': {}
+
   '@vueuse/shared@10.11.1(vue@3.5.45(typescript@6.0.3))':
     dependencies:
       vue-demi: 0.14.10(vue@3.5.45(typescript@6.0.3))
@@ -23666,6 +23697,10 @@ snapshots:
   '@vueuse/shared@15.0.0(vue@3.5.45(typescript@6.0.3))':
     dependencies:
       vue: 3.5.45(typescript@6.0.3)
+
+  '@vueuse/shared@15.1.0(vue@3.5.45(@typescript/typescript6@6.0.2))':
+    dependencies:
+      vue: 3.5.45(@typescript/typescript6@6.0.2)
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:
@@ -31342,10 +31377,10 @@ snapshots:
       mermaid: 11.17.2
       vue: 3.5.45(@typescript/typescript6@6.0.2)
 
-  vitepress-openapi@0.2.16(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2)):
+  vitepress-openapi@0.2.21(vitepress@2.0.0-alpha.21(@types/node@26.6.6)(@typescript/typescript6@6.0.2)(axios@1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(fuse.js@7.5.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@8.1.1))(postcss@8.5.33)(sass-embedded@1.108.1)(sass@1.108.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.45(@typescript/typescript6@6.0.2)):
     dependencies:
-      '@lucide/vue': 1.70.0(vue@3.5.45(@typescript/typescript6@6.0.2))
-      '@vueuse/core': 14.4.0(vue@3.5.45(@typescript/typescript6@6.0.2))
+      '@lucide/vue': 1.82.0(vue@3.5.45(@typescript/typescript6@6.0.2))
+      '@vueuse/core': 15.1.0(vue@3.5.45(@typescript/typescript6@6.0.2))
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       markdown-it-link-attributes: 4.0.1
