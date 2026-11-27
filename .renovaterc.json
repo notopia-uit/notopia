@@ -49,6 +49,9 @@
     "enabled": true,
     "managerFilePatterns": ["/^deploy\\/k8s\\/clusters\\/.+\\/values\\.ya?ml$/"]
   },
+  "ignorePaths": [
+    "**/.mise/locks/**"
+  ],
   "schedule": ["* 1-18 * * 3,0"],
   "toolSettings": {
     "nodeMaxMemory": 2048
