@@ -1,0 +1,12 @@
+import{Tt as e,at as t,et as n,rt as r,t as i}from"./chunks/framework.CZq4qJDD.js";var a=JSON.parse(`{"title":"Overview","description":"","frontmatter":{"title":"Overview","order":1},"headers":[],"relativePath":"architecture/overview.md","filePath":"architecture/overview.md"}`),o={name:`architecture/overview.md`};function s(i,a,o,s,c,l){return e(),r(`div`,{"data-pagefind-body":!0,"data-pagefind-meta":`date:1795284828000`},[...a[0]||=[t(`<h1 id="system-architecture" tabindex="-1">System Architecture <a class="header-anchor" href="#system-architecture" aria-label="Permalink to “System Architecture”">​</a></h1><p>Notopia is a set of small services behind a single gateway (Traefik). Go services (note, authorization, billing) and NestJS services (document, search worker, AI) use gRPC for synchronous service calls and Redpanda for events. The diagram shows logical dependencies; local Compose provides infrastructure, while application services can run on the host.</p><p>Compose includes dedicated Redis instances for note, document, billing and AI. Document Redis is optional in configuration and supports collaborative scaling and distributed locks. Search-worker Redis is optional and not provisioned by Compose: without it, deletion tombstones use in-memory storage suitable only for a single worker. See <a href="./../services/search-worker/">Search Worker</a> for the limitations.</p><p>See <a href="./messaging.html">Messaging</a> for the event backbone and <a href="./auth-and-gateway.html">Auth and Gateway</a> for how requests are authenticated.</p>`,4),n(`figure`,{class:`vpd-diagram vpd-diagram--d2`,onclick:`
+        const figure = this;
+        const isFullscreen = figure.classList.contains('vpd-diagram--fullscreen');
+
+        document.querySelectorAll('.vpd-diagram').forEach(diagram => {
+          diagram.classList.remove('vpd-diagram--fullscreen');
+        });
+
+        if (!isFullscreen) {
+          figure.classList.add('vpd-diagram--fullscreen');
+        }
+      `},[n(`img`,{src:`/notopia/diagrams/d2-architecture-diagram-2d0f92dc058713038dc83cf1ffce9386.svg`,alt:`d2 Diagram`,class:`vpd-diagram-image`})],-1)]])}var c=i(o,[[`render`,s]]);export{a as __pageData,c as default};

@@ -1,0 +1,2 @@
+import{Kn as e,Nt as t,Yn as n,_n as r}from"./theme.DFPze7FE.js";import{n as i}from"./mermaid-parser.core.DoQxVA4O.js";var a={parse:n(async t=>{let n=await i(`info`,t);e.debug(n)},`parse`)},o={version:`11.17.2`},s={parser:a,db:{getVersion:n(()=>o.version,`getVersion`)},renderer:{draw:n((n,i,a)=>{e.debug(`rendering info diagram
+`+n);let o=t(i);r(o,100,400,!0),o.append(`g`).append(`text`).attr(`x`,100).attr(`y`,40).attr(`class`,`version`).attr(`font-size`,32).style(`text-anchor`,`middle`).text(`v${a}`)},`draw`)}};export{s as diagram};

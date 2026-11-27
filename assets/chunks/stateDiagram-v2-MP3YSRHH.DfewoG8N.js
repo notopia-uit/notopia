@@ -1,1 +1,0 @@
-import{i as e,n as t,r as n,t as r}from"./chunk-IMKFNOWR.Qb2ex0h6.js";import"./chunk-POPQ4Y6H.BbRx-lcU.js";import{Jn as i}from"./theme.50ld0knR.js";import"./chunk-F27PBJKO.ged1swWL.js";var a={parser:t,get db(){return new r(2)},renderer:n,styles:e,init:i(e=>{e.state||={},e.state.arrowMarkerAbsolute=e.arrowMarkerAbsolute},`init`)};export{a as diagram};
