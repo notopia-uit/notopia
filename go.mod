@@ -37,7 +37,7 @@ require (
 	github.com/oapi-codegen/runtime v1.9.1
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/pressly/goose/v3 v3.30.1
-	github.com/redis/go-redis/v9 v9.23.0
+	github.com/redis/go-redis/v9 v9.24.1
 	github.com/rs/zerolog v1.35.1
 	github.com/samber/slog-gin v1.21.1
 	github.com/samber/slog-multi v1.9.0
