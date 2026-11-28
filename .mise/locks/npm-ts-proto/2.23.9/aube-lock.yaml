@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       ts-proto:
-        specifier: 2.22.0
-        version: 2.22.0
+        specifier: 2.23.9
+        version: 2.23.9
 
 packages:
 
@@ -35,8 +35,8 @@ packages:
   ts-proto-descriptors@2.1.0:
     resolution: {integrity: sha512-S5EZYEQ6L9KLFfjSRpZWDIXDV/W7tAj8uW7pLsihIxyr62EAVSiKuVPwE8iWnr849Bqa53enex1jhDUcpgquzA==}
 
-  ts-proto@2.22.0:
-    resolution: {integrity: sha512-FODGAPNklhzjkmsGgzekOZqbUT1CNxE90H+eFQdRGvVsyqywyeCE0zn+8LPrFZjegCue18O8wdMGlYoYH87PQg==}
+  ts-proto@2.23.9:
+    resolution: {integrity: sha512-6oHtCJ4LsQb2NIxDmX3TGtfZty/RH7Bcc806e0pa2gQMoaU7s4um1M6N1PSJGK4PCJvPYe2l2mzGQdCbiVeFsQ==}
     hasBin: true
 
 snapshots:
@@ -59,7 +59,7 @@ snapshots:
     dependencies:
       '@bufbuild/protobuf': 2.17.0
 
-  ts-proto@2.22.0:
+  ts-proto@2.23.9:
     dependencies:
       '@bufbuild/protobuf': 2.17.0
       case-anything: 2.1.13
