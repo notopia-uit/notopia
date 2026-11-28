@@ -37,19 +37,21 @@ url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/664187486"
 provenance = "minisign"
 
 [[tools.d2]]
-version = "0.7.1"
+version = "v0.10.0"
 backend = "aqua:d2lang/d2"
-specifiers = ["0.7.1"]
+specifiers = ["v0.10.0"]
 
 [tools.d2."platforms.linux-x64"]
-checksum = "sha256:eb172adf59f38d1e5a70ab177591356754ffaf9bebb84e0ca8b767dfb421dad7"
-url = "https://github.com/d2lang/d2/releases/download/v0.7.1/d2-v0.7.1-linux-amd64.tar.gz"
-url_api = "https://api.github.com/repos/d2lang/d2/releases/assets/284023615"
+checksum = "sha256:8d0431301a1c2cccb73e4895dc8144113b37fdc56d00c7666f6177b9ec90cd9a"
+url = "https://github.com/d2lang/d2/releases/download/v0.10.0/d2-v0.10.0-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/d2lang/d2/releases/assets/800723441"
+provenance = "github-attestations"
 
 [tools.d2."platforms.macos-arm64"]
-checksum = "sha256:80de85f3b0ac7d9569acac0780ed65dd994ea78969b6b230c58bbb2c6113465b"
-url = "https://github.com/d2lang/d2/releases/download/v0.7.1/d2-v0.7.1-macos-arm64.tar.gz"
-url_api = "https://api.github.com/repos/d2lang/d2/releases/assets/284023623"
+checksum = "sha256:69dd590f9723d85013f3af23a014acd73cd86ebe3bac665fed7add1c5c457c09"
+url = "https://github.com/d2lang/d2/releases/download/v0.10.0/d2-v0.10.0-macos-arm64.tar.gz"
+url_api = "https://api.github.com/repos/d2lang/d2/releases/assets/800723775"
+provenance = "github-attestations"
 
 [[tools."github:dadav/helm-schema"]]
 version = "0.24.0"
