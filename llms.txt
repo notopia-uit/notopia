@@ -1,0 +1,139 @@
+# Notopia
+
+> Utopia of Notes
+
+## Table of Contents
+
+### Course progress reports
+
+- [2026-11-24 Detail](/notopia/reports/2026-11-24-detail.md)
+- [2026-11-24](/notopia/reports/2026-11-24.md)
+
+### Architecture
+
+- [Overview](/notopia/architecture/overview.md)
+- [Messaging](/notopia/architecture/messaging.md)
+- [Auth and Gateway](/notopia/architecture/auth-and-gateway.md)
+
+### Services
+
+- [Note](/notopia/services/note.md)
+- [Document](/notopia/services/document.md)
+- [Authorization](/notopia/services/authorization.md)
+- [Billing](/notopia/services/billing.md)
+- [AI service](/notopia/services/ai.md)
+- [Search Worker](/notopia/services/search-worker.md)
+
+#### Note
+
+- [Note Class Diagram](/services/note/domain.md)
+- [Note Database Diagram](/services/note/data.md)
+- [Note Flows](/services/note/flows.md)
+- [Events](/services/note/events.md)
+
+#### Document
+
+- [Document Class Diagram](/services/document/domain.md)
+- [Document Database Diagram](/services/document/data.md)
+- [Document flows](/services/document/flows.md)
+
+#### Authorization
+
+- [Authorization Class Diagram](/services/authorization/domain.md)
+- [Authorization Database Diagram](/services/authorization/data.md)
+- [Authorization Flows](/services/authorization/flows.md)
+
+#### Billing
+
+- [Billing Class Diagram](/services/billing/domain.md)
+- [Billing Database Diagram](/services/billing/data.md)
+- [Billing Flows](/services/billing/flows.md)
+
+#### AI service
+
+- [AI service flows](/services/ai/flows.md)
+- [Model providers: OpenRouter and OpenCode](/services/ai/model-providers.md)
+
+#### Search Worker
+
+- [Search Worker Flows](/services/search-worker/flows.md)
+
+### API
+
+- [Protocol Documentation](/notopia/api/proto.md)
+- [REST API](/notopia/api/rest.md)
+
+### Deployment
+
+- [Kubernetes](/notopia/deploy/kubernetes.md)
+
+#### homelab
+
+- [Homelab RustFS](/deploy/homelab/rustfs.md)
+- [Stripe webhook](/deploy/homelab/stripe-webhook.md)
+
+#### Kubernetes
+
+- [Authorization](/deploy/kubernetes/authorization.md)
+- [Billing](/deploy/kubernetes/billing.md)
+- [Document](/deploy/kubernetes/document.md)
+- [Note](/deploy/kubernetes/note.md)
+- [Notopia Edge](/deploy/kubernetes/notopia-edge.md)
+- [Search Worker](/deploy/kubernetes/search-worker.md)
+- [Web](/deploy/kubernetes/web.md)
+
+### Developer Notes
+
+- [Documentation previews](/notopia/developer/docs-previews.md)
+- [Tooling with mise](/notopia/developer/mise.md)
+- [Conventions](/notopia/developer/conventions.md)
+- [Stories](/notopia/developer/story.md)
+- [Limitations](/notopia/developer/limitations.md)
+
+#### Conventions
+
+- [Go Clean Architecture + CQRS](/developer/conventions/go-clean-architecture.md)
+
+#### Stories
+
+- [Taking Money in Vietnam: Stripe, PayPal, SePay, and a Provider-Agnostic Billing Core](/developer/story/BILLING_PAYMENT_PROVIDERS.md)
+- [Casbin Remembers, the Database Changes](/developer/story/casbin-policy-not-watching-db.md)
+- [The Helper Enforcer That Erased Everyone's Membership](/developer/story/casbin-role-manager-clobber.md)
+- [The Docs Build Waiting on Git](/developer/story/docs-build-git-history.md)
+- [The Documentation Pages That Wouldn't Disappear](/developer/story/docs-preview-ghost-pages.md)
+- [Follow-up (2026-10): blocknote 0.55, transitive bundling, and a container that actually boots](/developer/story/nestjs-bundling-otel-2026-10-blocknote-055.md)
+- [Bundling the NestJS apps (document / search-worker): OpenTelemetry logs, CJS, and the externals split](/developer/story/nestjs-bundling-otel.md)
+- [NestJS gRPC: no `.proto` files at runtime, but `@grpc/proto-loader` must be installed](/developer/story/nestjs-grpc-proto-loader.md)
+- [Next.js OpenTelemetry compatibility](/developer/story/nextjs-vercel-otel-compatibility.md)
+- [The SSE Ghost That Lived After the Request Died](/developer/story/note-workspace-event-sse-issue.md)
+- [The Docs Build That Lost `useData`](/developer/story/vitepress-openapi-ssr-usedata.md)
+- [The Event Processor That Would Have Eaten Every Message](/developer/story/watermill-event-gaps.md)
+
+#### Limitations
+
+- [Kubernetes deployment limitations](/developer/limitations/kubernetes-deployment.md)
+- [Document replica event delivery](/developer/limitations/document-replica-events.md)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Other
+
+- [Getting Started](/notopia/getting-started.md)
