@@ -5,6 +5,6 @@
   "type": "module",
   "dependencies": {
     "@notopia-uit/api": "workspace:",
-    "@scalar/api-reference-react": "0.9.95"
+    "@scalar/api-reference-react": "0.9.98"
   }
 }
