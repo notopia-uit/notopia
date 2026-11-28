@@ -105,6 +105,7 @@ function waitForKroki(url: string): Plugin {
     apply: 'build',
 
     async buildStart() {
+      const startedAt = performance.now();
       try {
         await waitOn({ resources: [health], timeout: KROKI_START_TIMEOUT });
       } catch {
@@ -113,6 +114,9 @@ function waitForKroki(url: string): Plugin {
             'Start that server, point the variable at a running one, or unset it to fall back to ' +
             `${PUBLIC_KROKI_URL}.`
         );
+      }
+      if (process.env.CI) {
+        console.log(`Kroki health check: ${Math.round(performance.now() - startedAt)}ms`);
       }
     },
   };
