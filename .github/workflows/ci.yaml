@@ -454,7 +454,7 @@ jobs:
           nx-cache-action -- \
           pnpm exec nx build page \
             --configuration 'production' \
-            --output-style=static \
+            --output-style=stream \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
 
       - name: Publish Preview

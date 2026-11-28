@@ -116,7 +116,7 @@ function waitForKroki(url: string): Plugin {
         );
       }
       if (process.env.CI) {
-        console.log(`Kroki health check: ${Math.round(performance.now() - startedAt)}ms`);
+        console.log(`Kroki health check (${url}): ${Math.round(performance.now() - startedAt)}ms`);
       }
     },
   };
