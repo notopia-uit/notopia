@@ -28,7 +28,7 @@ catalog:
   "@actions/core": ~3.0.1
   "vitepress-plugin-tabs": "0.9.1"
   "vitepress-plugin-llms": "1.15.0"
-  "@ai-sdk/openai-compatible": "^2.0.81"
+  "@ai-sdk/openai-compatible": "^3.0.0"
   "@ai-sdk/react": "^3.0.303"
   "@aws-sdk/client-s3": "^3.1008.0"
   "@aws-sdk/s3-request-presigner": "^3.1008.0"
