@@ -1,22 +1,24 @@
 ---
 aside: false
 outline: false
-title: Notopia OpenAPI
+title: REST API
 order: 1
 ---
 
 <script setup>
-import { onBeforeMount, onBeforeUnmount } from 'vue'
-import { useTheme } from 'vitepress-openapi/client'
-import spec from "@notopia-uit/api/openapi" with { type: "json" };
-
-onBeforeMount(() => {
-    useTheme({
-        server: {
-            allowCustomServer: true,
-        },
-    })
-})
+import { withBase } from 'vitepress';
+import { data as groups } from './rest.data';
 </script>
 
-<OASpec :spec="spec" />
+# REST API
+
+Browse the endpoints by tag. Each endpoint page includes request and response details.
+
+<section v-for="{ tag, operations } in groups" :key="tag">
+  <h2>{{ tag }}</h2>
+  <ul>
+    <li v-for="{ operationId, title, method, path, href } in operations" :key="operationId">
+      <a :href="withBase(`${href}.html`)">{{ title }}</a> — <code>{{ method }} {{ path }}</code>
+    </li>
+  </ul>
+</section>

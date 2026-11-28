@@ -17,7 +17,9 @@
     ".vitepress/*.mts",
     ".vitepress/*.ts",
     ".vitepress/theme/*.ts",
-    ".vitepress/**/*.vue"
+    ".vitepress/**/*.vue",
+    "src/**/*.data.ts",
+    "src/**/*.paths.ts"
   ],
   "exclude": [".vitepress/**/*.spec.ts"]
 }

@@ -12,7 +12,7 @@
       "{projectRoot}/tsconfig*.json",
       "{projectRoot}/.vitepress/theme/**/*.{vue,ts,mts}",
       "{projectRoot}/src/**/*.md",
-      "{projectRoot}/src/**/*.paths.ts",
+      "{projectRoot}/src/**/*.{data,paths}.ts",
       "{workspaceRoot}/deploy/k8s/charts/authorization/README.md",
       "{workspaceRoot}/deploy/k8s/charts/billing/README.md",
       "{workspaceRoot}/deploy/k8s/charts/document/README.md",

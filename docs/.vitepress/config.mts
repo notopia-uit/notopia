@@ -2,6 +2,7 @@ import { type ChildProcess, spawn } from 'node:child_process';
 import { statSync } from 'node:fs';
 import path from 'node:path';
 
+import spec from '@notopia-uit/api/openapi' with { type: 'json' };
 import getPort from 'get-port';
 import { DefaultTheme, UserConfig, defineConfig } from 'vitepress';
 import { type Plugin } from 'vitepress';
@@ -16,6 +17,7 @@ import { withSidebar } from 'vitepress-sidebar';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 import waitOn from 'wait-on';
 
+import { getRestReference } from './rest-reference';
 import { copyScalarOutput } from './scalar-output';
 import { validateAuthorship } from './theme/authorship';
 
@@ -205,6 +207,9 @@ const vitePressOptions = {
   },
   transformPageData(pageData) {
     validateAuthorship(pageData.frontmatter.authorship, pageData.relativePath);
+    if (pageData.relativePath.startsWith('api/rest/operations/') && pageData.params?.title) {
+      pageData.title = pageData.params.title;
+    }
   },
   markdown: {
     theme: {
@@ -256,6 +261,24 @@ const vitePressSidebarOptions = {
   sortMenusByFrontmatterOrder: true,
   collapsed: true,
   collapseDepth: 2,
+  excludeByGlobPattern: ['[[]operationId].md'],
 } satisfies VitePressSidebarOptions;
 
-export default defineConfig(withSidebar(vitePressOptions, vitePressSidebarOptions));
+const config = withSidebar(vitePressOptions, vitePressSidebarOptions);
+const restSidebar = getRestReference(spec).groups.map(({ tag, operations }) => ({
+  text: tag,
+  collapsed: true,
+  items: operations.map(({ title, href }) => ({ text: title, link: href })),
+}));
+
+export default defineConfig({
+  ...config,
+  themeConfig: {
+    ...config.themeConfig,
+    sidebar: {
+      '/': config.themeConfig?.sidebar as DefaultTheme.SidebarItem[],
+      '/api/rest.md': restSidebar,
+      '/api/rest/': restSidebar,
+    },
+  },
+});
