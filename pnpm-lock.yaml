@@ -572,7 +572,7 @@ catalogs:
       version: 3.0.0
     ws:
       specifier: ^8.19.0
-      version: 8.22.2
+      version: 8.23.1
     yaml:
       specifier: 2.9.1
       version: 2.9.1
@@ -1085,7 +1085,7 @@ importers:
         version: 14.0.3
       ws:
         specifier: 'catalog:'
-        version: 8.22.2
+        version: 8.23.1
       yjs:
         specifier: 'catalog:'
         version: 13.6.33
@@ -15392,8 +15392,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.22.2:
-    resolution: {integrity: sha512-/rEZ2ejown2N5gxVTHUu9bVVC7ttu0/Tgzf5hbTOixR3Fs7mbbXgn2DbdbcKgJOmpQMtrIUWivtYuVMnp/W/yA==}
+  ws@8.23.1:
+    resolution: {integrity: sha512-1rzWDSN0NOi3tpwgHsQExjWRoKUGtjCkJ2gZRaaRtzhYLboMytOI9pj9PU7yCgY37auqdd4OyLofZDbkeuZmPA==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -21723,7 +21723,7 @@ snapshots:
       stdout-update: 4.0.1
       tar-fs: 3.1.2(bare-buffer@3.7.1)
       undici: 8.10.2
-      ws: 8.22.2
+      ws: 8.23.1
       yaml: 2.8.3
     transitivePeerDependencies:
       - bare-abort-controller
@@ -22053,7 +22053,7 @@ snapshots:
       '@scalar/helpers': 0.18.0
       hono: 4.13.17
       js-base64: 3.9.6
-      ws: 8.22.2
+      ws: 8.23.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -26647,7 +26647,7 @@ snapshots:
       type-fest: 5.10.0
       widest-line: 6.0.0
       wrap-ansi: 9.0.2
-      ws: 8.22.2
+      ws: 8.23.1
       yoga-layout: 3.2.1
     optionalDependencies:
       '@types/react': 19.3.0
@@ -31791,7 +31791,7 @@ snapshots:
 
   ws@8.21.3: {}
 
-  ws@8.22.2: {}
+  ws@8.23.1: {}
 
   wsl-utils@0.3.1:
     dependencies:
