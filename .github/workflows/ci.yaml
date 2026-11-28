@@ -431,7 +431,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          filter: tree:0
+          # Pagefind walks Markdown history; keep historical trees available.
+          filter: blob:none
           persist-credentials: false
 
       - name: Setup

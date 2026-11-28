@@ -105,7 +105,6 @@ function waitForKroki(url: string): Plugin {
     apply: 'build',
 
     async buildStart() {
-      const startedAt = performance.now();
       try {
         await waitOn({ resources: [health], timeout: KROKI_START_TIMEOUT });
       } catch {
@@ -114,9 +113,6 @@ function waitForKroki(url: string): Plugin {
             'Start that server, point the variable at a running one, or unset it to fall back to ' +
             `${PUBLIC_KROKI_URL}.`
         );
-      }
-      if (process.env.CI) {
-        console.log(`Kroki health check (${url}): ${Math.round(performance.now() - startedAt)}ms`);
       }
     },
   };
@@ -238,6 +234,7 @@ const vitePressOptions = {
     ],
   },
   vite: {
+    // Pagefind reads Markdown Git history during configuration; CI keeps historical trees.
     plugins: [...krokiPlugins(), pagefindPlugin(), diagrams.vitePlugin()],
     ssr: {
       // vitepress-openapi >=0.2.13 imports `useData` from 'vitepress'; when externalized, Node resolves
