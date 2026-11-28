@@ -4119,6 +4119,10 @@ API references for Notopia's public REST endpoints and internal gRPC services.
 * Scalar API Explorer
 * [Protocol reference](./proto)
 
+## Markdown for AI tools
+
+* REST API reference in Markdown — an overview with links to a Markdown page for each endpoint.
+
 ---
 
 ---
@@ -6445,6 +6449,48 @@ What `policy.csv` means now:
 * **Never pass `enforcer.GetModel()` to another enforcer constructor.** Enforcer setup writes role managers onto the model's assertions, so the two enforcers end up sharing, and overwriting, them.
 * To load policy text, parse with `persist.LoadPolicyLine` into a model from `model.NewModelFromString`, then use `AddPoliciesEx` / `AddNamedGroupingPoliciesEx` / `RemovePolicies` on the real enforcer.
 * A restart is a test case: write a test that persists data, builds a fresh process-like instance, and checks behaviour, not rows.
+
+---
+
+---
+url: /notopia/pr/428/developer/story/docs-build-git-history.md
+---
+
+# The Docs Build Waiting on Git
+
+*Why a fast local build took minutes in CI.*
+
+Written with AI, November 2026.
+
+The Docs job took almost seven minutes, though publishing itself took six seconds. A later
+diagnostic run took nearly fourteen minutes. The diagram cache restored successfully, and Kroki
+was healthy; neither explained the delay.
+
+We streamed the Nx task output to locate the pause. VitePress spent over ten minutes before
+its first Vite build hook, while page rendering and Pagefind indexing each took seconds or less.
+The same uncached docs build took under ten seconds locally.
+
+The culprit was the interaction between two choices:
+
+* The Docs checkout used `fetch-depth: 0` and `filter: tree:0`: it had full commit history,
+  but omitted historical Git trees.
+* `vitepress-plugin-pagefind` scans Markdown Git history during configuration to provide
+  search-result date metadata, even when the dates are not displayed.
+
+Walking that history caused Git to fetch missing trees on demand. In a controlled local clone,
+the same history scan with `tree:0` made 2,922 fetches and timed out after 90 seconds. With
+`blob:none`, it finished in 0.18 seconds and returned the same history as the full clone.
+
+We changed only the Docs checkout to `blob:none`. It retains commits and historical trees but
+omits historical file contents until needed. In the [verification run][run], VitePress built in
+7.06 seconds and the Docs job completed in 2 minutes 45 seconds; the diagram cache still hit.
+Most remaining time was setup and pulling the Kroki container.
+
+Future docs builds should avoid the repeated tree fetches while retaining history for Pagefind.
+The Main job still uses `tree:0`; if another tool there starts walking file history, it may
+encounter the same tradeoff.
+
+[run]: https://github.com/notopia-uit/notopia/actions/runs/46140110306
 
 ---
 

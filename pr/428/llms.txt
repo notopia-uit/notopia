@@ -99,6 +99,7 @@
 - [Taking Money in Vietnam: Stripe, PayPal, SePay, and a Provider-Agnostic Billing Core](/developer/story/BILLING_PAYMENT_PROVIDERS.md)
 - [Casbin Remembers, the Database Changes](/developer/story/casbin-policy-not-watching-db.md)
 - [The Helper Enforcer That Erased Everyone's Membership](/developer/story/casbin-role-manager-clobber.md)
+- [The Docs Build Waiting on Git](/developer/story/docs-build-git-history.md)
 - [The Documentation Pages That Wouldn't Disappear](/developer/story/docs-preview-ghost-pages.md)
 - [Follow-up (2026-10): blocknote 0.55, transitive bundling, and a container that actually boots](/developer/story/nestjs-bundling-otel-2026-10-blocknote-055.md)
 - [Bundling the NestJS apps (document / search-worker): OpenTelemetry logs, CJS, and the externals split](/developer/story/nestjs-bundling-otel.md)
