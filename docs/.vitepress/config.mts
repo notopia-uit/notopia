@@ -16,6 +16,7 @@ import { withSidebar } from 'vitepress-sidebar';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 import waitOn from 'wait-on';
 
+import { copyScalarOutput } from './scalar-output';
 import { validateAuthorship } from './theme/authorship';
 
 const COMPOSE_KROKI_URL = 'http://localhost:8002';
@@ -196,6 +197,12 @@ const vitePressOptions = {
   lang: 'en-GB',
   base,
   srcDir: 'src',
+  async buildEnd(siteConfig) {
+    await copyScalarOutput(
+      path.resolve(import.meta.dirname, '../../apps/api-web/dist'),
+      siteConfig.outDir
+    );
+  },
   transformPageData(pageData) {
     validateAuthorship(pageData.frontmatter.authorship, pageData.relativePath);
   },
@@ -220,7 +227,7 @@ const vitePressOptions = {
       },
       {
         text: 'Scalar API',
-        link: '/api/index.html',
+        link: '/api/openapi-scalar/index.html',
         target: '_blank',
         rel: 'noopener',
       },
@@ -237,7 +244,7 @@ const vitePressOptions = {
     // Pagefind reads Markdown Git history during configuration; CI keeps historical trees.
     plugins: [...krokiPlugins(), pagefindPlugin(), diagrams.vitePlugin()],
   },
-  ignoreDeadLinks: [`${base}api/index.html`],
+  ignoreDeadLinks: [`${base}api/openapi-scalar/index.html`],
 } satisfies UserConfig<NoInfer<DefaultTheme.Config>>;
 
 const vitePressSidebarOptions = {

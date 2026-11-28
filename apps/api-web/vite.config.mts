@@ -1,7 +1,7 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
-export default defineConfig(() => ({
+export default defineConfig(({ command, isPreview }) => ({
   resolve: {
     tsconfigPaths: true,
   },
@@ -15,7 +15,7 @@ export default defineConfig(() => ({
     host: true,
   },
   plugins: [react()],
-  base: `${process.env.DOCS_BASE || '/notopia/'}api/`,
+  base: `${process.env.DOCS_BASE || '/notopia/'}api/${command === 'build' || isPreview ? 'openapi-scalar/' : ''}`,
   build: {
     outDir: './dist',
     emptyOutDir: true,
