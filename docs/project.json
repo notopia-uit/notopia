@@ -3,14 +3,16 @@
   "name": "docs",
   "projectType": "application",
   "tags": ["scope:docs"],
+  "implicitDependencies": ["api", "api-web"],
   "namedInputs": {
     "default": [
-      "{projectRoot}/.vitepress/config.{mts,ts}",
-      "{projectRoot}/.vitepress/**/*.spec.ts",
+      "{projectRoot}/.vitepress/*.{mts,ts}",
+      "{projectRoot}/package.json",
       "{projectRoot}/vitest.config.mts",
       "{projectRoot}/tsconfig*.json",
       "{projectRoot}/.vitepress/theme/**/*.{vue,ts,mts}",
       "{projectRoot}/src/**/*.md",
+      "{projectRoot}/src/**/*.{data,paths}.ts",
       "{workspaceRoot}/deploy/k8s/charts/authorization/README.md",
       "{workspaceRoot}/deploy/k8s/charts/billing/README.md",
       "{workspaceRoot}/deploy/k8s/charts/document/README.md",
@@ -25,6 +27,7 @@
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
+      "dependsOn": [{ "projects": ["api"], "target": "join" }],
       "options": {
         "command": "vitepress dev",
         "cwd": "{projectRoot}",
@@ -38,7 +41,16 @@
         "command": "vitepress build",
         "cwd": "{projectRoot}"
       },
-      "inputs": ["default", "^default", { "env": "DOCS_BASE" }],
+      "dependsOn": [
+        { "projects": ["api"], "target": "join" },
+        { "projects": ["api-web"], "target": "build" }
+      ],
+      "inputs": [
+        "default",
+        { "dependentTasksOutputFiles": "api/bundled/openapi.json" },
+        { "dependentTasksOutputFiles": "apps/api-web/dist/**/*" },
+        { "env": "DOCS_BASE" }
+      ],
       "outputs": ["{projectRoot}/.vitepress/dist"]
     },
     "preview": {
@@ -49,6 +61,29 @@
         "cwd": "{projectRoot}"
       },
       "continuous": true
+    },
+    "deployPage": {
+      "executor": "nx-github-pages:deploy",
+      "dependsOn": ["build"],
+      "cache": false,
+      "options": {
+        "directory": "docs/.vitepress/dist",
+        "syncWithBaseBranch": true,
+        "preview": {
+          "url": "https://notopia-uit.github.io/notopia",
+          "pathPrefix": "pr/{prNumber}",
+          "comment": true
+        }
+      }
+    },
+    "cleanup-previews": {
+      "executor": "nx-github-pages:cleanup-preview",
+      "cache": false,
+      "options": {
+        "pathPrefix": "pr",
+        "maxAgeDays": 7,
+        "updatePrComments": true
+      }
     },
     "lint": {
       "executor": "nx:noop"

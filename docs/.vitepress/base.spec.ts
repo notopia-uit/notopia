@@ -7,8 +7,8 @@ afterEach(() => {
 });
 
 describe.each([
-  ['/notopia/', '/notopia/api/'],
-  ['/notopia/pr/123/', '/notopia/pr/123/api/'],
+  ['/notopia/', '/notopia/api/openapi-scalar/'],
+  ['/notopia/pr/123/', '/notopia/pr/123/api/openapi-scalar/'],
 ])('site base %s', (base, apiBase) => {
   it('configures documentation and API asset paths', async () => {
     vi.stubEnv('DOCS_BASE', base);
@@ -20,10 +20,19 @@ describe.each([
     );
 
     expect(docs.base).toBe(base);
-    expect(docs.ignoreDeadLinks).toContain(`${apiBase}index.html`);
+    expect(docs.ignoreDeadLinks).toEqual([`${apiBase}index.html`]);
     expect(docs.themeConfig?.nav).toContainEqual(
-      expect.objectContaining({ text: 'Scalar API', link: '/api/index.html' })
+      expect.objectContaining({ text: 'Scalar API', link: '/api/openapi-scalar/index.html' })
     );
     expect(api?.config.base).toBe(apiBase);
   });
+});
+
+it('retains the standalone Scalar dev base', async () => {
+  vi.stubEnv('DOCS_BASE', '');
+  const api = await loadConfigFromFile(
+    { command: 'serve', mode: 'development', isPreview: false },
+    '../apps/api-web/vite.config.mts'
+  );
+  expect(api?.config.base).toBe('/notopia/api/');
 });

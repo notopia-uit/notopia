@@ -2,20 +2,25 @@ import { type ChildProcess, spawn } from 'node:child_process';
 import { statSync } from 'node:fs';
 import path from 'node:path';
 
+import spec from '@notopia-uit/api/openapi' with { type: 'json' };
 import getPort from 'get-port';
 import { DefaultTheme, UserConfig, defineConfig } from 'vitepress';
 import { type Plugin } from 'vitepress';
+import { generateLlmsFiles, llmsDevServer, useSidebar } from 'vitepress-openapi';
 import {
   BuildTimeDiagramPluginOptions,
   DiagramPluginOptions,
   createBuildTimeDiagramsPlugin,
 } from 'vitepress-plugin-diagrams';
+import llmstxt from 'vitepress-plugin-llms';
 import { pagefindPlugin } from 'vitepress-plugin-pagefind';
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs';
 import { withSidebar } from 'vitepress-sidebar';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 import waitOn from 'wait-on';
 
+import { restLlmsOptions } from './rest-llms';
+import { copyScalarOutput } from './scalar-output';
 import { validateAuthorship } from './theme/authorship';
 
 const COMPOSE_KROKI_URL = 'http://localhost:8002';
@@ -196,8 +201,19 @@ const vitePressOptions = {
   lang: 'en-GB',
   base,
   srcDir: 'src',
+  async buildEnd(siteConfig) {
+    await copyScalarOutput(
+      path.resolve(import.meta.dirname, '../../apps/api-web/dist'),
+      siteConfig.outDir
+    );
+    const { outDir, pages, site } = siteConfig;
+    await generateLlmsFiles({ outDir, pages, site }, restLlmsOptions);
+  },
   transformPageData(pageData) {
     validateAuthorship(pageData.frontmatter.authorship, pageData.relativePath);
+    if (pageData.relativePath.startsWith('api/rest/operations/') && pageData.params?.title) {
+      pageData.title = pageData.params.title;
+    }
   },
   markdown: {
     theme: {
@@ -220,7 +236,7 @@ const vitePressOptions = {
       },
       {
         text: 'Scalar API',
-        link: '/api/index.html',
+        link: '/api/openapi-scalar/index.html',
         target: '_blank',
         rel: 'noopener',
       },
@@ -235,9 +251,21 @@ const vitePressOptions = {
   },
   vite: {
     // Pagefind reads Markdown Git history during configuration; CI keeps historical trees.
-    plugins: [...krokiPlugins(), pagefindPlugin(), diagrams.vitePlugin()],
+    plugins: [
+      ...krokiPlugins(),
+      pagefindPlugin(),
+      diagrams.vitePlugin(),
+      llmsDevServer(restLlmsOptions),
+      llmstxt({
+        ignoreFiles: ['api/rest/operations/**'],
+        ignoreFilesPerOutput: {
+          pages: ['api/rest.md'],
+          llmsFullTxt: ['api/rest.md'],
+        },
+      }),
+    ],
   },
-  ignoreDeadLinks: [`${base}api/index.html`],
+  ignoreDeadLinks: [`${base}api/openapi-scalar/index.html`],
 } satisfies UserConfig<NoInfer<DefaultTheme.Config>>;
 
 const vitePressSidebarOptions = {
@@ -249,6 +277,25 @@ const vitePressSidebarOptions = {
   sortMenusByFrontmatterOrder: true,
   collapsed: true,
   collapseDepth: 2,
+  excludeByGlobPattern: ['[[]operationId].md'],
 } satisfies VitePressSidebarOptions;
 
-export default defineConfig(withSidebar(vitePressOptions, vitePressSidebarOptions));
+const config = withSidebar(vitePressOptions, vitePressSidebarOptions);
+const restSidebar = useSidebar({
+  spec: spec as unknown as NonNullable<Parameters<typeof useSidebar>[0]>['spec'],
+  defaultTag: 'Other',
+})
+  .generateSidebarGroups({ linkPrefix: '/api/rest/operations/' })
+  .map((group) => ({ ...group, collapsed: true }));
+
+export default defineConfig({
+  ...config,
+  themeConfig: {
+    ...config.themeConfig,
+    sidebar: {
+      '/': config.themeConfig?.sidebar as DefaultTheme.SidebarItem[],
+      '/api/rest.md': restSidebar,
+      '/api/rest/': restSidebar,
+    },
+  },
+});

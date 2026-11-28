@@ -4,7 +4,12 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "inputs": ["default", "^default", { "env": "DOCS_BASE" }]
+      "dependsOn": [{ "projects": ["api"], "target": "join" }],
+      "inputs": [
+        "default",
+        { "dependentTasksOutputFiles": "api/bundled/openapi.json" },
+        { "env": "DOCS_BASE" }
+      ]
     },
     "dev": {
       "dependsOn": [

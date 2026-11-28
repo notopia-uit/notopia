@@ -2,7 +2,6 @@ packages:
   - ".github/actions/cache-docs-diagrams"
   - "docs"
   - "api"
-  - "page"
   - "api/*"
   - "packages/*"
   - "apps/*"
@@ -28,6 +27,7 @@ catalog:
   "@actions/cache": ~6.3.0
   "@actions/core": ~3.0.1
   "vitepress-plugin-tabs": "0.9.1"
+  "vitepress-plugin-llms": "1.15.0"
   "@ai-sdk/openai-compatible": "^2.0.81"
   "@ai-sdk/react": "^3.0.303"
   "@aws-sdk/client-s3": "^3.1008.0"
