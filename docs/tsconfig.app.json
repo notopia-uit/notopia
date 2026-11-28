@@ -6,6 +6,13 @@
     "types": ["node"],
     "outDir": "out-tsc/app"
   },
-  "include": [".vitepress/config.mts", ".vitepress/theme/authorship.ts"],
+  "contentMappers": [
+    {
+      "package": "@vue/content-mapper",
+      "extensions": [".vue"],
+      "options": {}
+    }
+  ],
+  "include": [".vitepress/config.mts", ".vitepress/theme/*.ts", ".vitepress/**/*.vue"],
   "exclude": [".vitepress/**/*.spec.ts"]
 }

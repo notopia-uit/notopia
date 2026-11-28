@@ -51,6 +51,9 @@
     },
     {
       "path": "./scripts"
+    },
+    {
+      "path": "./.github/actions/cache-docs-diagrams"
     }
   ]
 }

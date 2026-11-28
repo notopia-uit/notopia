@@ -36,6 +36,15 @@
     {
       "groupName": "wire",
       "matchPackageNames": ["go:github.com/goforj/wire/cmd/wire", "github.com/goforj/wire"]
+    },
+    {
+      "matchPackageNames": ["typescript"],
+      "followTag": "beta"
+    },
+    {
+      "matchPackageNames": ["@vue/content-mapper"],
+      "respectLatest": false,
+      "ignoreUnstable": false
     }
   ],
   "docker-compose": {
@@ -49,9 +58,7 @@
     "enabled": true,
     "managerFilePatterns": ["/^deploy\\/k8s\\/clusters\\/.+\\/values\\.ya?ml$/"]
   },
-  "ignorePaths": [
-    "**/.mise/locks/**"
-  ],
+  "ignorePaths": ["**/.mise/locks/**"],
   "schedule": ["* 1-18 * * 3,0"],
   "toolSettings": {
     "nodeMaxMemory": 2048

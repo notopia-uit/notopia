@@ -109,6 +109,33 @@
         "doctor": {}
       }
     },
+    "build": [
+      {
+        "inputs": ["default", "^default"],
+        "dependsOn": ["^build*"],
+        "defaultConfiguration": "development",
+        "cache": true,
+        "configurations": {
+          "development": {},
+          "production": {},
+          "doctor": {}
+        }
+      },
+      {
+        "filter": { "plugin": "@nx/js/typescript" },
+        "options": {
+          "args": ["--runExternalCode"]
+        }
+      }
+    ],
+    "typecheck": [
+      {
+        "filter": { "plugin": "@nx/js/typescript" },
+        "options": {
+          "args": ["--runExternalCode"]
+        }
+      }
+    ],
     "run": {
       "configurations": {
         "mon": {}
@@ -151,41 +178,11 @@
       "plugin": "@nx/js/typescript",
       "exclude": ["packages/api-gen/**"],
       "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
-        "build": {
-          "targetName": "build",
-          "configName": "tsconfig.lib.json",
-          "buildDepsName": "build-deps",
-          "watchDepsName": "watch-deps"
-        }
+        "build": true
       }
     },
-    {
-      "plugin": "@nx/vite/plugin",
-      "options": {
-        "buildTargetName": "build",
-        "serveTargetName": "serve",
-        "devTargetName": "dev",
-        "previewTargetName": "preview",
-        "serveStaticTargetName": "serve-static",
-        "typecheckTargetName": "typecheck",
-        "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps"
-      }
-    },
-    {
-      "plugin": "@nx/next/plugin",
-      "options": {
-        "startTargetName": "start",
-        "buildTargetName": "build",
-        "devTargetName": "dev",
-        "serveStaticTargetName": "serve-static",
-        "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps"
-      }
-    },
+    "@nx/vite/plugin",
+    "@nx/next/plugin",
     {
       "plugin": "@nx/docker",
       "options": {
@@ -236,17 +233,7 @@
         }
       }
     },
-    {
-      "plugin": "@nx/rspack/plugin",
-      "options": {
-        "buildTargetName": "build",
-        "serveTargetName": "serve",
-        "serveStaticTargetName": "serve-static",
-        "previewTargetName": "preview",
-        "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps"
-      }
-    },
+    "@nx/rspack/plugin",
     {
       "plugin": "@nx/oxlint",
       "options": {}
