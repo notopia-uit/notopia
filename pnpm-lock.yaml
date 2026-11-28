@@ -301,8 +301,8 @@ catalogs:
       specifier: 0.301.2
       version: 0.301.2
     '@redocly/cli':
-      specifier: ~2.82.0
-      version: 2.82.0
+      specifier: ~2.84.0
+      version: 2.84.0
     '@rsdoctor/rspack-plugin':
       specifier: ^1.6.4
       version: 1.6.5
@@ -820,7 +820,7 @@ importers:
         version: 2.42.2(@nestjs/microservices@11.2.11)(@nestjs/platform-express@11.2.11)(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       '@redocly/cli':
         specifier: 'catalog:'
-        version: 2.82.0
+        version: 2.84.0
       '@scalar/cli':
         specifier: 'catalog:'
         version: 2.21.0(@typescript/typescript6@6.0.2)(bare-buffer@3.7.1)(supports-color@8.1.1)
@@ -6496,8 +6496,8 @@ packages:
   '@radix-ui/rect@1.1.3':
     resolution: {integrity: sha512-JtyZR+mqgBibTo8xea3B6ZRmzZiM/YeVBtUkas6zMuXjAlfIFIW2FgqeM9eLyvEaYX66vr6DJMK+4U6LV0KhNw==}
 
-  '@redocly/cli@2.82.0':
-    resolution: {integrity: sha512-yyd53xbJgLRa1qyFhaxf9PxOnccjfWJmVRC7uqY7lRUhSq7Zo0id8lHLblpJKMjj4fE2t5zKDF3xml3hnBscJw==}
+  '@redocly/cli@2.84.0':
+    resolution: {integrity: sha512-0RmjaLv9QrydTLMEKXvQTasLy4uFQRbrAIwjgRhOB1uiI3O3H7AbEmSIyvHh3r7ARx/bm9+uD154jmh+HfBG0Q==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -21107,7 +21107,7 @@ snapshots:
 
   '@radix-ui/rect@1.1.3': {}
 
-  '@redocly/cli@2.82.0': {}
+  '@redocly/cli@2.84.0': {}
 
   '@reduxjs/toolkit@2.14.0(@types/react@19.3.0)(react-redux@9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1))(react@19.3.1)':
     dependencies:
