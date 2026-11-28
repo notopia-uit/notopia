@@ -62,6 +62,29 @@
       },
       "continuous": true
     },
+    "deployPage": {
+      "executor": "nx-github-pages:deploy",
+      "dependsOn": ["build"],
+      "cache": false,
+      "options": {
+        "directory": "docs/.vitepress/dist",
+        "syncWithBaseBranch": true,
+        "preview": {
+          "url": "https://notopia-uit.github.io/notopia",
+          "pathPrefix": "pr/{prNumber}",
+          "comment": true
+        }
+      }
+    },
+    "cleanup-previews": {
+      "executor": "nx-github-pages:cleanup-preview",
+      "cache": false,
+      "options": {
+        "pathPrefix": "pr",
+        "maxAgeDays": 7,
+        "updatePrComments": true
+      }
+    },
     "lint": {
       "executor": "nx:noop"
     }

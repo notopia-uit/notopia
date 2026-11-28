@@ -2,7 +2,6 @@ packages:
   - ".github/actions/cache-docs-diagrams"
   - "docs"
   - "api"
-  - "page"
   - "api/*"
   - "packages/*"
   - "apps/*"
