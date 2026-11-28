@@ -4,7 +4,7 @@
 just = "1.59.0"
 "pipx:codecov-cli" = "11.2.8"
 "npm:@kevinnitro/nx-cache-action" = { version = "0.1.1", allow_low_downloads = true }
-python = "3.13.18"
+python = "3.15.2"
 uv = "0.13.10"
 
 [shell_alias]
