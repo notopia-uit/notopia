@@ -2,6 +2,29 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "web",
   "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "syncGenerators": ["@nx/js:typescript-sync"],
+      "cache": true,
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/tsconfig.base.json",
+        {
+          "externalDependencies": ["next", "typescript", "@typescript/native"]
+        }
+      ],
+      "outputs": ["{projectRoot}/.next/types", "{projectRoot}/next-env.d.ts"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "parallel": false,
+        "commands": [
+          "next typegen",
+          "tsc --project tsconfig.json --noEmit --declarationMap false --emitDeclarationOnly false"
+        ]
+      }
+    },
     "nx-release-publish": {
       "parallelism": false
     },

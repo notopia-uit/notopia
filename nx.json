@@ -181,6 +181,15 @@
         "build": true
       }
     },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": ["packages/api-gen/**"],
+      "options": {
+        "build": {
+          "skipBuildCheck": true
+        }
+      }
+    },
     "@nx/vite/plugin",
     "@nx/next/plugin",
     {

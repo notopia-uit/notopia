@@ -42,6 +42,7 @@
     "autoprefixer": "catalog:",
     "postcss": "catalog:",
     "tailwind-merge": "catalog:",
-    "tw-animate-css": "catalog:"
+    "tw-animate-css": "catalog:",
+    "typescript": "catalog:typescript-native"
   }
 }
