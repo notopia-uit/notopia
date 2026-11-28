@@ -178,6 +178,5 @@ pkg/                            # Go packages
 Before commit, make sure to:
 
 - Use conventional commit
-- Should run `oxfmt {pathChanged}` after writing JS code
-- Run `nx lint {projectName} --fix` to apply eslint/golangcilint fix
-- If introduce deps, should run `go mod tidy` for go, and use pnpm workspace catalog `pnpm install` for Javascript
+- Run `nx lint {projectName} --fix` to apply oxlint/golangcilint fix
+- If introduce JS dependencies, use pnpm workspace catalog
