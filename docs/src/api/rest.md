@@ -18,7 +18,7 @@ Browse the endpoints by tag. Each endpoint page includes request and response de
   <h2>{{ tag }}</h2>
   <ul>
     <li v-for="{ operationId, title, method, path, href } in operations" :key="operationId">
-      <a :href="withBase(`${href}.html`)">{{ title }}</a> — <code>{{ method }} {{ path }}</code>
+      <OAOperationLink :href="withBase(`${href}.html`)" :method="method" :title="title" /> — <code>{{ path }}</code>
     </li>
   </ul>
 </section>

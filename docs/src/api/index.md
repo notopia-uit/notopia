@@ -14,3 +14,7 @@ API references for Notopia's public REST endpoints and internal gRPC services.
 - [REST API](./rest)
 - <a :href="withBase('/api/openapi-scalar/index.html')" target="_blank" rel="noopener">Scalar API Explorer</a>
 - [Protocol reference](./proto)
+
+## Markdown for AI tools
+
+- <a :href="withBase('/api/rest.md')">REST API reference in Markdown</a> — an overview with links to a Markdown page for each endpoint.

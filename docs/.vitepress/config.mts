@@ -6,7 +6,7 @@ import spec from '@notopia-uit/api/openapi' with { type: 'json' };
 import getPort from 'get-port';
 import { DefaultTheme, UserConfig, defineConfig } from 'vitepress';
 import { type Plugin } from 'vitepress';
-import { generateLlmsFiles, llmsDevServer } from 'vitepress-openapi';
+import { generateLlmsFiles, llmsDevServer, useSidebar } from 'vitepress-openapi';
 import {
   BuildTimeDiagramPluginOptions,
   DiagramPluginOptions,
@@ -20,7 +20,6 @@ import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 import waitOn from 'wait-on';
 
 import { restLlmsOptions } from './rest-llms';
-import { getRestReference } from './rest-reference';
 import { copyScalarOutput } from './scalar-output';
 import { validateAuthorship } from './theme/authorship';
 
@@ -282,11 +281,12 @@ const vitePressSidebarOptions = {
 } satisfies VitePressSidebarOptions;
 
 const config = withSidebar(vitePressOptions, vitePressSidebarOptions);
-const restSidebar = getRestReference(spec).groups.map(({ tag, operations }) => ({
-  text: tag,
-  collapsed: true,
-  items: operations.map(({ title, href }) => ({ text: title, link: href })),
-}));
+const restSidebar = useSidebar({
+  spec: spec as unknown as NonNullable<Parameters<typeof useSidebar>[0]>['spec'],
+  defaultTag: 'Other',
+})
+  .generateSidebarGroups({ linkPrefix: '/api/rest/operations/' })
+  .map((group) => ({ ...group, collapsed: true }));
 
 export default defineConfig({
   ...config,

@@ -65,7 +65,10 @@ it('uses tag navigation only for REST pages', async () => {
     const sidebar = config.themeConfig?.sidebar as DefaultTheme.SidebarMulti;
     const overview = sidebar['/api/rest.md'] as DefaultTheme.SidebarItem[];
     expect(overview.find(({ text }) => text === 'Note')?.items).toContainEqual(
-      expect.objectContaining({ link: '/api/rest/operations/createNote' })
+      expect.objectContaining({
+        link: '/api/rest/operations/createNote',
+        text: expect.stringContaining('OAMethodBadge--post'),
+      })
     );
     expect(sidebar['/api/rest/']).toEqual(overview);
     const general = sidebar['/'] as DefaultTheme.SidebarItem[];
