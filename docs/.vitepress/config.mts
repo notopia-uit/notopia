@@ -6,17 +6,20 @@ import spec from '@notopia-uit/api/openapi' with { type: 'json' };
 import getPort from 'get-port';
 import { DefaultTheme, UserConfig, defineConfig } from 'vitepress';
 import { type Plugin } from 'vitepress';
+import { generateLlmsFiles, llmsDevServer } from 'vitepress-openapi';
 import {
   BuildTimeDiagramPluginOptions,
   DiagramPluginOptions,
   createBuildTimeDiagramsPlugin,
 } from 'vitepress-plugin-diagrams';
+import llmstxt from 'vitepress-plugin-llms';
 import { pagefindPlugin } from 'vitepress-plugin-pagefind';
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs';
 import { withSidebar } from 'vitepress-sidebar';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 import waitOn from 'wait-on';
 
+import { restLlmsOptions } from './rest-llms';
 import { getRestReference } from './rest-reference';
 import { copyScalarOutput } from './scalar-output';
 import { validateAuthorship } from './theme/authorship';
@@ -204,6 +207,8 @@ const vitePressOptions = {
       path.resolve(import.meta.dirname, '../../apps/api-web/dist'),
       siteConfig.outDir
     );
+    const { outDir, pages, site } = siteConfig;
+    await generateLlmsFiles({ outDir, pages, site }, restLlmsOptions);
   },
   transformPageData(pageData) {
     validateAuthorship(pageData.frontmatter.authorship, pageData.relativePath);
@@ -247,7 +252,19 @@ const vitePressOptions = {
   },
   vite: {
     // Pagefind reads Markdown Git history during configuration; CI keeps historical trees.
-    plugins: [...krokiPlugins(), pagefindPlugin(), diagrams.vitePlugin()],
+    plugins: [
+      ...krokiPlugins(),
+      pagefindPlugin(),
+      diagrams.vitePlugin(),
+      llmsDevServer(restLlmsOptions),
+      llmstxt({
+        ignoreFiles: ['api/rest/operations/**'],
+        ignoreFilesPerOutput: {
+          pages: ['api/rest.md'],
+          llmsFullTxt: ['api/rest.md'],
+        },
+      }),
+    ],
   },
   ignoreDeadLinks: [`${base}api/openapi-scalar/index.html`],
 } satisfies UserConfig<NoInfer<DefaultTheme.Config>>;
